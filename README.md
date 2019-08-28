@@ -1,2 +1,3 @@
-# eskaroy.github.io
-Testing Github Pages.
+# eggforce.github.io
+
+Website for upcoming decentralized game "Eggforce" on POA Network and xDai chain.
