@@ -1,0 +1,31 @@
+
+body {
+	font-family: 'Cairo', serif;
+}
+
+h1 {
+	font-family: 'Exo', serif;
+}
+
+/* 
+// icon-link
+// color grey, lighten when selected
+*/
+
+.icon-link {
+	height: 128px;
+	cursor: pointer;
+	filter: brightness(50%);
+  -webkit-filter: brightness(50%);
+  -moz-filter: brightness(50%);
+  -o-filter: brightness(50%);
+  -ms-filter: brightness(50%);
+}
+
+.icon-link:hover {
+	filter: brightness(80%);
+  -webkit-filter: brightness(80%);
+  -moz-filter: brightness(80%);
+  -o-filter: brightness(80%);
+  -ms-filter: brightness(80%);
+}
