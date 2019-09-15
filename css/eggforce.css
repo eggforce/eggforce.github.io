@@ -13,7 +13,7 @@ h1 {
 */
 
 .icon-link {
-	height: 128px;
+	height: 96px;
 	cursor: pointer;
 	filter: brightness(50%);
   -webkit-filter: brightness(50%);
