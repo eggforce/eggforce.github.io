@@ -1788,6 +1788,12 @@ let contract = new ethers.Contract(contractAddress, abi, provider);
 // Get owner address
 contract.owner().then((result) => 
 	{
-		let _owner = result; // in case we need to manipulate result
+		let _owner = result;
 		console.log(_owner); 
+	});
+	
+// Sending a tx?? 
+contract.StartGame().then((result) =>
+	{
+		console.log(result);
 	});
