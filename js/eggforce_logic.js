@@ -1,3 +1,19 @@
+window.addEventListener('load', async () => {
+    // Modern dapp browsers...
+    if (window.ethereum) {
+        try {
+            // Request account access if needed
+            await ethereum.enable();
+        } catch (error) {
+            // User denied account access...
+        }
+    }
+    // Non-dapp browsers...
+    else {
+        console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+    }
+});
+
 //Error: unsupported network
 //"1" works (mainnet?), 2 doesn't, 3 doesn't, 4 does (testnet?)
 //let provider = ethers.getDefaultProvider(99);
