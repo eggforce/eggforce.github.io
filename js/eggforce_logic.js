@@ -4,6 +4,37 @@ window.addEventListener('load', async () => {
         try {
             // Request account access if needed
             await ethereum.enable();
+			
+			//Error: unsupported network
+			//"1" works (mainnet?), 2 doesn't, 3 doesn't, 4 does (testnet?)
+			//let provider = ethers.getDefaultProvider(99);
+
+			//Reference Error: web3 undefined in local tests
+			//Works once deployed to web
+			let provider = new ethers.providers.Web3Provider(web3.currentProvider);
+			let signer = provider.getSigner();
+
+			// provider: read-only access
+			// signer: read and write
+			let contract = new ethers.Contract(contractAddress, abi, signer);
+
+			// Get owner address
+			// works!
+			/*
+			contract.owner().then((result) => 
+			{
+				let _owner = result;
+				console.log(_owner); 
+			});
+			*/
+	
+			// Sending a tx?? 
+			// MetaMask - RPC Error: Internal JSON-RPC error.
+			contract.ComputeShroomMultiplier().then((result) =>
+			{
+				console.log(result);
+			});
+			
         } catch (error) {
             // User denied account access...
         }
@@ -11,17 +42,16 @@ window.addEventListener('load', async () => {
     // Non-dapp browsers...
     else {
         console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+		/*let provider = ethers.getDefaultProvider(99);
+		
+		let contract = new ethers.Contract(contractAddress, abi, provider);
+		contract.owner().then((result) => 
+			{
+				let _owner = result;
+				console.log(_owner); 
+			});*/
     }
 });
-
-//Error: unsupported network
-//"1" works (mainnet?), 2 doesn't, 3 doesn't, 4 does (testnet?)
-//let provider = ethers.getDefaultProvider(99);
-
-//Reference Error: web3 undefined in local tests
-//Works once deployed to web
-let provider = new ethers.providers.Web3Provider(web3.currentProvider);
-let signer = provider.getSigner();
 
 let abi = [
 	{
@@ -1798,19 +1828,12 @@ let abi = [
 
 let contractAddress = "0x2eBabFE27c967967F97a005F9A5be1fA5e202421";
 
-// We connect to the Contract using a Provider, so we will only
-// have read-only access to the Contract
-let contract = new ethers.Contract(contractAddress, abi, signer);
+function getContractOwner() {
+	contract.owner().then((result) => 
+			{
+				let _owner = result;
+				console.log(_owner);
+				document.getElementById("contractOwner").innerHTML = _owner;
+			});
+}
 
-// Get owner address
-contract.owner().then((result) => 
-	{
-		let _owner = result;
-		console.log(_owner); 
-	});
-	
-// Sending a tx?? 
-contract.StartGame().then((result) =>
-	{
-		console.log(result);
-	});
