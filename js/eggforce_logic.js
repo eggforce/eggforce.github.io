@@ -1,4 +1,10 @@
-let provider = new ethers.providers.Web3Provider(web3.currentProvider);
+//Error: unsupported network
+//"1" works (mainnet?), 2 doesn't, 3 doesn't, 4 does (testnet?)
+//let provider = ethers.getDefaultProvider(99);
+
+//Reference Error: web3 undefined in local tests
+//Works once deployed to web
+//let provider = new ethers.providers.Web3Provider(web3.currentProvider);
 
 let abi = [
 	{
@@ -1779,5 +1785,9 @@ let contractAddress = "0x2eBabFE27c967967F97a005F9A5be1fA5e202421";
 // have read-only access to the Contract
 let contract = new ethers.Contract(contractAddress, abi, provider);
 
-// utils never works. why??
-console.log(ethers.utils.getAddress(contractAddress));
+// Get owner address
+contract.owner().then((result) => 
+	{
+		let _owner = result; // in case we need to manipulate result
+		console.log(_owner); 
+	});
