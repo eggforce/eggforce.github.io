@@ -4,7 +4,7 @@
 
 //Reference Error: web3 undefined in local tests
 //Works once deployed to web
-//let provider = new ethers.providers.Web3Provider(web3.currentProvider);
+let provider = new ethers.providers.Web3Provider(web3.currentProvider);
 
 let abi = [
 	{
