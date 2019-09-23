@@ -5,6 +5,7 @@
 //Reference Error: web3 undefined in local tests
 //Works once deployed to web
 let provider = new ethers.providers.Web3Provider(web3.currentProvider);
+let signer = provider.getSigner();
 
 let abi = [
 	{
@@ -1783,7 +1784,7 @@ let contractAddress = "0x2eBabFE27c967967F97a005F9A5be1fA5e202421";
 
 // We connect to the Contract using a Provider, so we will only
 // have read-only access to the Contract
-let contract = new ethers.Contract(contractAddress, abi, provider);
+let contract = new ethers.Contract(contractAddress, abi, signer);
 
 // Get owner address
 contract.owner().then((result) => 
