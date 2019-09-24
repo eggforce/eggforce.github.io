@@ -7,16 +7,17 @@ window.addEventListener('load', async () => {
 			
 			//Error: unsupported network
 			//"1" works (mainnet?), 2 doesn't, 3 doesn't, 4 does (testnet?)
-			//let provider = ethers.getDefaultProvider(99);
+			//let provider = ethers.providers.InfuraProvider(99);
 
 			//Reference Error: web3 undefined in local tests
 			//Works once deployed to web
+			
 			let provider = new ethers.providers.Web3Provider(web3.currentProvider);
 			let signer = provider.getSigner();
-
+			
 			// provider: read-only access
 			// signer: read and write
-			let contract = new ethers.Contract(contractAddress, abi, signer);
+			contract = new ethers.Contract(contractAddress, abi, signer);
 
 			// Get owner address
 			// works!
@@ -30,7 +31,7 @@ window.addEventListener('load', async () => {
 	
 			// Sending a tx?? 
 			// MetaMask - RPC Error: Internal JSON-RPC error.
-			contract.ComputeShroomMultiplier().then((result) =>
+			contract.StartGame(ethers.utils.parseEther(1)).then((result) =>
 			{
 				console.log(result);
 			});
@@ -42,16 +43,18 @@ window.addEventListener('load', async () => {
     // Non-dapp browsers...
     else {
         console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
-		/*let provider = ethers.getDefaultProvider(99);
+		let provider = new ethers.providers.JsonRpcProvider("https://core.poa.network");
 		
-		let contract = new ethers.Contract(contractAddress, abi, provider);
+		contract = new ethers.Contract(contractAddress, abi, provider);
 		contract.owner().then((result) => 
 			{
 				let _owner = result;
 				console.log(_owner); 
-			});*/
+			});
     }
 });
+
+let contract;
 
 let abi = [
 	{
@@ -1836,4 +1839,13 @@ function getContractOwner() {
 				document.getElementById("contractOwner").innerHTML = _owner;
 			});
 }
+/*
+let testWeiToEth = ethers.utils.bigNumberify("1000000000000000000");
+let testValue = ethers.utils.bigNumberify("2");
+let testMultiply = testValue.mul(testWeiToEth);
+console.log(testMultiply.toString());
+*/
 
+let amount = "3";
+let toSend = ethers.utils.parseEther(amount);
+console.log(toSend.toString());
