@@ -31,13 +31,6 @@ window.addEventListener('load', async () => {
 				console.log(_owner); 
 			});
 			*/
-	
-			// Sending a tx?? 
-			// MetaMask - RPC Error: Internal JSON-RPC error.
-			contract.StartGame(ethers.utils.parseEther(1)).then((result) =>
-			{
-				console.log(result);
-			});
 			
         } catch (error) {
             // User denied account access...
@@ -1836,6 +1829,15 @@ function getContractOwner() {
 				let _owner = result;
 				console.log(_owner);
 				document.getElementById("contractOwner").innerHTML = _owner;
+			});
+}
+
+function startGame() {
+				// Sending a tx?? 
+			// MetaMask - RPC Error: Internal JSON-RPC error.
+	contract.StartGame(ethers.utils.parseEther(1)).then((result) =>
+			{
+				console.log(result);
 			});
 }
 /*
