@@ -1,3 +1,6 @@
+let contract;
+let contractAddress = "0x2eBabFE27c967967F97a005F9A5be1fA5e202421";
+
 window.addEventListener('load', async () => {
     // Modern dapp browsers...
     if (window.ethereum) {
@@ -53,8 +56,6 @@ window.addEventListener('load', async () => {
 			});
     }
 });
-
-let contract;
 
 let abi = [
 	{
@@ -1828,8 +1829,6 @@ let abi = [
 		"type": "function"
 	}
 ]
-
-let contractAddress = "0x2eBabFE27c967967F97a005F9A5be1fA5e202421";
 
 function getContractOwner() {
 	contract.owner().then((result) => 
