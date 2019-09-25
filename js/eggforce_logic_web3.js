@@ -10,6 +10,7 @@ window.addEventListener('load', async () => {
             // Request account access if needed
             await ethereum.enable();
             // Acccounts now exposed
+			m_account = web3.eth.accounts[0];
             web3.eth.sendTransaction({/* ... */});
         } catch (error) {
             // User denied account access...
@@ -19,6 +20,8 @@ window.addEventListener('load', async () => {
     else if (window.web3) {
         window.web3 = new Web3(web3.currentProvider);
         // Acccounts always exposed
+		m_account = web3.eth.accounts[0];
+		document.getElementById("account").innerHTML = formatEthAdr(m_account);
         web3.eth.sendTransaction({/* ... */});
     }
     // Non-dapp browsers...
@@ -27,11 +30,39 @@ window.addEventListener('load', async () => {
     }
 });
 
+// VARIABLES
+
+var a_balance = 0;
+
+var doc_balance = document.getElementById('balance');
+
+// FUNCTIONS
+
+//Truncates ETH address to first 8 numbers, and add etherscan link
+function formatEthAdr(adr){
+	var _smallAdr = adr.substring(0, 10);
+	/*var _stringLink = '<a href="https://etherscan.io/address/' + adr + '" target="_blank">' + _smallAdr + '</a>';
+	return _stringLink;*/
+	return _smallAdr;
+}
+
+// WEB3 - READ
+
 function getContractOwner() {
 	owner(function(result) {
 		document.getElementById("contractOwner").innerHTML = result;	
 	});
 }
+
+//Current player balance
+function updateBalance(){
+	balance(m_account, function(result) {
+		a_balance = web3.fromWei(result,'ether');
+		doc_balance.innerHTML = a_balance;
+	});
+}
+
+// WEB3 - WRITE
 
 function startGame() {
 	var weitospend = web3.toWei(1,'ether');
