@@ -73,7 +73,7 @@ function startGame() {
 				});
 }
 */
-function startGame() {
+const startGame = async() => {
 	try {
 		console.log("about to send transaction")
 		const startTheGame = await contract.StartGame({
