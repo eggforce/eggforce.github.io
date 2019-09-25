@@ -35,7 +35,7 @@ function getContractOwner() {
 
 function startGame() {
 	var weitospend = web3.toWei(1,'ether');
-	StartGame(function(result){
+	StartGame(weitospend, function(result){
 		console.log(result);
 	});
 }
