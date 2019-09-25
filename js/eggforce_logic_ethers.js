@@ -59,16 +59,32 @@ function getContractOwner() {
 			});
 }
 
+let weiToSend = ethers.utils.parseEther("1");
+/*
 function startGame() {
 				// Sending a tx?? 
 				// Error: unknown transaction override _hex
-				let weiToSend = ethers.utils.parseEther("1");
-				weiToSend = weiToSend.toString();
-				console.log(weiToSend);
+
+				//weiToSend = weiToSend.toString();
+				//console.log(weiToSend);
 				contract.StartGame(weiToSend).then((result) =>
 				{
 					console.log(result);
 				});
+}
+*/
+function startGame() {
+	try {
+		console.log("about to send transaction")
+		const startTheGame = await contract.StartGame({
+		  //call function to request access, from the current wallet (REVERTS)
+		  value: weiToSend
+		})
+
+		console.log("this worked");
+	  } catch (error) {
+		console.log("Error: ", error) //fires as the contract reverted the payment
+	  }
 }
 /*
 let testWeiToEth = ethers.utils.bigNumberify("1000000000000000000");
