@@ -1,3 +1,4 @@
+let contractAddress = "0x2eBabFE27c967967F97a005F9A5be1fA5e202421";
 var contractAbi = web3.eth.contract(abi);
 var myContract = contractAbi.at(contractAddress);
 
