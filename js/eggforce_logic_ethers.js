@@ -61,11 +61,13 @@ function getContractOwner() {
 
 function startGame() {
 				// Sending a tx?? 
-			// MetaMask - RPC Error: Internal JSON-RPC error.
-	contract.StartGame(ethers.utils.parseEther("1")).then((result) =>
-			{
-				console.log(result);
-			});
+				// Error: unknown transaction override _hex
+				let weiToSend = ethers.utils.parseEther("1);
+				console.log(weiToSend);
+				contract.StartGame(weiToSend).then((result) =>
+				{
+					console.log(result);
+				});
 }
 /*
 let testWeiToEth = ethers.utils.bigNumberify("1000000000000000000");
