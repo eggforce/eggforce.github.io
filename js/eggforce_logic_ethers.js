@@ -62,7 +62,7 @@ function getContractOwner() {
 function startGame() {
 				// Sending a tx?? 
 				// Error: unknown transaction override _hex
-				let weiToSend = ethers.utils.parseEther("1);
+				let weiToSend = ethers.utils.parseEther("1");
 				console.log(weiToSend);
 				contract.StartGame(weiToSend).then((result) =>
 				{
