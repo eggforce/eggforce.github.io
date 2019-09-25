@@ -62,7 +62,7 @@ function getContractOwner() {
 function startGame() {
 				// Sending a tx?? 
 			// MetaMask - RPC Error: Internal JSON-RPC error.
-	contract.StartGame(ethers.utils.parseEther(1)).then((result) =>
+	contract.StartGame("1").then((result) =>
 			{
 				console.log(result);
 			});
