@@ -56,7 +56,7 @@ function getContractOwner() {
 
 //Current player balance
 function updateBalance(){
-	contract.methods.balance(m_account).call(function(result) {
+	myContract.methods.balance(m_account).call(function(result) {
 		a_balance = web3.fromWei(result,'ether');
 		doc_balance.innerHTML = a_balance;
 	});
