@@ -50,14 +50,35 @@ window.addEventListener('load', async () => {
     }
 });
 
+// VARIABLES
+
+var a_balance = 0;
+var m_account = "";
+
+var doc_balance = document.getElementById('balance');
+
+// READ ONLY ETHERS
+
 function getContractOwner() {
 	contract.owner().then((result) => 
 			{
 				let _owner = result;
 				console.log(_owner);
+				m_account = _owner;
 				document.getElementById("contractOwner").innerHTML = _owner;
 			});
 }
+
+//Current player balance
+function updateBalance(){
+	contract.balance(m_account).then((result) => 
+		{
+			a_balance = web3.fromWei(result,'ether');
+			doc_balance.innerHTML = a_balance;
+		});
+}
+
+// WRITE ETHERS
 
 let weiToSend = ethers.utils.parseEther("1");
 /*

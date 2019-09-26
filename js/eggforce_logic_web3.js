@@ -20,7 +20,7 @@ window.addEventListener('load', async () => {
     else if (window.web3) {
         window.web3 = new Web3(web3.currentProvider);
         // Acccounts always exposed
-		m_account = web3.eth.accounts[0];
+		var m_account = web3.eth.accounts[0];
 		document.getElementById("account").innerHTML = formatEthAdr(m_account);
         web3.eth.sendTransaction({/* ... */});
     }

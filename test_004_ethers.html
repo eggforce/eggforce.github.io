@@ -14,14 +14,21 @@
 			<br>
 			<hr>
 			<br>
-			<div class="container">
-				<button onClick="getContractOwner()">Get Contract Owner</button>
-				<br><span id="contractOwner">?</span>
+				<div class="row">
+				<div class="col-sm">
+					<button onClick="getContractOwner()">Get Contract Owner</button>
+					<br><span id="contractOwner">?</span>
+				</div>
+				<div class="col-sm">
+					<button onClick="startGame()">StartGame</button>
+				</div>
+				<div class="col-sm">
+					<button onClick="updateBalance()">Update Balance</button>
+					<br><span id="balance">?</span>
+				</div>
 			</div>
 			<br>
-			<div class="container">
-				<button onClick="startGame()">StartGame</button>
-			</div>
+			<h3>Account = <span id="account">?</span></h3>
 			<hr><hr>
 			<div class="row">
 				<!-- Medium Widget from pixelpoint -->
