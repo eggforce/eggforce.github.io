@@ -18,7 +18,7 @@ window.addEventListener('load', async () => {
 			let provider = new ethers.providers.Web3Provider(web3.currentProvider);
 			let signer = provider.getSigner();
 
-			console.log(signer.address);
+			console.log(signer.getAddress());
 			
 			// provider: read-only access
 			// signer: read and write
