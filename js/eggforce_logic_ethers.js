@@ -17,6 +17,8 @@ window.addEventListener('load', async () => {
 			
 			let provider = new ethers.providers.Web3Provider(web3.currentProvider);
 			let signer = provider.getSigner();
+
+			console.log(signer.address);
 			
 			// provider: read-only access
 			// signer: read and write
@@ -56,12 +58,23 @@ function getContractOwner() {
 			{
 				let _owner = result;
 				console.log(_owner);
-				m_account = _owner;
+				m_account = _owner; //hack until I find out how to query account with ethers
 				document.getElementById("contractOwner").innerHTML = _owner;
 			});
 }
 
-//Current player balance
+// Events
+
+function beginEventLogging() {
+	
+	console.log("event logging begins");
+	
+	contract.on("JoinedGame", (sender, tribe, event) => {
+		console.log("New player: " + sender + " has joined tribe " + tribe.toString());
+	});
+}
+
+// Current player balance
 function updateBalance(){
 	contract.balance(m_account).then((result) => 
 		{
@@ -110,11 +123,3 @@ let amount = "3";
 let toSend = ethers.utils.parseEther(amount);
 console.log(toSend.toString());
 
-function beginEventLogging() {
-	
-	console.log("event logging begins");
-	
-	contract.on("JoinedGame", (sender, tribe, event) => {
-		console.log("Someone has joined the game: " + sender, tribe);
-	});
-}
