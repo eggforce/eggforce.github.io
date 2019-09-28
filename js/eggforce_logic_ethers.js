@@ -34,21 +34,22 @@ window.addEventListener('load', async () => {
 			
         } catch (error) {
             // User denied account access...
+			useReadOnlyProvider();
         }
     }
     // Non-dapp browsers...
     else {
         console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
-		let provider = new ethers.providers.JsonRpcProvider("https://core.poa.network");
-		
-		contract = new ethers.Contract(contractAddress, abi, provider);
-		contract.owner().then((result) => 
-			{
-				let _owner = result;
-				console.log(_owner); 
-			});
+		useReadOnlyProvider();
     }
 });
+
+function useReadOnlyProvider() {
+	let provider = new ethers.providers.JsonRpcProvider("https://core.poa.network");		
+	contract = new ethers.Contract(contractAddress, abi, provider);
+	
+	eventLogging();
+}
 
 // VARIABLES
 
@@ -118,6 +119,8 @@ let amount = "3";
 let toSend = ethers.utils.parseEther(amount);
 console.log(toSend.toString());
 
-contract.on("StartedGame", (launch, end, event) => {
-    console.log("game has started!" + launch, end);
-});
+function eventLogging() {
+	contract.on("StartedGame", (launch, end, event) => {
+		console.log("game has started!" + launch, end);
+	});
+}
