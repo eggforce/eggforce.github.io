@@ -18,7 +18,10 @@ window.addEventListener('load', async () => {
 			let provider = new ethers.providers.Web3Provider(web3.currentProvider);
 			let signer = provider.getSigner();
 
-			console.log(signer.getAddress());
+			let addressPromise = signer.getAddress().then(function(result){
+				m_account = result;
+			});
+			console.log(m_account);
 			
 			// provider: read-only access
 			// signer: read and write
@@ -58,7 +61,7 @@ function getContractOwner() {
 			{
 				let _owner = result;
 				console.log(_owner);
-				m_account = _owner; //hack until I find out how to query account with ethers
+				//m_account = _owner; //hack until I find out how to query account with ethers
 				document.getElementById("contractOwner").innerHTML = _owner;
 			});
 }
