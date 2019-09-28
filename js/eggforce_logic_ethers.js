@@ -52,7 +52,7 @@ window.addEventListener('load', async () => {
 
 // VARIABLES
 
-var a_balance = 0;
+var a_balance = 1;
 var m_account = "";
 
 var doc_balance = document.getElementById('balance');
@@ -73,7 +73,7 @@ function getContractOwner() {
 function updateBalance(){
 	contract.balance(m_account).then((result) => 
 		{
-			a_balance = web3.fromWei(result,'ether');
+			a_balance = result;
 			doc_balance.innerHTML = a_balance;
 		});
 }
@@ -117,3 +117,7 @@ console.log(testMultiply.toString());
 let amount = "3";
 let toSend = ethers.utils.parseEther(amount);
 console.log(toSend.toString());
+
+contract.on("StartedGame", (launch, end, event) => {
+    console.log("game has started!" + launch, end);
+});
