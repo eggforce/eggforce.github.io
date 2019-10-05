@@ -1,0 +1,98 @@
+<html>
+	<head>
+		<link href="https://fonts.googleapis.com/css?family=Cairo|Exo&display=swap" rel="stylesheet"> 
+		<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+		<link rel="stylesheet" type="text/css" href="css/eggforce.css">
+	</head>
+	<body>
+		<br>
+		<div class="container" align="center">
+			<div class="container">
+				<h1 class="display-1">EGGFORCE test 004e</h1>
+				<br>		
+			</div>
+			<br>
+			<hr>
+			<br>
+			<div class="row">
+				<div class="col-sm">
+					<button onClick="getContractOwner()">Get Contract Owner</button>
+					<br><span id="contractOwner">?</span>
+				</div>
+				<div class="col-sm">
+					<button onClick="startGame()">StartGame</button>
+				</div>
+				<div class="col-sm">
+					<button onClick="updateBalance(m_account)">Update Balance</button>
+					<br><span id="balance">?</span>
+				</div>
+				<div class="col-sm">
+					<button onClick="updateTerritory()">Update Land 1</button>
+				</div>
+				<div class="col-sm">
+					<button onclick="updateNestStat()">Update Nest Stat</button>
+				</div>
+			</div>
+			<hr>
+			<br>
+            <h4>Select Land (1 to 64) <input type="text" id="landSelector" onInput="updateLand(this.value)" value="0.01" size="4">
+            </h5>
+            <br>
+            <div class="row">
+                <div class="col-sm">
+                    <h5>Last Shroom Harvest:</h5>
+                    <span id="landLast">?</span>
+                </div>
+                <div class="col-sm">
+                    <h5>Current Lord:</h5>
+                    <span id="landLord">?</span>
+                </div>
+                <div class="col-sm">
+                    <h5>Tier of Lord's Eggoas:</h5>
+                    <span id="landEggoa">?</span>
+                </div>
+                <div class="col-sm">
+                    <h5>Land Level:</h5>
+                    <span id="landLevel">?</span>
+                </div>
+                <div class="col-sm">
+                    <h5>Lord Tribe:</h5>
+                    <span id="landTribe">?</span>
+                </div>
+            </div>
+			<button onClick="attackLand()">Attack Land <span id="landSelected">?</span></button>
+			<br>
+            <hr>
+            <h3>GENERAL STUFF</h3>
+            <br>
+            <h5>DAI Anomaly</h5>
+            <h6>Base auction cost: <span id="daiAuctionCost">?</span></h6>
+			<h6>Auction started at: <span id="daiAuctionTimer">?</span></h6>
+            <br>
+            <h5>RAD Anomaly</h5>
+            <h6>Base auction cost: <span id="radAuctionCost">?</span></h6>
+			<h6>Auction started at: <span id="radAuctionTimer">?</span></h6>
+            <br>
+            <hr>
+            <h3>MY STUFF</h3>
+            <h4>Account = <span id="account">?</span></h3>
+            <br>
+            <h5>My Nest: </h5>
+            <h6>Best Tier unlocked: <span id="tier">?</span></h5>
+            <h6>Saved Rads: <span id="rad">?</span></h6>
+            <h6>Saved Shrooms: <span id="shroom">?</span></h6>
+            <h6>Tribe: <span id="tribe">?</span></h6>
+            <h6>Rads in Tribe Chest: <span id="tribeRad">?</span></h6>
+            <h6>Number of times I changed Tribes: <span id="tribeChange">?</span></h6>
+			<h6>Collected Rads from Tribe = <span id="collectedTribeRad">?</span></h6>
+			<hr>
+			<br><br><br><br>
+            <hr><hr>
+        </div>
+		<!-- etherjs -->
+		<script src="js/ethers-v4.min.js"></script>
+		<!-- Eggforce scripts -->
+		<script src="js/smartcontract_abi.js"></script>
+		<script src="js/eggforce_logic_ethers.js"></script>
+	</body>
+</html>

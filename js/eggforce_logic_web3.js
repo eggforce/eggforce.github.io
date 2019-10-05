@@ -32,7 +32,7 @@ window.addEventListener('load', async () => {
 
 // VARIABLES
 
-var a_balance = 0;
+var a_balance = 1;
 
 var doc_balance = document.getElementById('balance');
 
