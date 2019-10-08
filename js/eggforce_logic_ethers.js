@@ -24,7 +24,7 @@ window.addEventListener('load', async () => {
 
 			let addressPromise = signer.getAddress().then(function(result){
 				m_account = result;
-				document.getElementById('account').innerHTML = m_account;
+				document.getElementById('account').innerHTML = formatEthAdr(m_account);
 				console.log(m_account);
 				startLoop();
 			});
@@ -210,43 +210,63 @@ function convertTime(__timestamp){
 	let _minutes = Math.floor((_time % 3600) / 60);
 	let _seconds = parseFloat((_time % 3600) % 60).toFixed(0);
 
+	let _positive = true;
+
+	let _returnString = "";
+
 	if(_hours >= 24 || _hours <= -24){
 		if(_hours <= -24){
+			_positive = false;
 			_days = -_days;
 		}
 
 		if(_days == 1){
-			if(_hours >= 24){
-				return _days + " day";
-			} else {
-				return _days + " day ago";
+			_returnString = _days + " day from now";
+			if(_positive == false){
+				_returnString = _returnString + " ago";
 			}
 		} else {
-			if(_hours >= 24){
-				return _days + " days";
-			} else {
-				return _days + " days ago";
+			_returnString = _days + " days from now";
+			if(_positive == false){
+				_returnString = _returnString + " ago";
 			}
 		}
 			
-	} else if(_hours > -24) {
+	} else if(_hours >= 0) {
 		if(_hours < 0) {
+			_positive = false;
 			_hours = -_hours;
-			_minutes = -_minutes;
-			_seconds = -_seconds;
+
 		}
 
 		if(_hours < 10) { _hours = "0" + _hours }
 		if(_minutes < 10) { _minutes = "0" + _minutes }
 		if(_seconds < 10) { _seconds = "0" + _seconds }
 
-		if(_hours >= 0){
-			return _hours + ":" + _minutes + ":" + _seconds;
+		_returnString =  _hours + ":" + _minutes + ":" + _seconds;
+		if(_positive == false){
+			_returnString = _returnString + " ago";
+		}
+
+	} else {
+		_hours = -_hours;
+		_minutes = -_minutes;
+		_seconds = -_seconds;
+
+		if(_hours > 1) { 
+			_returnString = _hours + " hours ago";
+		} else if(_hours == 1) { 
+			_returnString = "1 hour ago";
+		} else if(_minutes > 1) {
+			_returnString = _minutes + " minutes ago";
+		} else if(_minutes == 1) {
+			_returnString = "1 minute ago";
 		} else {
-			return _hours + ":" + _minutes + ":" + _seconds + " ago";
+			_returnString = "a few seconds ago";
 		}
 	}
 
+	return _returnString;
 }
 
 //** LOCAL FUNCTIONS **//
@@ -621,7 +641,6 @@ function beginEventLogging() {
 
 // WRITE ETHERS
 
-let weiToSend = ethers.utils.parseEther("1");
 /*
 function startGame() {
 				// Sending a tx?? 
@@ -640,7 +659,7 @@ const startGame = async() => {
 		console.log("about to send transaction");
 		const startTheGame = await contract.StartGame({
 		  //call function to request access, from the current wallet (REVERTS)
-		  value: weiToSend
+		  value: ethers.utils.parseEther("1")
 		})
 
 		console.log("this worked");
@@ -649,17 +668,31 @@ const startGame = async() => {
 	  }
 }
 
-// UNTESTED
+// UNTESTED - DOESN't WORK
 const attackLand = async() => {
 	try {
 		console.log("about to send transaction");
-		const attackThisLand = await contract.AttackTerritory(h_selectedLand, 0)
+		const attackThisLand = await contract.AttackTerritory({h_selectedLand, 0})
 		console.log("sent attackland tx successfully");
 	} catch(error) {
 		console.log("Error: ", error);
 	}
 }
 // UNTESTED ^^
+
+const joinGame = async() => {
+	try {
+		console.log("about to send transaction");
+		const startTheGame = await contract.JoinGame({
+		  //call function to request access, from the current wallet (REVERTS)
+		  value: ethers.utils.parseEther("0.01")
+		})
+
+		console.log("joined the game successfully");
+	  } catch (error) {
+		console.log("Error: ", error); //fires as the contract reverted the payment
+	  }
+}
 
 /*
 let testWeiToEth = ethers.utils.bigNumberify("1000000000000000000");
