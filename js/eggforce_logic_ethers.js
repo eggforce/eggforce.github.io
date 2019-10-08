@@ -658,7 +658,6 @@ const startGame = async() => {
 	try {
 		console.log("about to send transaction");
 		const startTheGame = await contract.StartGame({
-		  //call function to request access, from the current wallet (REVERTS)
 		  value: ethers.utils.parseEther("1")
 		})
 
@@ -672,7 +671,7 @@ const startGame = async() => {
 const attackLand = async() => {
 	try {
 		console.log("about to send transaction");
-		const attackThisLand = await contract.AttackTerritory({h_selectedLand, 0})
+		const attackThisLand = await contract.AttackTerritory(h_selectedLand, 0)
 		console.log("sent attackland tx successfully");
 	} catch(error) {
 		console.log("Error: ", error);
@@ -684,7 +683,6 @@ const joinGame = async() => {
 	try {
 		console.log("about to send transaction");
 		const startTheGame = await contract.JoinGame({
-		  //call function to request access, from the current wallet (REVERTS)
 		  value: ethers.utils.parseEther("0.01")
 		})
 
