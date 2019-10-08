@@ -679,12 +679,14 @@ const attackLand = async() => {
 }
 // UNTESTED ^^
 
+let m_tribeChoice = 1;
+
 const joinGame = async() => {
 	try {
 		console.log("about to send transaction");
 		const startTheGame = await contract.JoinGame({
 		  value: ethers.utils.parseEther("0.01")
-		})
+		}, m_tribeChoice)
 
 		console.log("joined the game successfully");
 	  } catch (error) {
