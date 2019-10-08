@@ -1,7 +1,7 @@
 // INITIALIZE WEB3
 
 let contract;
-let contractAddress = "0x2eBabFE27c967967F97a005F9A5be1fA5e202421";
+let contractAddress = "0x288DcF64881dD7f2c9326D724228Ea2B4F6dF257"; // v005
 let provider;
 let signer = 0;
 
@@ -56,34 +56,58 @@ function useReadOnlyProvider() {
 
 // VARIABLES
 
-var a_daiAuctionCost = 0;
-var a_daiAuctionTimer = 0;
-var a_end = 0;
-var a_globalRad = 0;
-var a_joinCost = 0;
-var a_launch = 0;
-var a_plantamidDaiCost = 0;
-var a_radAuctionCost = 0;
-var a_radAuctionTimer = 0;
-var a_tribeRad = 0;
+var a_daiAuctionCost = [0];
+var a_daiAuctionTimer = [0];
+var a_end = [0];
+var a_globalRad = [0];
+var a_joinCost = [0];
+var a_launch = [0];
+var a_plantamidDaiCost = [0];
+var a_radAuctionCost = [0];
+var a_radAuctionTimer = [0];
+var a_tribeRad = [0];
 
 var h_selectedLand = 0;
 
 var m_account = "0xABF3E252006D805Cce3C7219A929B83465F2a46e"; // should be "", setup for local tests
 document.getElementById('account').innerHTML = formatEthAdr(m_account);
-var m_balance = 0;
-var m_collectedTribeRad = 0;
-var m_daiPlantamid = 0;
-var m_earnedRad = 0;
-var m_eggoaPlantamid = 0;
-var m_lastRad = 0;
-var m_lastShroom = 0;
+var m_balance = [0];
+var m_collectedTribeRad = [0];
+var m_daiPlantamid = [0];
+var m_earnedRad = [0];
+var m_eggoaPlantamid = [0];
+var m_lastRad = [0];
+var m_lastShroom = [0];
 var m_openedChest = false;
-var m_rad = 0;
-var m_shroom = 0;
-var m_tier = 0;
-var m_tribe = 0;
-var m_tribeChange = 0;
+var m_rad = [0];
+var m_shroom = [0];
+var m_tier = [0];
+var m_tribe = [0];
+var m_tribeChange = [0];
+
+// Nest array
+var m_nest = [
+	{ amount: 0, level: 0, attackNext: 0, ownedLand: 0, stat0: 1, stat1: 0, stat2: 0, stat3: 0 },
+	{ amount: 0, level: 0, attackNext: 0, ownedLand: 0, stat0: 1, stat1: 0, stat2: 0, stat3: 0 },
+	{ amount: 0, level: 0, attackNext: 0, ownedLand: 0, stat0: 1, stat1: 0, stat2: 0, stat3: 0 },
+	{ amount: 0, level: 0, attackNext: 0, ownedLand: 0, stat0: 1, stat1: 0, stat2: 0, stat3: 0 },
+	{ amount: 0, level: 0, attackNext: 0, ownedLand: 0, stat0: 1, stat1: 0, stat2: 0, stat3: 0 },
+	{ amount: 0, level: 0, attackNext: 0, ownedLand: 0, stat0: 1, stat1: 0, stat2: 0, stat3: 0 },
+	{ amount: 0, level: 0, attackNext: 0, ownedLand: 0, stat0: 1, stat1: 0, stat2: 0, stat3: 0 },
+	{ amount: 0, level: 0, attackNext: 0, ownedLand: 0, stat0: 1, stat1: 0, stat2: 0, stat3: 0 } 
+];	
+
+// Doc array
+var doc_m_nest = [
+	document.getElementById("tier0"), 
+	document.getElementById("tier1"), 
+	document.getElementById("tier2"), 
+	document.getElementById("tier3"), 
+	document.getElementById("tier4"), 
+	document.getElementById("tier5"), 
+	document.getElementById("tier6"), 
+	document.getElementById("tier7")
+];
 
 var o_collectedTribeRad
 
@@ -111,6 +135,7 @@ var doc_landSelected = document.getElementById('landSelected');
 function startLoop(){
 	console.log('Main loop started.');
 	initializeBlockchainData();
+	controlLoop1();
 	controlLoop4();
     controlLoop60();
 }
@@ -122,6 +147,13 @@ function initializeBlockchainData(){
 	updateLaunchTimestamp();
 	updateEndTimestamp();
 	updateTerritory();
+}
+
+//Fast loop every second
+function controlLoop1(){
+	updateLaunchTimer();
+	updateEndTimer();
+	setTimeout(controlLoop1, 1000);
 }
 
 //Main loop on 4 seconds
@@ -137,12 +169,14 @@ function controlLoop60(){
 }
 
 function refreshData(){
+	/*
 	updateTribeChange(m_account);
 	updateTribe(m_account);
 	updateTribeRad(m_tribe);
 	updateRad(m_account);
-	updateShroom(m_account);
+	updateShroom(m_account);*/
 	updateTier(m_account);
+	/*
 	updateOpenedChest(m_account);
 	updateLastRad(m_account);
 	updateLastShroom(m_account);
@@ -154,14 +188,75 @@ function refreshData(){
 	updateDaiAuctionCost();
 	updateDaiAuctionTimer();
 	updateRadAuctionCost();
-	updateRadAuctionTimer();
+	updateRadAuctionTimer();*/
 }
 
-/* UTILITIES */
+//** UTILITIES **//
 
 //Truncates ETH address to first 8 numbers
-function formatEthAdr(adr){
-	return adr.substring(0, 10);
+function formatEthAdr(__adr){
+	return __adr.substring(0, 10);
+}
+
+// Convert timestamp in seconds into readable date
+// hh:mm:ss if < |24h|, x days if >= |24h|
+function convertTime(__timestamp){
+
+	let _currentTimestamp = (new Date()).getTime() / 1000; // from ms to s
+	let _time = __timestamp - _currentTimestamp;
+
+	let _hours = Math.floor(_time / 3600);
+	let _days = parseFloat(_hours / 24).toFixed(0);
+	let _minutes = Math.floor((_time % 3600) / 60);
+	let _seconds = parseFloat((_time % 3600) % 60).toFixed(0);
+
+	if(_hours >= 24 || _hours <= -24){
+		if(_hours <= -24){
+			_days = -_days;
+		}
+
+		if(_days == 1){
+			if(_hours >= 24){
+				return _days + " day";
+			} else {
+				return _days + " day ago";
+			}
+		} else {
+			if(_hours >= 24){
+				return _days + " days";
+			} else {
+				return _days + " days ago";
+			}
+		}
+			
+	} else if(_hours > -24) {
+		if(_hours < 0) {
+			_hours = -_hours;
+			_minutes = -_minutes;
+			_seconds = -_seconds;
+		}
+
+		if(_hours < 10) { _hours = "0" + _hours }
+		if(_minutes < 10) { _minutes = "0" + _minutes }
+		if(_seconds < 10) { _seconds = "0" + _seconds }
+
+		if(_hours >= 0){
+			return _hours + ":" + _minutes + ":" + _seconds;
+		} else {
+			return _hours + ":" + _minutes + ":" + _seconds + " ago";
+		}
+	}
+
+}
+
+//** LOCAL FUNCTIONS **//
+
+function updateLaunchTimer() {
+	document.getElementById('launch').innerHTML = convertTime(a_launch);
+}
+
+function updateEndTimer() {
+	document.getElementById('end').innerHTML = convertTime(a_end);
 }
 
 // READ ONLY ETHERS
@@ -220,15 +315,19 @@ function updateLand(__id){
 }
 
 // Nest values
-function updateNestValue(__player){
-	contract.eggoaNest(__player, 0).then((result) =>
+function updateNestValue(__player, __tier){
+	contract.eggoaNest(__player, __tier).then((result) =>
 	{
-		console.log("Nest 0");
+		console.log("Nest " + __tier);
+		m_nest[__tier].amount = result.amount.toString();
 		console.log("Size : " + result.amount.toString());
+		m_nest[__tier].level = result.level.toString();
 		console.log("Level : " + result.level.toString());
+		m_nest[__tier].attackNext = result.attackNext;
 		console.log("Next attack : " + result.attackNext);
+		m_nest[__tier].ownedLand = result.ownedLand.toString()
 		console.log("Owned land : " + result.ownedLand.toString());
-		console.log(result.stat[2].toString()); // shouldn't work
+		//console.log(result.stat[2].toString()); // shouldn't work
 	})
 }
 
@@ -237,12 +336,35 @@ function updateNestStat(__player, __tier){
 	contract.GetNestStat(__player, __tier).then((result) =>
 	{
 		console.log(result[0].toString());
+		m_nest[__tier].stat0 = result[0].toString();
 		console.log(result[1].toString());
+		m_nest[__tier].stat1 = result[1].toString();
 		console.log(result[2].toString());
+		m_nest[__tier].stat2 = result[2].toString();
 		console.log(result[3].toString());
+		m_nest[__tier].stat3 = result[3].toString();
 	});
 }
 
+// Update all nests for player
+function updateNest(__player){
+	for(let i = 0; i < m_tier[0]; i++){
+		updateNestValue(__player, i);
+		updateNestStat(__player, i);
+	}
+}
+
+// Update nest text for m_account
+function updateNestText(){
+	for(let i = 0; i < m_tier[0]; i++){
+		doc_m_nest[i].innerHTML = 
+		"<h6>Amount: " + m_nest[i].amount + "</h6>" +
+		"<h6>Level: " + m_nest[i].level + "</h6>" +
+		"<h6>Time until attack: " + m_nest[i].attackNext + "</h6>" +
+		"<h6>Lord of Land: " + m_nest[i].ownedLand + "</h6>" +
+		"<h6>Stats: " + m_nest[i].stat0 + " " + m_nest[i].stat1 + " " + m_nest[i].stat2 + " " + m_nest[i].stat3; 
+	}
+}
 
 // Tier prod (all 4)
 function updateTierProd(){
@@ -270,17 +392,21 @@ function updateCurrentBlock(){
 // Log to console and return a_
 function handleResult(result_, a_, doc_, operation_){
 	if(operation_ == "none"){
-		a_ = result_;
+		a_[0] = result_;
 	} 
 	else if(operation_ == "string"){
-		a_ = result_.toString();
+		a_[0] = result_.toString();
 	}
 	else if(operation_ == "dai"){
-		a_ = ethers.utils.formatEther(result_);
+		a_[0] = ethers.utils.formatEther(result_);
 	}
-	document.getElementById(doc_).innerHTML = a_;
-	console.log(a_);
-	return a_;
+
+	if(doc_ != 0){
+		document.getElementById(doc_).innerHTML = a_[0];
+	}
+
+	console.log(a_[0]);
+	return a_[0];
 }
 
 // Current player balance
@@ -348,7 +474,7 @@ function updateEggoaPlantamid(__player){
 function updateEndTimestamp(){
 	contract.end().then((result) =>
 	{
-		handleResult(result, a_end, 'end', "none");
+		handleResult(result, a_end, 0, "none");
 	});
 }
 
@@ -388,7 +514,7 @@ function updateLastShroom(__player){
 function updateLaunchTimestamp(){
 	contract.launch().then((result) =>
 	{
-		handleResult(result, a_launch, 'launch', "none");
+		handleResult(result, a_launch, 0, "none");
 	});
 }
 
