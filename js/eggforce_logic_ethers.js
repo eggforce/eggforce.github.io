@@ -683,16 +683,42 @@ let m_tribeChoice = 1;
 
 const joinGame = async() => {
 	try {
-		console.log("about to send transaction");
-		const startTheGame = await contract.JoinGame({
+		console.log("about to send transaction joingame");
+		const joinTheGame = await contract.JoinGame(m_tribeChoice, {
 		  value: ethers.utils.parseEther("0.01")
-		}, m_tribeChoice)
+		})
 
 		console.log("joined the game successfully");
 	  } catch (error) {
 		console.log("Error: ", error); //fires as the contract reverted the payment
 	  }
 }
+
+let override = { value: ethers.utils.parseEther("0.01") };
+
+const joinGame2 = async() => {
+	try {
+		console.log("about to send transaction joingame2");
+		const joinTheGame2 = await contract.JoinGame(m_tribeChoice, override)
+
+		console.log("joined the game successfully");
+	  } catch (error) {
+		console.log("Error: ", error); //fires as the contract reverted the payment
+	  }
+}
+
+const joinGame3 = async() => {
+	try {
+		console.log("about to send transaction joingame2");
+		const joinTheGame3 = await contract.JoinGame(m_tribeChoice)
+
+		console.log("joined the game successfully");
+	  } catch (error) {
+		console.log("Error: ", error); //fires as the contract reverted the payment
+	  }
+}
+
+//let tx = await contract.JoinGame("I like turtles.");
 
 /*
 let testWeiToEth = ethers.utils.bigNumberify("1000000000000000000");
