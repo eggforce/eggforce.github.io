@@ -1,7 +1,7 @@
 // INITIALIZE WEB3
 
 let contract;
-let contractAddress = "0x288DcF64881dD7f2c9326D724228Ea2B4F6dF257"; // v005
+let contractAddress = "0xc302B696CcE10880BE65717beDd440e353E885a6"; // v006
 let provider;
 let signer = 0;
 
@@ -99,21 +99,26 @@ var m_nest = [
 
 // Doc array
 var doc_m_nest = [
-	document.getElementById("tier0"), 
+	0, 
 	document.getElementById("tier1"), 
 	document.getElementById("tier2"), 
 	document.getElementById("tier3"), 
 	document.getElementById("tier4"), 
 	document.getElementById("tier5"), 
 	document.getElementById("tier6"), 
-	document.getElementById("tier7")
+	document.getElementById("tier7"),
+	document.getElementById("tier8")
 ];
 
-var o_collectedTribeRad
+var o_collectedTribeRad;
 
+var landobj;
 var t_land = []; // holds all land info. lastLand, lord, eggoa, level, tribe
-
 /*
+for(let t = 1; t < 65; t++) {
+	t_land[t] = landobj;
+}
+
 var doc_balance = document.getElementById('balance');
 var doc_daiAuctionCost = document.getElementById('daiAuctionCost');
 var doc_daiAuctionTimer = document.getElementById('daiAuctionTimer');
@@ -123,7 +128,7 @@ var doc_otherCollectedTribeRad = document.getElementById('otherCollectedTribeRad
 
 var doc_landLast = document.getElementById('landLast');
 var doc_landLord = document.getElementById('landLord');
-var doc_landEggoa = document.getElementById('landEggoa');
+var doc_landPower = document.getElementById('landPower');
 var doc_landLevel = document.getElementById('landLevel');
 var doc_landTribe = document.getElementById('landTribe');
 var doc_landSelected = document.getElementById('landSelected');
@@ -146,7 +151,8 @@ function initializeBlockchainData(){
 	updateJoinCost();
 	updateLaunchTimestamp();
 	updateEndTimestamp();
-	updateTerritory();
+	updateTerritory(1);
+
 }
 
 //Fast loop every second
@@ -169,18 +175,18 @@ function controlLoop60(){
 }
 
 function refreshData(){
-	/*
 	updateTribeChange(m_account);
 	updateTribe(m_account);
 	updateTribeRad(m_tribe);
 	updateRad(m_account);
-	updateShroom(m_account);*/
+	updateShroom(m_account);
 	updateTier(m_account);
-	/*
+	//updateNest(m_account);
 	updateOpenedChest(m_account);
 	updateLastRad(m_account);
 	updateLastShroom(m_account);
 	updateGlobalRad();
+	updateDaiPlantamid(m_account);
 	updateEggoaPlantamid(m_account);
 	updateEarnedRad(m_account);
 	updateBalance(m_account);
@@ -188,7 +194,7 @@ function refreshData(){
 	updateDaiAuctionCost();
 	updateDaiAuctionTimer();
 	updateRadAuctionCost();
-	updateRadAuctionTimer();*/
+	updateRadAuctionTimer();
 }
 
 //** UTILITIES **//
@@ -223,12 +229,12 @@ function convertTime(__timestamp){
 		if(_days == 1){
 			_returnString = _days + " day from now";
 			if(_positive == false){
-				_returnString = _returnString + " ago";
+				_returnString = _days + " day ago";
 			}
 		} else {
 			_returnString = _days + " days from now";
 			if(_positive == false){
-				_returnString = _returnString + " ago";
+				_returnString = _days + " days ago";
 			}
 		}
 			
@@ -244,9 +250,9 @@ function convertTime(__timestamp){
 		if(_seconds < 10) { _seconds = "0" + _seconds }
 
 		_returnString =  _hours + ":" + _minutes + ":" + _seconds;
-		if(_positive == false){
+		/*if(_positive == false){
 			_returnString = _returnString + " ago";
-		}
+		}*/
 
 	} else {
 		_hours = -_hours;
@@ -304,6 +310,7 @@ function getContractOwner() {
 }
 
 // Territory stats (all 64)
+/*
 function updateTerritory(){
 	for(let i = 1; i <= 64; i++){
 		contract.land(i).then((result) =>
@@ -313,25 +320,102 @@ function updateTerritory(){
 			console.log(result.lord);
 			console.log(result.eggoa.toString());
 			console.log(result.level.toString());
-			contract.tribe(result.lord).then((result2) =>
+			contract.GetLandStat(i).then((result3) =>
 			{
-				console.log("Territory " + i + " is held by tribe " + result2.toString());
-				t_land[i] = [result.lastLand.toString(), result.lord, result.eggoa.toString(), result.level.toString(), result2.toString()];
+				contract.tribe(result.lord).then((result2) =>
+				{
+					console.log("Territory " + i + " is held by tribe " + result2.toString());
+					t_land[i] = [result.lastLand.toString(), result.lord, result.eggoa.toString(), result.level.toString(), result2.toString(), result3[0].toString(), result3[1].toString(), result3[2].toString(), result3[3].toString()];
+					updateLand(document.getElementById('landSelector').value);
+				});
 			});
-			//console.log(result.stat); // doesn't work, b/c array?
 		});
 	}
+}
+*/
+
+function updateTerritory(__id) {
+
+	// make sure __id is within boundaries
+	if(__id > 64) {
+		__id = 64;
+		document.getElementById('landSelector').value = __id;
+	} else if(__id < 1) {
+		__id = 1;
+		document.getElementById('landSelector').value = __id;
+	}
+
+	// initialize t_land if previously undefined
+	if(t_land[__id] == null){
+		t_land[__id] = {};
+	}
+
+	// display message while waiting for promise result 
+	document.getElementById('w3q_land').innerHTML = "Waiting for blockchain...";
+
+	// begin the spam
+	contract.land(__id).then((result) =>
+	{
+		contract.GetLandStat(__id).then((result2) =>
+		{
+			contract.tribe(result.lord).then((result3) =>
+			{
+				let _landWeight = parseInt(result2[0]) + parseInt(result2[1]) + parseInt(result2[2]) + parseInt(result2[3]);
+				console.log(_landWeight);
+				if(_landWeight == 0) { _landWeight = 1};
+				contract.ComputeForce(__id, _landWeight, result.lord, result.eggoa).then((result4) =>
+				{
+					t_land[__id].lord = result.lord;
+					t_land[__id].lastLand = result.lastLand.toString();
+					t_land[__id].level = result.level.toString();
+					t_land[__id].tribe = result3.toString();
+					t_land[__id].stat0 = result2[0].toString();
+					t_land[__id].stat1 = result2[1].toString();
+					t_land[__id].stat2 = result2[2].toString();
+					t_land[__id].stat3 = result2[3].toString();
+					t_land[__id].power = result4.toString();
+
+					// update all the HTML bits
+					updateLand(__id);
+
+					// update status message
+					document.getElementById('w3q_land').innerHTML = "Up to date.";
+				});
+			});
+		});
+	});
 }
 
 // Update HTML stats of a specific land
 function updateLand(__id){
 	h_selectedLand = __id;
-	document.getElementById('landLast').innerHTML = t_land[__id][0];
-	document.getElementById('landLord').innerHTML = formatEthAdr(t_land[__id][1]);
-	document.getElementById('landEggoa').innerHTML = t_land[__id][2];
-	document.getElementById('landLevel').innerHTML = t_land[__id][3];
-	document.getElementById('landTribe').innerHTML = t_land[__id][4];
+
+	//this should be refactored into switching between Discover and Attack states if land is/isn't init
+	if(t_land[__id] == null){
+		t_land[__id] = { lord: "none", level: 0, tribe: 0, power: 0, lastLand: 0, stat0: 0, stat1: 0, stat2: 0, stat3: 0};
+	}
 	document.getElementById('landSelected').innerHTML = __id;
+	document.getElementById('landLast').innerHTML = t_land[__id].lastLand;
+	document.getElementById('landLord').innerHTML = formatEthAdr(t_land[__id].lord);
+	document.getElementById('landPower').innerHTML = t_land[__id].power;
+	document.getElementById('landLevel').innerHTML = t_land[__id].level;
+	document.getElementById('landTribe').innerHTML = t_land[__id].tribe;
+	document.getElementById('landStat').innerHTML = t_land[__id].stat0 + "/" + t_land[__id].stat1 + "/" + t_land[__id].stat2 + "/" + t_land[__id].stat3;
+}
+
+// Land stat array
+function updateLandStat(__id) {
+	contract.GetLandStat(__id).then((result) =>
+	{
+		console.log(result[0].toString());
+		t_land[__id][5] = result[0].toString();
+		console.log(result[1].toString());
+		t_land[__id][6] = result[1].toString();
+		console.log(result[2].toString());
+		t_land[__id][7] = result[2].toString();
+		console.log(result[3].toString());
+		t_land[__id][8] = result[3].toString();
+	});
 }
 
 // Nest values
@@ -352,38 +436,48 @@ function updateNestValue(__player, __tier){
 }
 
 // Nest stat array
-function updateNestStat(__player, __tier){
+function updateNestValue(__player, __tier){
 	contract.GetNestStat(__player, __tier).then((result) =>
 	{
-		console.log(result[0].toString());
+		contract.eggoaNest(__player, __tier).then((result2) =>
+		{
+		console.log("Nest " + __tier);
+		m_nest[__tier].amount = result2.amount.toString();
+		console.log("Size : " + result2.amount.toString());
+		m_nest[__tier].level = result2.level.toString();
+		console.log("Level : " + result2.level.toString());
+		m_nest[__tier].attackNext = result2.attackNext;
+		console.log("Next attack : " + result2.attackNext);
+		m_nest[__tier].ownedLand = result2.ownedLand.toString()
+		console.log("Owned land : " + result2.ownedLand.toString());
+		console.log("Stat0 : " + result[0].toString());
 		m_nest[__tier].stat0 = result[0].toString();
-		console.log(result[1].toString());
+		console.log("Stat1 : " + result[1].toString());
 		m_nest[__tier].stat1 = result[1].toString();
-		console.log(result[2].toString());
+		console.log("Stat2 : " + result[2].toString());
 		m_nest[__tier].stat2 = result[2].toString();
-		console.log(result[3].toString());
+		console.log("Stat3 : " + result[3].toString());
 		m_nest[__tier].stat3 = result[3].toString();
+		updateNestText(__tier);
+		});
 	});
 }
 
 // Update all nests for player
 function updateNest(__player){
-	for(let i = 0; i < m_tier[0]; i++){
+	for(let i = 1; i <= m_tier[0]; i++){
 		updateNestValue(__player, i);
-		updateNestStat(__player, i);
 	}
 }
 
 // Update nest text for m_account
-function updateNestText(){
-	for(let i = 0; i < m_tier[0]; i++){
-		doc_m_nest[i].innerHTML = 
-		"<h6>Amount: " + m_nest[i].amount + "</h6>" +
-		"<h6>Level: " + m_nest[i].level + "</h6>" +
-		"<h6>Time until attack: " + m_nest[i].attackNext + "</h6>" +
-		"<h6>Lord of Land: " + m_nest[i].ownedLand + "</h6>" +
-		"<h6>Stats: " + m_nest[i].stat0 + " " + m_nest[i].stat1 + " " + m_nest[i].stat2 + " " + m_nest[i].stat3; 
-	}
+function updateNestText(__tier){
+		doc_m_nest[__tier].innerHTML = 
+		"<h6>Amount: " + m_nest[__tier].amount + "</h6>" +
+		"<h6>Level: " + m_nest[__tier].level + "</h6>" +
+		"<h6>Time until attack: " + m_nest[__tier].attackNext + "</h6>" +
+		"<h6>Lord of Land: " + m_nest[__tier].ownedLand + "</h6>" +
+		"<h6>Stats: " + m_nest[__tier].stat0 + "/" + m_nest[__tier].stat1 + "/" + m_nest[__tier].stat2 + "/" + m_nest[__tier].stat3;
 }
 
 // Tier prod (all 4)
@@ -425,7 +519,7 @@ function handleResult(result_, a_, doc_, operation_){
 		document.getElementById(doc_).innerHTML = a_[0];
 	}
 
-	console.log(a_[0]);
+	//console.log(a_[0]);
 	return a_[0];
 }
 
@@ -542,7 +636,7 @@ function updateLaunchTimestamp(){
 function updateOpenedChest(__player){
 	contract.openedChest(__player).then((result) =>
 	{
-		handleResult(result, m_openedChest, 'openedChest', "none");
+		handleResult(result, m_openedChest, 0, "none");
 	});
 }
 
@@ -589,8 +683,9 @@ function updateShroom(__player){
 // Unlocked tier for player
 function updateTier(__player){
 	contract.tier(__player).then((result) =>
-	{
+	{		
 		handleResult(result, m_tier, 'tier', "string");
+		updateNest(__player);
 	});
 }
 
@@ -667,7 +762,7 @@ const startGame = async() => {
 	  }
 }
 
-// UNTESTED - DOESN't WORK
+// ALSO WORKS! I JUST WASN'T JOINED / IN ACTIVE GAME
 const attackLand = async() => {
 	try {
 		console.log("about to send transaction");
@@ -677,8 +772,8 @@ const attackLand = async() => {
 		console.log("Error: ", error);
 	}
 }
-// UNTESTED ^^
 
+// JOINGAME WORKS - SECOND ARGUMENT IS "OVERRIDE", FOR ETH VALUE AMONGST OTHER
 let m_tribeChoice = 1;
 
 const joinGame = async() => {
@@ -694,31 +789,42 @@ const joinGame = async() => {
 	  }
 }
 
-let override = { value: ethers.utils.parseEther("0.01") };
+let h_selectedTier = 1; // let player pick this later, and restrict between 1 and 8
 
-const joinGame2 = async() => {
+const raiseGoamid = async() => {
 	try {
-		console.log("about to send transaction joingame2");
-		const joinTheGame2 = await contract.JoinGame(m_tribeChoice, override)
+		console.log("about to send transaction raiseeggoaplantamid");
+		const raiseMyGoamid = await contract.RaiseEggoaPlantamid(h_selectedTier)
 
-		console.log("joined the game successfully");
-	  } catch (error) {
+		console.log("raised the plantamid successfully");
+	} catch (error) {
 		console.log("Error: ", error); //fires as the contract reverted the payment
-	  }
+	}
 }
 
-const joinGame3 = async() => {
-	try {
-		console.log("about to send transaction joingame2");
-		const joinTheGame3 = await contract.JoinGame(m_tribeChoice)
+let h_selectedFloor = 1; // let player pick this later
+let daimid_dai = 0;
 
-		console.log("joined the game successfully");
-	  } catch (error) {
-		console.log("Error: ", error); //fires as the contract reverted the payment
-	  }
+function raiseDaimid() {
+	contract.ComputeDaiPlantamidCost(m_daiPlantamid, h_selectedFloor).then((result) =>
+	{
+		daimid_dai = ethers.utils.parseEther(result);
+		raiseDaimid2();
+	});
 }
 
-//let tx = await contract.JoinGame("I like turtles.");
+const raiseDaimid2 = async() => {
+	try {
+		console.log("about to send transaction raisedaiplantamid");
+		const raiseMyGoamid = await contract.RaiseDaiPlantamid(h_selectedFloor, {
+			value: daimid_dai
+		})
+
+		console.log("raised the plantamid successfully");
+	} catch (error) {
+		console.log("Error: ", error); //fires as the contract reverted the payment
+	}
+}
 
 /*
 let testWeiToEth = ethers.utils.bigNumberify("1000000000000000000");

@@ -1060,6 +1060,11 @@ let abi = [
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "__var",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
 				"name": "__max",
 				"type": "uint256"
 			}
@@ -1100,6 +1105,11 @@ let abi = [
 	{
 		"constant": true,
 		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "__tier",
+				"type": "uint256"
+			},
 			{
 				"internalType": "uint256",
 				"name": "__rad",
