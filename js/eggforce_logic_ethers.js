@@ -680,7 +680,7 @@ function updateRadAuctionTimer(){
 
 // Owned Shrooms for player (from land grabs)
 function updateShroom(__player){
-	contract.shroom(__player).then((result) =>
+	contract.ComputeShroom(__player).then((result) =>
 	{
 		handleResult(result, m_shroom, 'shroom', "string");
 	});
@@ -814,7 +814,9 @@ const joinGame = async() => {
 }
 
 
-// WORKS, but take care of selectedTier
+// WORKED ONCE UPON A TIME, does not anymore for some reason
+// Possible note: should revert anyway because not enough eggoas
+// (This doesn't justify MetaMask failing to send it) 
 const raiseGoamid = async() => {
 	try {
 		console.log("about to send transaction raiseeggoaplantamid");
@@ -826,7 +828,7 @@ const raiseGoamid = async() => {
 	}
 }
 
-// WORKS, but take care of selectedFloor
+// WORKS
 const raiseDaimid = async() => {
 	try {
 		console.log("about to send transaction raisedaiplantamid");
@@ -839,4 +841,28 @@ const raiseDaimid = async() => {
 		console.log("Error: ", error); //fires as the contract reverted the payment
 	}
 }
+
+
+// Hatch Shrooms using __rads into Eggoas of __tier
+let h_hatchShroomRad = 0;
+
+function changeShroomRad(__rad) {
+	h_hatchShroomRad = __rad;
+}
+
+let h_hatchShroomTier = 1;
+
+function changeShroomTier(__tier) {
+	h_hatchShroomTier = __tier;
+}
+
+const hatchShrooms = async() => {
+	try {
+		console.log("about to try to hatch shrooms");
+		const hatchMyShrooms = await contract.HatchShroom(h_hatchShroomTier, h_hatchShroomRad)
+		console.log("hatched shrooms !");
+	} catch (error) {
+		console.log("Error: couldn't hatch shrooms due to ", error);
+	}
+} 
 

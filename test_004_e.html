@@ -129,7 +129,6 @@
             </div>
             <hr>
             <h6>Saved Rads: <span id="rad">?</span></h6>
-            <h6>Saved Shrooms: <span id="shroom">?</span></h6>
             <h6>Tribe: <span id="tribe">?</span></h6>
             <h6>Rads in Tribe Chest: <span id="tribeRad">?</span></h6>
             <h6>Number of Tribe Changes: <span id="tribeChange">?</span></h6>
@@ -158,6 +157,14 @@
                     <button onclick="raiseDaimid()">Raise Daimid</button>
                 </div>
             </div>                    
+            <br>
+            <hr>
+            <h5>SHROOMS</h5>
+            <br>
+            <h6>You have <span id="shroom">?</span> Shrooms</h6>
+            <h6>Hatch them using <input type="text" id="shroomRad" onInput="changeShroomRad(this.value)" value="0" size="1"> rads</h6>
+            <h6>Tier of Eggoa to hatch: <input type="text" id="shroomTier" onInput="changeShroomTier(this.value)" value="1" size="1"></h6>
+            <button onclick="hatchShrooms()">Hatch Shrooms</button>
             <br>
             <hr>
             <h5>GAME STATS</h5>
