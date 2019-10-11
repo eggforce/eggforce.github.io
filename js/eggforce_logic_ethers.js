@@ -803,12 +803,12 @@ const raiseGoamid = async() => {
 }
 
 let h_selectedFloor = 1; // let player pick this later
-let daimid_dai = 0;
+let daimid_wei = 0;
 
 function raiseDaimid() {
 	contract.ComputeDaiPlantamidCost(m_daiPlantamid, h_selectedFloor).then((result) =>
 	{
-		daimid_dai = ethers.utils.parseEther(result.toString());
+		daimid_wei = result.toString();
 		raiseDaimid2();
 	});
 }
@@ -817,7 +817,7 @@ const raiseDaimid2 = async() => {
 	try {
 		console.log("about to send transaction raisedaiplantamid");
 		const raiseMyGoamid = await contract.RaiseDaiPlantamid(h_selectedFloor, {
-			value: daimid_dai
+			value: daimid_wei
 		})
 
 		console.log("raised the plantamid successfully");
