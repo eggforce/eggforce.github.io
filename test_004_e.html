@@ -108,6 +108,7 @@
                     <span id="tier4">?</span>
                 </div>
             </div>
+            <br>
             <div class="row">
                 <div class="col-sm">
                     <h6>TIER 5</h6>
@@ -142,10 +143,18 @@
             <div class="row">
                 <div class="col-sm">
                     <h6>Eggoa Plantamid Floor: <span id="eggoaPlantamid">?</span></h6>
+                    <br>
+                    <h5>Sacrifice Eggoas to raise Floor</h5>
+                    <h6>Tier to sacrifice: <input type="text" id="tierSacrifice" onInput="getSacrificeAmount(this.value)" value="1" size="1"></h6>
+                    <h6>(You will sacrifice <span id="sacrificeAmount">?</span> Eggoas)</h6>
                     <button onclick="raiseGoamid()">Raise Goamid</button>
                 </div>
                 <div class="col-sm">
                     <h6>Dai Plantamid Floor: <span id="daiPlantamid">?</span></h6>
+                    <br>
+                    <h5>Spend Dai [POA] to raise Floor by 1 or more levels</h5>
+                    <h6>Number of Floors: <input type="text" id="floorsAdded" onInput="getFloorDaiCost(this.value)" value="1" size="1"></h6>
+                    <h6>(You will spend <span id="floorDaiCost">?</span> Dai [POA])</h6>
                     <button onclick="raiseDaimid()">Raise Daimid</button>
                 </div>
             </div>                    

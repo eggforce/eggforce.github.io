@@ -85,6 +85,9 @@ var m_tier = [0];
 var m_tribe = [0];
 var m_tribeChange = [0];
 
+var n_sacrificeAmount = [0];
+var n_floorDaiCost = [0];
+
 // Nest array
 var m_nest = [
 	{ amount: 0, level: 0, attackNext: 0, ownedLand: 0, stat0: 1, stat1: 0, stat2: 0, stat3: 0 },
@@ -152,6 +155,7 @@ function initializeBlockchainData(){
 	updateLaunchTimestamp();
 	updateEndTimestamp();
 	updateTerritory(1);
+	getSacrificeAmount(1);
 
 }
 
@@ -713,6 +717,23 @@ function updateTribeRad(__tribe){
 	});
 }
 
+// Get amount of Eggoas of given tier to sacrifice for player's next plantamid floor
+function getSacrificeAmount(__tier){
+	contract.ComputeEggoaPlantamidCost(m_eggoaPlantamid, __tier).then((result) =>
+	{
+		handleResult(result, n_sacrificeAmount, 'sacrificeAmount', "string");
+	});
+}
+
+// Get Dai cost to raise the Plantamid by __floor floors
+function getFloorDaiCost(__floor){
+	contract.ComputeDaiPlantamidCost(m_daiPlantamid, __floor).then((result) =>
+	{
+		handleResult(result, n_floorDaiCost, 'floorDaiCost', "dai");
+		h_selectedFloor = __floor;
+	});
+}
+
 // Return test
 function returnTest(){
 	let testValueB = 2;
@@ -789,12 +810,12 @@ const joinGame = async() => {
 	  }
 }
 
-let h_selectedTier = 1; // let player pick this later, and restrict between 1 and 8
 
+// WORKS, but take care of selectedTier
 const raiseGoamid = async() => {
 	try {
 		console.log("about to send transaction raiseeggoaplantamid");
-		const raiseMyGoamid = await contract.RaiseEggoaPlantamid(h_selectedTier)
+		const raiseMyGoamid = await contract.RaiseEggoaPlantamid(n_sacrificeAmount)
 
 		console.log("raised the plantamid successfully");
 	} catch (error) {
@@ -802,22 +823,12 @@ const raiseGoamid = async() => {
 	}
 }
 
-let h_selectedFloor = 1; // let player pick this later
-let daimid_wei = 0;
-
-function raiseDaimid() {
-	contract.ComputeDaiPlantamidCost(m_daiPlantamid, h_selectedFloor).then((result) =>
-	{
-		daimid_wei = result;
-		raiseDaimid2();
-	});
-}
-
-const raiseDaimid2 = async() => {
+// WORKS, but take care of selectedFloor
+const raiseDaimid = async() => {
 	try {
 		console.log("about to send transaction raisedaiplantamid");
 		const raiseMyGoamid = await contract.RaiseDaiPlantamid(h_selectedFloor, {
-			value: daimid_wei
+			value: ethers.utils.parseEther(n_floorDaiCost)
 		})
 
 		console.log("raised the plantamid successfully");
@@ -825,15 +836,4 @@ const raiseDaimid2 = async() => {
 		console.log("Error: ", error); //fires as the contract reverted the payment
 	}
 }
-
-/*
-let testWeiToEth = ethers.utils.bigNumberify("1000000000000000000");
-let testValue = ethers.utils.bigNumberify("2");
-let testMultiply = testValue.mul(testWeiToEth);
-console.log(testMultiply.toString());
-*/
-
-let amount = "3";
-let toSend = ethers.utils.parseEther(amount);
-console.log(toSend.toString());
 
