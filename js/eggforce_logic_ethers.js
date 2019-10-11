@@ -67,7 +67,7 @@ var a_radAuctionCost = [0];
 var a_radAuctionTimer = [0];
 var a_tribeRad = [0];
 
-var h_selectedLand = 1; // base land selected for land update
+var h_attackLandId = 1; // base land selected for land update
 var h_selectedTier = 1; // base tier for Eggoa Plantamid
 var h_selectedFloor = 1; // base rise for Dai Plantamid
 
@@ -340,8 +340,19 @@ function updateTerritory(){
 }
 */
 
+function checkBoundaries(__number, __html, __min, __max) {
+	if(__number > __max) {
+		__number = __max;
+	} else if (__number < __min) {
+		__number = __min;
+	}
+	document.getElementById(__html).value = __number;
+	return __number;
+}
+
 function updateTerritory(__id) {
 
+	/*
 	// make sure __id is within boundaries
 	if(__id > 64) {
 		__id = 64;
@@ -350,6 +361,8 @@ function updateTerritory(__id) {
 		__id = 1;
 		document.getElementById('landSelector').value = __id;
 	}
+	*/
+	__id = checkBoundaries(__id, 'landSelector', 1, 64);
 
 	// initialize t_land if previously undefined
 	if(t_land[__id] == null){
@@ -394,7 +407,7 @@ function updateTerritory(__id) {
 
 // Update HTML stats of a specific land
 function updateLand(__id){
-	h_selectedLand = __id;
+	h_attackLandId = __id;
 
 	//this should be refactored into switching between Discover and Attack states if land is/isn't init
 	if(t_land[__id] == null){
@@ -786,11 +799,17 @@ const startGame = async() => {
 	  }
 }
 
-// ALSO WORKS! I JUST WASN'T JOINED / IN ACTIVE GAME
+// Attack Land h_attackLandId using Eggoas of tier h_attackLandTier
+let h_attackLandTier = 1;
+
+function changeAttackLandTier(__tier) {
+	h_attackLandTier = __tier;
+}
+
 const attackLand = async() => {
 	try {
 		console.log("about to send transaction");
-		const attackThisLand = await contract.AttackTerritory(h_selectedLand, 0)
+		const attackThisLand = await contract.AttackTerritory(h_attackLandId, h_attackLandTier)
 		console.log("sent attackland tx successfully");
 	} catch(error) {
 		console.log("Error: ", error);
@@ -814,9 +833,7 @@ const joinGame = async() => {
 }
 
 
-// WORKED ONCE UPON A TIME, does not anymore for some reason
-// Possible note: should revert anyway because not enough eggoas
-// (This doesn't justify MetaMask failing to send it) 
+// WORKS
 const raiseGoamid = async() => {
 	try {
 		console.log("about to send transaction raiseeggoaplantamid");
@@ -843,8 +860,8 @@ const raiseDaimid = async() => {
 }
 
 
-// Hatch Shrooms using __rads into Eggoas of __tier
-// METAMASK FAILS
+// Hatch Shrooms using h_hatchShroomRad into Eggoas of h_hatchShroomTier
+// METAMASK FAILS IF h_hatchShroomRad > m_rad
 let h_hatchShroomRad = 0;
 
 function changeShroomRad(__rad) {
@@ -867,7 +884,7 @@ const hatchShrooms = async() => {
 	}
 } 
 
-// Harvest Rads
+// Harvest Rads - WORKS
 const harvestRads = async() => {
 	try {
 		console.log("about to try to harvest rads");
