@@ -1,0 +1,176 @@
+<html>
+	<head>
+		<link href="https://fonts.googleapis.com/css?family=Cairo|Exo&display=swap" rel="stylesheet"> 
+		<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+		<link rel="stylesheet" type="text/css" href="css/eggforce.css">
+	</head>
+	<body>
+		<br>
+		<div class="container" align="center">
+			<div class="container">
+				<h1 class="display-1">EGGFORCE test 004e</h1>
+				<br>		
+			</div>
+			<br>
+			<hr>
+			<br>
+			<div class="row">
+				<div class="col-sm">
+					<button onClick="getContractOwner()">Get Contract Owner</button>
+					<br><span id="contractOwner">?</span>
+				</div>
+				<div class="col-sm">
+					<button onClick="startGame()">StartGame</button>
+				</div>
+				<div class="col-sm">
+					<button onClick="updateBalance(m_account)">Update Balance</button>
+					<br><span id="balance">?</span>
+				</div>
+				<div class="col-sm">
+					<button onClick="updateTerritory()">Update Land 1</button>
+				</div>
+				<div class="col-sm">
+					<button onclick="updateNestStat()">Update Nest Stat</button>
+				</div>
+			</div>
+			<hr>
+            <br>
+            <div class="row">
+                <div class="col-sm">
+                    <h4>Select Land (1 to 64) <input type="text" id="landSelector" onInput="updateTerritory(this.value)" value="1" size="1"></h4>
+                </div>
+                <div class="col-sm">
+                    <h5><span id="w3q_land">?</span></h5>
+                </div>
+            </div>     
+            <br>
+            <div class="row">
+                <div class="col-sm">
+                    <h5>Land Level:</h5>
+                    <span id="landLevel">?</span>
+                </div>
+                <div class="col-sm">
+                    <h5>Land Stats:</h5>
+                    <span id="landStat">?</span>
+                </div>
+
+                <div class="col-sm">
+                    <h5>Current Lord:</h5>
+                    <span id="landLord">?</span>
+                </div>
+                <div class="col-sm">
+                    <h5>Lord Power:</h5>
+                    <span id="landPower">?</span>
+                </div>
+                <div class="col-sm">
+                    <h5>Lord Tribe:</h5>
+                    <span id="landTribe">?</span>
+                </div>
+                <div class="col-sm">
+                    <h5>Last Shroom Harvest:</h5>
+                    <span id="landLast">?</span>
+                </div>
+            </div>
+			<button onClick="attackLand()">Attack Land <span id="landSelected">?</span></button>
+			<br>
+            <hr>
+            <h3>GENERAL STUFF</h3>
+            <br>
+            <h5>DAI Anomaly</h5>
+            <h6>Base auction cost: <span id="daiAuctionCost">?</span></h6>
+			<h6>Auction started at: <span id="daiAuctionTimer">?</span></h6>
+            <br>
+            <h5>RAD Anomaly</h5>
+            <h6>Base auction cost: <span id="radAuctionCost">?</span></h6>
+			<h6>Auction started at: <span id="radAuctionTimer">?</span></h6>
+            <br>
+            <hr>
+            <h3>MY STUFF</h3>
+            <h4>Account = <span id="account">?</span></h3>
+            <br>
+            <h5>My Nest: </h5>
+            <h6>Best Tier unlocked: <span id="tier">?</span></h5>
+            <div class="row">
+                <div class="col-sm">
+                    <h6>TIER 1</h6>
+                    <span id="tier1">?</span>
+                </div>
+                <div class="col-sm">
+                    <h6>TIER 2</h6>
+                    <span id="tier2">?</span>
+                </div>
+                <div class="col-sm">
+                    <h6>TIER 3</h6>
+                    <span id="tier3">?</span>
+                </div>
+                <div class="col-sm">
+                    <h6>TIER 4</h6>
+                    <span id="tier4">?</span>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-sm">
+                    <h6>TIER 5</h6>
+                    <span id="tier5">?</span>
+                </div>
+                <div class="col-sm">
+                    <h6>TIER 6</h6>
+                    <span id="tier6">?</span>
+                </div>
+                <div class="col-sm">
+                    <h6>TIER 7</h6>
+                    <span id="tier7">?</span>
+                </div>
+                <div class="col-sm">
+                    <h6>TIER 8</h6>
+                    <span id="tier8">?</span>
+                </div>
+            </div>
+            <hr>
+            <h6>Saved Rads: <span id="rad">?</span></h6>
+            <h6>Saved Shrooms: <span id="shroom">?</span></h6>
+            <h6>Tribe: <span id="tribe">?</span></h6>
+            <h6>Rads in Tribe Chest: <span id="tribeRad">?</span></h6>
+            <h6>Number of Tribe Changes: <span id="tribeChange">?</span></h6>
+            <h6>Collected Rads from Tribe: <span id="collectedTribeRad">?</span></h6>
+            <h6>Earned Rads: <span id="earnedRad">?</span></h6>
+            <h6>Last Rad collection: <span id="lastRad">?</span></h6>
+            <h6>Last Shroom collection: <span id="lastShroom">?</span></h6>
+            <hr>
+            <h5>MY PLANTAMIDS</h5>
+            <br>
+            <div class="row">
+                <div class="col-sm">
+                    <h6>Eggoa Plantamid Floor: <span id="eggoaPlantamid">?</span></h6>
+                    <br>
+                    <h5>Sacrifice Eggoas to raise Floor</h5>
+                    <button onclick="raiseGoamid()">Raise Goamid</button>
+                </div>
+            </div>                    
+            <br>
+            <hr>
+            <h5>GAME STATS</h5>
+            <br>
+            <h6>Game start: <span id="launch">?</span></h6>
+            <h6>Game end: <span id="end">?</span></h6>
+            <h6>Cost to join game: <span id="joinCost">?</span> POA</h6>
+            <button onclick="joinGame()">Join Game</button>
+            <br>
+            <h6>Total number of Rads earned by all players: <span id="globalRad">?</span></h6>
+            <br>
+            <hr>
+            <h5>POA CHEST</h5>
+            <br>
+            <h6>You've won: <span id="openedChest">(do that later)</span></h6>
+            <h6>(Add button here)</h6>
+            <br>
+            <hr><hr>
+        </div>
+		<!-- etherjs -->
+		<script src="js/ethers-v4.min.js"></script>
+		<!-- Eggforce scripts -->
+		<script src="js/smartcontract_abi.js"></script>
+		<script src="js/eggforce_logic_ethers2.js"></script>
+	</body>
+</html>
