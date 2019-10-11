@@ -67,7 +67,9 @@ var a_radAuctionCost = [0];
 var a_radAuctionTimer = [0];
 var a_tribeRad = [0];
 
-var h_selectedLand = 0;
+var h_selectedLand = 1; // base land selected for land update
+var h_selectedTier = 1; // base tier for Eggoa Plantamid
+var h_selectedFloor = 1; // base rise for Dai Plantamid
 
 var m_account = "0xABF3E252006D805Cce3C7219A929B83465F2a46e"; // should be "", setup for local tests
 document.getElementById('account').innerHTML = formatEthAdr(m_account);
@@ -156,7 +158,7 @@ function initializeBlockchainData(){
 	updateEndTimestamp();
 	updateTerritory(1);
 	getSacrificeAmount(1);
-
+	getFloorDaiCost(1);
 }
 
 //Fast loop every second
@@ -722,6 +724,7 @@ function getSacrificeAmount(__tier){
 	contract.ComputeEggoaPlantamidCost(m_eggoaPlantamid, __tier).then((result) =>
 	{
 		handleResult(result, n_sacrificeAmount, 'sacrificeAmount', "string");
+		h_selectedTier = __tier;
 	});
 }
 
@@ -815,7 +818,7 @@ const joinGame = async() => {
 const raiseGoamid = async() => {
 	try {
 		console.log("about to send transaction raiseeggoaplantamid");
-		const raiseMyGoamid = await contract.RaiseEggoaPlantamid(n_sacrificeAmount)
+		const raiseMyGoamid = await contract.RaiseEggoaPlantamid(h_selectedTier)
 
 		console.log("raised the plantamid successfully");
 	} catch (error) {
@@ -828,7 +831,7 @@ const raiseDaimid = async() => {
 	try {
 		console.log("about to send transaction raisedaiplantamid");
 		const raiseMyGoamid = await contract.RaiseDaiPlantamid(h_selectedFloor, {
-			value: ethers.utils.parseEther(n_floorDaiCost)
+			value: ethers.utils.parseEther(n_floorDaiCost[0])
 		})
 
 		console.log("raised the plantamid successfully");
