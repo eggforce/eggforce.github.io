@@ -808,7 +808,7 @@ let daimid_wei = 0;
 function raiseDaimid() {
 	contract.ComputeDaiPlantamidCost(m_daiPlantamid, h_selectedFloor).then((result) =>
 	{
-		daimid_wei = result.toString();
+		daimid_wei = ethers.utils.parseUnits(result.toString(), 18);
 		raiseDaimid2();
 	});
 }
