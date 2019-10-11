@@ -844,6 +844,7 @@ const raiseDaimid = async() => {
 
 
 // Hatch Shrooms using __rads into Eggoas of __tier
+// METAMASK FAILS
 let h_hatchShroomRad = 0;
 
 function changeShroomRad(__rad) {
@@ -866,3 +867,13 @@ const hatchShrooms = async() => {
 	}
 } 
 
+// Harvest Rads
+const harvestRads = async() => {
+	try {
+		console.log("about to try to harvest rads");
+		const harvestMyRads = await contract.HarvestRad()
+		console.log("harvested rads !");
+	} catch (error) {
+		console.log("Error: couldn't harvest due to ", error);
+	}
+} 
