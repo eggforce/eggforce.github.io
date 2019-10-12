@@ -438,7 +438,7 @@ function updateLand(__id){
 	document.getElementById('landTribe').innerHTML = t_land[__id].tribe;
 	document.getElementById('landStat').innerHTML = t_land[__id].stat0 + "/" + t_land[__id].stat1 + "/" + t_land[__id].stat2 + "/" + t_land[__id].stat3;
 }
-
+/*
 // Land stat array
 function updateLandStat(__id) {
 	contract.GetLandStat(__id).then((result) =>
@@ -453,7 +453,7 @@ function updateLandStat(__id) {
 		t_land[__id][8] = result[3].toString();
 	});
 }
-
+/*
 // Nest values
 function updateNestValue(__player, __tier){
 	contract.eggoaNest(__player, __tier).then((result) =>
@@ -470,31 +470,26 @@ function updateNestValue(__player, __tier){
 		//console.log(result.stat[2].toString()); // shouldn't work
 	})
 }
-
+*/
 // Nest stat array
 function updateNestValue(__player, __tier){
 	contract.GetNestStat(__player, __tier).then((result) =>
 	{
 		contract.eggoaNest(__player, __tier).then((result2) =>
-		{
-		console.log("Nest " + __tier);
+		{		
 		m_nest[__tier].amount = result2.amount.toString();
-		console.log("Size : " + result2.amount.toString());
 		m_nest[__tier].level = result2.level.toString();
-		console.log("Level : " + result2.level.toString());
 		m_nest[__tier].attackNext = result2.attackNext;
-		console.log("Next attack : " + result2.attackNext);
 		m_nest[__tier].ownedLand = result2.ownedLand.toString()
-		console.log("Owned land : " + result2.ownedLand.toString());
-		console.log("Stat0 : " + result[0].toString());
+
 		m_nest[__tier].stat0 = result[0].toString();
-		console.log("Stat1 : " + result[1].toString());
 		m_nest[__tier].stat1 = result[1].toString();
-		console.log("Stat2 : " + result[2].toString());
 		m_nest[__tier].stat2 = result[2].toString();
-		console.log("Stat3 : " + result[3].toString());
 		m_nest[__tier].stat3 = result[3].toString();
+		
 		updateNestText(__tier);
+		
+		//console.log("Nest " + __tier + " size: " + result2.amount.toString() + " level: " + result2.level.toString() + " next attack: " + result2.attackNext + " owned land: " + result2.ownedLand.toString() + " stats: " + result[0].toString() + "/" + result[1].toString() + "/" + result[2].toString() + "/" + result[3].toString());
 		});
 	});
 }
@@ -720,6 +715,10 @@ function updateShroom(__player){
 function updateTier(__player){
 	contract.tier(__player).then((result) =>
 	{		
+		// run updateUnlockCost if player tier has changed
+		if(result.toString() != m_tier) {
+			updateUnlockCost();
+		}
 		handleResult(result, m_tier, 'tier', "string");
 		updateNest(__player);
 	});
@@ -768,8 +767,8 @@ function getFloorDaiCost(__floor){
 }
 
 // Get Rad cost to unlock tier after __tier
-function updateUnlockCost(__tier) {
-	contract.ComputeUnlockCost(__tier).then((result) =>
+function updateUnlockCost(m_tier) {
+	contract.ComputeUnlockCost(m_tier).then((result) =>
 	{
 		handleResult(result, m_unlockTierRadCost, 'unlockTierRadCost', "string");
 	});
