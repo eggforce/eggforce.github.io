@@ -309,6 +309,7 @@ function updateLandButton() {
 }
 
 // html update for upgrade costs
+var d_upgradeCost = [];
 d_upgradeCost[1] = document.getElementById('upgradeCost1');
 d_upgradeCost[2] = document.getElementById('upgradeCost2');
 d_upgradeCost[3] = document.getElementById('upgradeCost3');
