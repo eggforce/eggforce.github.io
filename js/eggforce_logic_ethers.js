@@ -67,7 +67,7 @@ var a_radAuctionCost = [0];
 var a_radAuctionTimer = [0];
 var a_tribeRad = [0];
 
-var h_attackLandId = 1; // base land selected for land update
+var h_selectedLand = 1; // base land selected for land update
 var h_selectedTier = 1; // base tier for Eggoa Plantamid
 var h_selectedFloor = 1; // base rise for Dai Plantamid
 
@@ -291,6 +291,19 @@ function updateEndTimer() {
 	document.getElementById('end').innerHTML = convertTime(a_end);
 }
 
+// change land button to "attack" or "collect" depending if player is lord of h_selectedland
+let d_landButton = document.getElementById('landButton');
+
+function updateLandButton() {
+	if(t_land[h_selectedLand].lord == m_account) {
+		d_landButton.innerHTML = '<button onClick="collectShrooms()">Collect Shrooms</button>';
+	} else if {t_land[h_selectedLand].tribe == m_tribe) {}
+		d_landButton.innerHTML = 'Land Owned by a Tribe Member';
+	} else {
+		d_landButton.innerHTML = '<button onClick="attackLand()">Attack Land</button>';
+	}
+}
+
 // READ ONLY ETHERS
 
 // if signer isn't 0, check if player changes accounts
@@ -399,6 +412,9 @@ function updateTerritory(__id) {
 
 					// update status message
 					document.getElementById('w3q_land').innerHTML = "Up to date.";
+
+					// update possible action
+					updateLandButton();
 				});
 			});
 		});
@@ -407,7 +423,7 @@ function updateTerritory(__id) {
 
 // Update HTML stats of a specific land
 function updateLand(__id){
-	h_attackLandId = __id;
+	h_selectedLand = __id;
 
 	//this should be refactored into switching between Discover and Attack states if land is/isn't init
 	if(t_land[__id] == null){
@@ -591,7 +607,7 @@ function updateDaiPlantamid(__player){
 function updateEarnedRad(__player){
 	contract.earnedRad(__player).then((result) =>
 	{
-		handleResult(result, m_earnedRad, 'earnedRad', "dai");
+		handleResult(result, m_earnedRad, 'earnedRad', "string");
 	});
 }
 
@@ -799,7 +815,7 @@ const startGame = async() => {
 	  }
 }
 
-// Attack Land h_attackLandId using Eggoas of tier h_attackLandTier
+// Attack Land h_selectedLand using Eggoas of tier h_attackLandTier
 let h_attackLandTier = 1;
 
 function changeAttackLandTier(__tier) {
@@ -809,7 +825,7 @@ function changeAttackLandTier(__tier) {
 const attackLand = async() => {
 	try {
 		console.log("about to send transaction");
-		const attackThisLand = await contract.AttackTerritory(h_attackLandId, h_attackLandTier)
+		const attackThisLand = await contract.AttackTerritory(h_selectedLand, h_attackLandTier)
 		console.log("sent attackland tx successfully");
 	} catch(error) {
 		console.log("Error: ", error);
@@ -892,5 +908,17 @@ const harvestRads = async() => {
 		console.log("harvested rads !");
 	} catch (error) {
 		console.log("Error: couldn't harvest due to ", error);
+	}
+} 
+
+// Collect Shrooms - TEST
+// (TODO) Add condition for button to appear: h_selectedLand must = player owned lands
+const collectShrooms = async() => {
+	try {
+		console.log("about to collect shrooms");
+		const collectMyShrooms = await contract.CollectShroom(h_selectedLand)
+		console.log("collected shrooms !");
+	} catch (error) {
+		console.log("Error: couldn't collect ", error);
 	}
 } 
