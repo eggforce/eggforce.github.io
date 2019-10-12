@@ -715,12 +715,9 @@ function updateShroom(__player){
 function updateTier(__player){
 	contract.tier(__player).then((result) =>
 	{		
-		// run updateUnlockCost if player tier has changed
-		if(result.toString() != m_tier) {
-			updateUnlockCost();
-		}
 		handleResult(result, m_tier, 'tier', "string");
 		updateNest(__player);
+		updateUnlockCost();
 	});
 }
 
@@ -766,8 +763,9 @@ function getFloorDaiCost(__floor){
 	});
 }
 
-// Get Rad cost to unlock tier after __tier
-function updateUnlockCost(m_tier) {
+// Get Rad cost to unlock next tier
+// gives mysterious __tier error even as __tier isn't used?...
+function updateUnlockCost() {
 	contract.ComputeUnlockCost(m_tier).then((result) =>
 	{
 		handleResult(result, m_unlockTierRadCost, 'unlockTierRadCost', "string");
