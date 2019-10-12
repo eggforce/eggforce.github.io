@@ -977,9 +977,10 @@ const withdrawDai = async() => {
 }
 
 // UpgradeEggoa - TEST
+// (TODO) let player pick upgradeStat. total should be 4
 let s_upgradeTier = 1;
 
-let s_upgradeStat = [0, 0, 0, 0];
+let s_upgradeStat = [1, 1, 1, 1];
 
 function selectTierThenUpgrade(__tier) {
 	s_upgradeTier = __tier;
@@ -995,3 +996,27 @@ const upgradeGoa = async() => {
 		console.log("Error: couldn't collect ", error);
 	}
 } 
+
+// OpenChest - TEST
+
+const openRewardChest = async () => {
+	try {
+		console.log("opening dai chest...");
+		const openMyChest = await contract.OpenChest()
+		console.log("success!");
+	} catch (error) {
+		console.log("Error: couldn't open ", error);
+	}
+}
+
+// ClaimTribeRad - TEST
+
+const claimTribeRads = async () => {
+	try {
+		console.log("claiming tribe rad...");
+		const claimMyTribeRads = await contract.ClaimTribeRad()
+		console.log("success!");
+	} catch (error) {
+		console.log("Error: couldn't get tribe rads ", error);
+	}
+}
