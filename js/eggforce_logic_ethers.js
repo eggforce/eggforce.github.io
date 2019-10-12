@@ -91,6 +91,8 @@ var m_unlockTierRadCost = [0];
 var n_sacrificeAmount = [0];
 var n_floorDaiCost = [0];
 
+var s_upgradeRadCost = [];
+
 // Nest array
 var m_nest = [
 	{ amount: 0, level: 0, attackNext: 0, ownedLand: 0, stat0: 1, stat1: 0, stat2: 0, stat3: 0 },
@@ -317,7 +319,7 @@ d_upgradeCost[7] = document.getElementById('upgradeCost7');
 d_upgradeCost[8] = document.getElementById('upgradeCost8');
 
 function updateHTMLupgradeCost() {
-	for(i = 1; i < 9; i++) {
+	for(i = 1; i <= m_tier; i++) {
 		d_upgradeCost[i].innerHTML = s_upgradeRadCost[i];
 	}
 }
@@ -798,7 +800,7 @@ function updateUpgradeCost() {
 			handleResult(result, s_upgradeRadCost[i], 0, "string");
 		});
 	}
-	updateHTMLupgradeCost()
+	updateHTMLupgradeCost();
 }
 
 // Events
@@ -975,7 +977,7 @@ const withdrawDai = async() => {
 
 // UpgradeEggoa - TEST
 let s_upgradeTier = 1;
-let s_upgradeRadCost = [];
+
 let s_upgradeStat = [0, 0, 0, 0];
 
 function selectTierThenUpgrade(__tier) {
