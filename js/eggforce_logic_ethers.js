@@ -202,6 +202,7 @@ function refreshData(){
 	updateDaiAuctionTimer();
 	updateRadAuctionCost();
 	updateRadAuctionTimer();
+	updateUpgradeCost();
 }
 
 //** UTILITIES **//
@@ -302,6 +303,22 @@ function updateLandButton() {
 		d_landButton.innerHTML = 'Land Owned by a Tribe Member';
 	} else {
 		d_landButton.innerHTML = '<button onClick="attackLand()">Attack Land</button>';
+	}
+}
+
+// html update for upgrade costs
+d_upgradeCost[1] = document.getElementById('upgradeCost1');
+d_upgradeCost[2] = document.getElementById('upgradeCost2');
+d_upgradeCost[3] = document.getElementById('upgradeCost3');
+d_upgradeCost[4] = document.getElementById('upgradeCost4');
+d_upgradeCost[5] = document.getElementById('upgradeCost5');
+d_upgradeCost[6] = document.getElementById('upgradeCost6');
+d_upgradeCost[7] = document.getElementById('upgradeCost7');
+d_upgradeCost[8] = document.getElementById('upgradeCost8');
+
+function updateHTMLupgradeCost() {
+	for(i = 1; i < 9; i++) {
+		d_upgradeCost[i].innerHTML = s_upgradeRadCost[i];
 	}
 }
 
@@ -764,12 +781,24 @@ function getFloorDaiCost(__floor){
 }
 
 // Get Rad cost to unlock next tier
-// gives mysterious __tier error even as __tier isn't used?...
+// might not even be needed. unlock cost = tier ** 10 * 10
 function updateUnlockCost() {
-	contract.ComputeUnlockCost(m_tier).then((result) =>
+	let __tier = parseInt(m_tier) + parseInt(1);
+	contract.ComputeUnlockCost(__tier).then((result) =>
 	{
 		handleResult(result, m_unlockTierRadCost, 'unlockTierRadCost', "string");
 	});
+}
+
+// Get Rad cost for next upgrade of given Eggoa
+function updateUpgradeCost() {
+	for(i = 1; i <= m_tier; i++) {
+		contract.ComputeUpgradeCost(i).then((result) =>
+		{
+			handleResult(result, s_upgradeRadCost[i], 0, "string");
+		});
+	}
+	updateHTMLupgradeCost()
 }
 
 // Events
@@ -909,7 +938,7 @@ const harvestRads = async() => {
 	}
 } 
 
-// Collect Shrooms - TEST
+// Collect Shrooms - WORKS - but need contract v7
 // (TODO) Add condition for button to appear: h_selectedLand must = player owned lands
 const collectShrooms = async() => {
 	try {
@@ -921,7 +950,7 @@ const collectShrooms = async() => {
 	}
 } 
 
-// UnlockTier - TEST
+// UnlockTier - WORKS
 // (TODO) run ComputeUnlockCost and disable/enable action based on m_rad evaluation
 const unlockNextTier = async() => {
 	try {
@@ -932,3 +961,34 @@ const unlockNextTier = async() => {
 		console.log("Error: couldn't unlock ", error);
 	}
 }
+
+// WithdrawBalance - TEST
+const withdrawDai = async() => {
+	try {
+		console.log("withdrawing all the internet money...");
+		const withdrawMyBalance= await contract.WithdrawBalance()
+		console.log("you are now a rich man!");
+	} catch (error) {
+		console.log("Error: stole all your money ", error);
+	}
+}
+
+// UpgradeEggoa - TEST
+let s_upgradeTier = 1;
+let s_upgradeRadCost = [];
+let s_upgradeStat = [0, 0, 0, 0];
+
+function selectTierThenUpgrade(__tier) {
+	s_upgradeTier = __tier;
+	upgradeGoa();
+}
+
+const upgradeGoa = async() => {
+	try {
+		console.log("upgrading eggoas...");
+		const collectMyShrooms = await contract.UpgradeEggoa(s_upgradeTier, s_upgradeRad[s_upgradeTier], s_upgradeStat[0], s_upgradeStat[1], s_upgradeStat[2], s_upgradeStat[3])
+		console.log("success!");
+	} catch (error) {
+		console.log("Error: couldn't collect ", error);
+	}
+} 
