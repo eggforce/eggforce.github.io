@@ -297,7 +297,7 @@ let d_landButton = document.getElementById('landButton');
 function updateLandButton() {
 	if(t_land[h_selectedLand].lord == m_account) {
 		d_landButton.innerHTML = '<button onClick="collectShrooms()">Collect Shrooms</button>';
-	} else if {t_land[h_selectedLand].tribe == m_tribe) {}
+	} else if (t_land[h_selectedLand].tribe == m_tribe) {
 		d_landButton.innerHTML = 'Land Owned by a Tribe Member';
 	} else {
 		d_landButton.innerHTML = '<button onClick="attackLand()">Attack Land</button>';
