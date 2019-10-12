@@ -86,6 +86,7 @@ var m_shroom = [0];
 var m_tier = [0];
 var m_tribe = [0];
 var m_tribeChange = [0];
+var m_unlockTierRadCost = [0];
 
 var n_sacrificeAmount = [0];
 var n_floorDaiCost = [0];
@@ -429,7 +430,7 @@ function updateLand(__id){
 	if(t_land[__id] == null){
 		t_land[__id] = { lord: "none", level: 0, tribe: 0, power: 0, lastLand: 0, stat0: 0, stat1: 0, stat2: 0, stat3: 0};
 	}
-	document.getElementById('landSelected').innerHTML = __id;
+	//document.getElementById('landSelected').innerHTML = __id;
 	document.getElementById('landLast').innerHTML = t_land[__id].lastLand;
 	document.getElementById('landLord').innerHTML = formatEthAdr(t_land[__id].lord);
 	document.getElementById('landPower').innerHTML = t_land[__id].power;
@@ -766,12 +767,12 @@ function getFloorDaiCost(__floor){
 	});
 }
 
-// Return test
-function returnTest(){
-	let testValueB = 2;
-	let testValueA = updateRadAuctionCost();
-
-	return testValueA * testValueB; // returns undefined because the async cal for update... isn't finished
+// Get Rad cost to unlock tier after __tier
+function updateUnlockCost(__tier) {
+	contract.ComputeUnlockCost(__tier).then((result) =>
+	{
+		handleResult(result, m_unlockTierRadCost, 'unlockTierRadCost', "string");
+	});
 }
 
 // Events
@@ -922,3 +923,15 @@ const collectShrooms = async() => {
 		console.log("Error: couldn't collect ", error);
 	}
 } 
+
+// UnlockTier - TEST
+// (TODO) run ComputeUnlockCost and disable/enable action based on m_rad evaluation
+const unlockNextTier = async() => {
+	try {
+		console.log("about to unlock tier");
+		const unlockMyNextTier = await contract.UnlockTier()
+		console.log("unlocked tier!");
+	} catch (error) {
+		console.log("Error: couldn't unlock ", error);
+	}
+}
