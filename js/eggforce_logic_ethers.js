@@ -798,7 +798,7 @@ function updateUpgradeCost() {
 	for(i = 1; i <= m_tier; i++) {
 		contract.ComputeUpgradeCost(i).then((result) =>
 		{
-			handleResult(result, s_upgradeRadCost[i], 0, "string");
+			s_upgradeRadCost[i] = result.toString();
 		});
 	}
 	updateHTMLupgradeCost();
