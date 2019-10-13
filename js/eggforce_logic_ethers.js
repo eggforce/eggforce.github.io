@@ -170,6 +170,10 @@ function initializeBlockchainData(){
 function controlLoop1(){
 	updateLaunchTimer();
 	updateEndTimer();
+	updateDaimidTimer();
+	updateGoamidTimer();
+	updateLastRadTimer();
+	updateLastShroomTimer();
 	setTimeout(controlLoop1, 1000);
 }
 
@@ -299,6 +303,22 @@ function updateLaunchTimer() {
 
 function updateEndTimer() {
 	document.getElementById('end').innerHTML = convertTime(a_end);
+}
+
+function updateDaimidTimer() {
+	document.getElementById('daiAuctionTimer').innerHTML = convertTime(a_daiAuctionTimer);
+}
+
+function updateGoamidTimer() {
+	document.getElementById('radAuctionTimer').innerHTML = convertTime(a_radAuctionTimer);
+}
+
+function updateLastRadTimer() {
+	document.getElementById('lastRad').innerHTML = convertTime(m_lastRad);
+}
+
+function updateLastShroomTimer() {
+	document.getElementById('lastShroom').innerHTML = convertTime(m_lastShroom);
 }
 
 // change land button to "attack" or "collect" depending if player is lord of h_selectedland
@@ -460,7 +480,7 @@ function updateLand(__id){
 		t_land[__id] = { lord: "none", level: 0, tribe: 0, power: 0, lastLand: 0, stat0: 0, stat1: 0, stat2: 0, stat3: 0};
 	}
 	//document.getElementById('landSelected').innerHTML = __id;
-	document.getElementById('landLast').innerHTML = t_land[__id].lastLand;
+	document.getElementById('landLast').innerHTML = convertTime(t_land[__id].lastLand);
 	document.getElementById('landLord').innerHTML = formatEthAdr(t_land[__id].lord);
 	document.getElementById('landPower').innerHTML = t_land[__id].power;
 	document.getElementById('landLevel').innerHTML = t_land[__id].level;
@@ -635,7 +655,7 @@ function updateDaiAuctionCost(){
 function updateDaiAuctionTimer(){
 	contract.daiAuctionTimer().then((result) =>
 	{
-		handleResult(result, a_daiAuctionTimer, 'daiAuctionTimer', "none");
+		handleResult(result, a_daiAuctionTimer, 0, "none");
 	})
 }
 
@@ -691,7 +711,7 @@ function updateJoinCost(){
 function updateLastRad(__player){
 	contract.lastRad(__player).then((result) =>
 	{
-		handleResult(result, m_lastRad, 'lastRad', "string");
+		handleResult(result, m_lastRad, 0, "string");
 	});
 }
 
@@ -699,7 +719,7 @@ function updateLastRad(__player){
 function updateLastShroom(__player){
 	contract.lastShroom(__player).then((result) =>
 	{
-		handleResult(result, m_lastShroom, 'lastShroom', "string");
+		handleResult(result, m_lastShroom, 0, "string");
 	});
 }
 
@@ -822,8 +842,7 @@ function getFloorDaiCost(__floor){
 // Get Rad cost to unlock next tier
 // might not even be needed. unlock cost = tier ** 10 * 10
 function updateUnlockCost() {
-	let __tier = parseInt(m_tier) + parseInt(1);
-	contract.ComputeUnlockCost(__tier).then((result) =>
+	contract.ComputeUnlockCost(m_tier).then((result) =>
 	{
 		handleResult(result, m_unlockTierRadCost, 'unlockTierRadCost', "string");
 	});
