@@ -832,7 +832,7 @@ function updateUnlockCost() {
 // Get Rad cost for next upgrade of given Eggoa
 function updateUpgradeCost() {
 	for(let i = 1; i <= m_tier; i++) {
-		contract.ComputeUpgradeCost(i).then((result) =>
+		contract.ComputeUpgradeCost(m_nest[i].level).then((result) =>
 		{
 			s_upgradeRadCost[i] = result.toString();
 		});
@@ -1022,6 +1022,7 @@ const withdrawDai = async() => {
 
 // UpgradeEggoa - TEST
 // (TODO) let player pick upgradeStat. total should be 4
+// DOESNT WORK
 let s_upgradeTier = 1;
 
 let s_upgradeStat = [1, 1, 1, 1];
