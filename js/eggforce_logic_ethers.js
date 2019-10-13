@@ -574,7 +574,7 @@ function updateNestText(__tier){
 		doc_m_nest[__tier].innerHTML = 
 		"<h6>Amount: " + m_nest[__tier].amount + "</h6>" +
 		"<h6>Level: " + m_nest[__tier].level + "</h6>" +
-		"<h6>Time until attack: " + m_nest[__tier].attackNext + "</h6>" +
+		"<h6>Time until attack: " + convertTime(m_nest[__tier].attackNext) + "</h6>" +
 		"<h6>Lord of Land: " + m_nest[__tier].ownedLand + "</h6>" +
 		"<h6>Stats: " + m_nest[__tier].stat0 + "/" + m_nest[__tier].stat1 + "/" + m_nest[__tier].stat2 + "/" + m_nest[__tier].stat3;
 }
