@@ -524,9 +524,28 @@ function updateNestValue(__player, __tier){
 }
 
 // Update all nests for player
-function updateNest(__player){
-	for(let i = 1; i <= m_tier[0]; i++){
+function updateNest(__player ) {
+
+	// if player is active
+	for(let i = 1; i <= m_tier[0]; i++) {
 		updateNestValue(__player, i);
+	}
+
+	// if player isn't active (account change)
+	if(m_tier[0] == 0) {
+		for(let j = 1; j < 9; j++) {
+			m_nest[j].amount = 0;
+			m_nest[j].level = 0;
+			m_nest[j].attackNext = 0;
+			m_nest[j].ownedLand = 0;
+
+			m_nest[j].stat0 = 0;
+			m_nest[j].stat1 = 0;
+			m_nest[j].stat2 = 0;
+			m_nest[j].stat3 = 0;
+
+			updateNestText(j);
+		}
 	}
 }
 
@@ -733,11 +752,19 @@ function updateRadAuctionTimer(){
 }
 
 // Owned Shrooms for player (from land grabs)
-function updateShroom(__player){
-	contract.ComputeShroom(__player).then((result) =>
-	{
-		handleResult(result, m_shroom, 'shroom', "string");
-	});
+function updateShroom(__player) {
+
+	// if player has joined the game
+	if(m_tier[0] > 0) {
+		contract.ComputeShroom(__player).then((result) =>
+		{
+			handleResult(result, m_shroom, 'shroom', "string");
+		});
+	}
+	// if player hasn't (i.e account change), reset value to 0
+	else {
+		handleResult(0, m_shroom, 'shroom', "none");
+	}
 }
 
 // Unlocked tier for player
@@ -1007,7 +1034,7 @@ function selectTierThenUpgrade(__tier) {
 const upgradeGoa = async() => {
 	try {
 		console.log("upgrading eggoas...");
-		const collectMyShrooms = await contract.UpgradeEggoa(s_upgradeTier, s_upgradeRad[s_upgradeTier], s_upgradeStat[0], s_upgradeStat[1], s_upgradeStat[2], s_upgradeStat[3])
+		const collectMyShrooms = await contract.UpgradeEggoa(s_upgradeTier, s_upgradeRadCost[s_upgradeTier], s_upgradeStat[0], s_upgradeStat[1], s_upgradeStat[2], s_upgradeStat[3])
 		console.log("success!");
 	} catch (error) {
 		console.log("Error: couldn't collect ", error);
