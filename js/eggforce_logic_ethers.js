@@ -1,7 +1,7 @@
 // INITIALIZE WEB3
 
 let contract;
-let contractAddress = "0xc302B696CcE10880BE65717beDd440e353E885a6"; // v006
+let contractAddress = "0xfe91Df2a735a9d26f0b5Ccbc516820E96b01078c"; // v007
 let provider;
 let signer = 0;
 
@@ -863,6 +863,8 @@ function beginEventLogging() {
 
 // WRITE ETHERS
 
+// (TODO - MOST FUNCTIONS) call appropriate refresh function to show updated data
+
 /*
 function startGame() {
 				// Sending a tx?? 
@@ -1022,7 +1024,7 @@ const withdrawDai = async() => {
 
 // UpgradeEggoa - TEST
 // (TODO) let player pick upgradeStat. total should be 4
-// DOESNT WORK
+// WORKS
 let s_upgradeTier = 1;
 
 let s_upgradeStat = [1, 1, 1, 1];
