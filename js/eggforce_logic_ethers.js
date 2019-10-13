@@ -831,7 +831,7 @@ function updateUnlockCost() {
 
 // Get Rad cost for next upgrade of given Eggoa
 function updateUpgradeCost() {
-	for(i = 1; i <= m_tier; i++) {
+	for(let i = 1; i <= m_tier; i++) {
 		contract.ComputeUpgradeCost(i).then((result) =>
 		{
 			s_upgradeRadCost[i] = result.toString();
