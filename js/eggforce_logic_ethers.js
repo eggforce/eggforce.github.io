@@ -5,6 +5,9 @@ let contractAddress = "0xc302B696CcE10880BE65717beDd440e353E885a6"; // v006
 let provider;
 let signer = 0;
 
+var m_account = "0xABF3E252006D805Cce3C7219A929B83465F2a46e"; // should be "", setup for local tests
+document.getElementById('account').innerHTML = formatEthAdr(m_account);
+
 window.addEventListener('load', async () => {
     // Modern dapp browsers...
     if (window.ethereum) {
@@ -18,7 +21,7 @@ window.addEventListener('load', async () => {
 
 			//Reference Error: web3 undefined in local tests
 			//Works once deployed to web
-			
+
 			provider = new ethers.providers.Web3Provider(web3.currentProvider);
 			signer = provider.getSigner();
 
@@ -71,8 +74,6 @@ var h_selectedLand = 1; // base land selected for land update
 var h_selectedTier = 1; // base tier for Eggoa Plantamid
 var h_selectedFloor = 1; // base rise for Dai Plantamid
 
-var m_account = "0xABF3E252006D805Cce3C7219A929B83465F2a46e"; // should be "", setup for local tests
-document.getElementById('account').innerHTML = formatEthAdr(m_account);
 var m_balance = [0];
 var m_collectedTribeRad = [0];
 var m_daiPlantamid = [0];
@@ -82,6 +83,7 @@ var m_lastRad = [0];
 var m_lastShroom = [0];
 var m_openedChest = false;
 var m_rad = [0];
+var m_radToHarvest = [0];
 var m_shroom = [0];
 var m_tier = [0];
 var m_tribe = [0];
@@ -172,8 +174,11 @@ function controlLoop1(){
 }
 
 //Main loop on 4 seconds
-function controlLoop4(){
-	updateAccount();
+function controlLoop4() {
+	if(signer != 0) {
+		updateAccount();
+	}
+
     setTimeout(controlLoop4, 4000);
 }
 
@@ -205,6 +210,7 @@ function refreshData(){
 	updateRadAuctionCost();
 	updateRadAuctionTimer();
 	updateUpgradeCost();
+	updateRadToHarvest();
 }
 
 //** UTILITIES **//
@@ -328,16 +334,19 @@ function updateHTMLupgradeCost() {
 // READ ONLY ETHERS
 
 // if signer isn't 0, check if player changes accounts
-function updateAccount(){
-	if(signer != 0){
-		let addressPromise = signer.getAddress().then(function(result){
-			if(m_account != result){
-				m_account = result;
-				document.getElementById('account').innerHTML = formatEthAdr(m_account);
-				refreshData();
-			}
-		});
-	}
+// TEST
+function updateAccount() {
+
+	provider = new ethers.providers.Web3Provider(web3.currentProvider);
+	signer = provider.getSigner();	
+	contract = new ethers.Contract(contractAddress, abi, signer);
+
+	let addressPromise = signer.getAddress().then(function(result){
+		m_account = result;
+		document.getElementById('account').innerHTML = formatEthAdr(m_account);
+		console.log(m_account);
+		refreshData();
+	});
 }
 
 function getContractOwner() {
@@ -804,6 +813,14 @@ function updateUpgradeCost() {
 	updateHTMLupgradeCost();
 }
 
+// Get Rads player can harvest
+function updateRadToHarvest() {
+	contract.ComputeFullRad(m_account).then((result) =>
+	{
+		handleResult(result, m_radToHarvest, 'radToHarvest', "string");
+	});
+}
+
 // Events
 
 function beginEventLogging() {
@@ -1009,7 +1026,7 @@ const openRewardChest = async () => {
 	}
 }
 
-// ClaimTribeRad - TEST
+// ClaimTribeRad - WORKS
 
 const claimTribeRads = async () => {
 	try {
