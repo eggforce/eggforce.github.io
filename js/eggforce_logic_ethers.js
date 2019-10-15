@@ -1169,7 +1169,7 @@ const claimTribeRads = async () => {
 }
 
 
-// FIND DAI ANOMALY
+// FIND DAI ANOMALY - WORKSish. deploy v8 and test
 const findDaiAnomaly = async() => {
 	try {
 		console.log("about to send transaction findDAIanomaly");
@@ -1196,3 +1196,5 @@ const findRadAnomaly = async() => {
 		console.log("Error: ", error); //fires as the contract reverted the payment
 	}
 }
+
+//

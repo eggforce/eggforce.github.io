@@ -12,22 +12,46 @@
 				<br>		
 			</div>
 			<br>
-			<hr>
-			<br>
-			<div class="row">
-				<div class="col-sm">
-					<button onClick="getContractOwner()">Get Contract Owner</button>
-					<br><span id="contractOwner">?</span>
-				</div>
-				<div class="col-sm">
-					<button onClick="startGame()">StartGame</button>
-				</div>
-				<div class="col-sm">
-					<button onClick="withdrawDai()">Withdraw Balance</button>
-					<br><span id="balance">?</span>
-				</div>
-			</div>
-			<hr>
+            <hr>
+            <h4>MY STUFF</h3>
+            <h5>Account = <span id="account">?</span></h3>
+            <br>
+            <div class="row">
+                <div class="col-sm">
+                        <h5>SHROOMS</h5>
+                        <br>
+                        <h6>You have <span id="shroom">?</span> Shrooms</h6>
+                        <h6>Hatch them using <input type="text" id="shroomRad" onInput="changeShroomRad(this.value)" value="0" size="1"> rads</h6>
+                        <h6>Tier of Eggoa to hatch: <input type="text" id="shroomTier" onInput="changeShroomTier(this.value)" value="1" size="1"></h6>
+                        <button onclick="hatchShrooms()">Hatch Shrooms</button>
+                        <br>
+                        <h6>Last Shroom collection: <span id="lastShroom">?</span></h6>
+                </div>
+                <div class="col-sm">
+                        <h6>Tribe: <span id="tribe">?</span></h6>
+                        <h6>Number of Tribe Changes: <span id="tribeChange">?</span></h6>
+                        <h6>Balance: <span id="balance">?</span> DAI</h6> <button onClick="withdrawDai()">Withdraw Balance</button>
+                </div>
+                <div class="col-sm">
+                    <h5>RADS</h5>
+                    <br>
+                    <h6>You have <span id="rad">?</span> RADS</h6>
+                        <h6>Rads ready for Harvest: <span id="radToHarvest">?</span></h6>
+                        <button onclick="harvestRads()">Harvest Rads</button>
+                        <br>
+                        <h6>Last Rad collection: <span id="lastRad">?</span></h6>
+                        <br>
+                        <h6>Rads in Tribe Chest: <span id="tribeRad">?</span></h6>
+                        <button onclick="claimTribeRads()">Claim Tribe Rads</button>
+                        <br>
+                        <h6>Previouly Claimed Rads from Tribe: <span id="collectedTribeRad">?</span></h6>
+                        <br>
+                        <h6>Earned Rads: <span id="earnedRad">?</span></h6>                    
+                </div>
+            </div>
+            
+            <br>
+            <hr>
             <br>
             <div class="row">
                 <div class="col-sm">
@@ -94,8 +118,7 @@
             <br>
             <br>
             <hr>
-            <h3>MY STUFF</h3>
-            <h4>Account = <span id="account">?</span></h3>
+
             <br>
             <h5>My Nest: </h5>
             <h6>Best Tier unlocked: <span id="tier">?</span></h5>
@@ -155,14 +178,8 @@
                 </div>
             </div>
             <hr>
-            <h6>Saved Rads: <span id="rad">?</span></h6>
-            <h6>Tribe: <span id="tribe">?</span></h6>
-            <h6>Rads in Tribe Chest: <span id="tribeRad">?</span></h6>
-            <h6>Number of Tribe Changes: <span id="tribeChange">?</span></h6>
-            <h6>Collected Rads from Tribe: <span id="collectedTribeRad">?</span></h6>
-            <h6>Earned Rads: <span id="earnedRad">?</span></h6>
-            <h6>Last Rad collection: <span id="lastRad">?</span></h6>
-            <h6>Last Shroom collection: <span id="lastShroom">?</span></h6>
+  
+            
             <hr>
             <h5>MY PLANTAMIDS</h5>
             <br>
@@ -186,17 +203,11 @@
             </div>                    
             <br>
             <hr>
-            <h5>SHROOMS</h5>
-            <br>
-            <h6>You have <span id="shroom">?</span> Shrooms</h6>
-            <h6>Hatch them using <input type="text" id="shroomRad" onInput="changeShroomRad(this.value)" value="0" size="1"> rads</h6>
-            <h6>Tier of Eggoa to hatch: <input type="text" id="shroomTier" onInput="changeShroomTier(this.value)" value="1" size="1"></h6>
-            <button onclick="hatchShrooms()">Hatch Shrooms</button>
+            
             <br>
             <hr>
             <br>
-            <h6>Rads ready for Harvest: <span id="radToHarvest">?</span></h6>
-            <button onclick="harvestRads()">Harvest Rads</button>
+            
             <br>
             <hr>
             <h5>GAME STATS</h5>
@@ -215,7 +226,23 @@
             <button onclick="openRewardChest()">Open Chest</button>
             <h6>(Can't open before game end)</h6>
             <br>
-            <button onclick="claimTribeRads()">Claim Tribe Rads</button>
+            
+            <hr><hr>
+            <h5>MISC FUNCTIONS</h5>
+            <br>
+            <div class="row">
+                    <div class="col-sm">
+                        <button onClick="getContractOwner()">Get Contract Owner</button>
+                        <br><span id="contractOwner">?</span>
+                    </div>
+                    <div class="col-sm">
+                        <button onClick="startGame()">StartGame</button>
+                    </div>
+                    <div class="col-sm">
+                        
+                        <br>
+                    </div>
+                </div>
             <hr><hr>
         </div>
 		<!-- etherjs -->
