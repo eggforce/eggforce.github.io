@@ -713,7 +713,11 @@ function updateDaiAuctionCostNow() {
 	let _daiBaseCost = ethers.utils.parseEther(a_daiAuctionCost[0].toString());
 	contract.ComputeAuction(a_daiAuctionTimer[0], _daiBaseCost, _currentTimestamp).then((result) =>
 	{
-		handleResult(result, a_daiAuctionCostNow, 'daiAuctionCost', "dai");
+		// for some reason, the exact cost doesn't work
+		// we refund the difference anyway, so multiply requirement
+		result = ethers.utils.formatEther(result);
+		result = result * 1.2;
+		handleResult(result, a_daiAuctionCostNow, 'daiAuctionCost', "none");
 	});
 }
 
@@ -1179,7 +1183,7 @@ const findDaiAnomaly = async() => {
 	}
 }
 
-// FIND RAD ANOMALY
+// FIND RAD ANOMALY - WORKS
 const findRadAnomaly = async() => {
 	try {
 		console.log("about to send transaction findRADanomaly");
