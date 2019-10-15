@@ -659,7 +659,11 @@ function handleResult(result_, a_, doc_, operation_){
 	}
 
 	if(doc_ != 0){
-		document.getElementById(doc_).innerHTML = a_[0];
+		let _html = a_[0];
+		if(operation_ == "dai") {
+			_html = parseFloat(a_[0]).toFixed(4);
+		}
+		document.getElementById(doc_).innerHTML = _html;
 	}
 
 	//console.log(a_[0]);
@@ -705,8 +709,9 @@ function updateDaiAuctionTimer(){
 
 // Current cost for DAI auction
 function updateDaiAuctionCostNow() {
-	let _currentTimestamp = (new Date()).getTime() / 1000; // from ms to s
-	contract.ComputeAuction(a_daiAuctionTimer, a_daiAuctionCost, _currentTimestamp).then((result) =>
+	let _currentTimestamp = parseInt((new Date()).getTime() / 1000); // from ms to s
+	let _daiBaseCost = ethers.utils.parseEther(a_daiAuctionCost[0].toString());
+	contract.ComputeAuction(a_daiAuctionTimer[0], _daiBaseCost, _currentTimestamp).then((result) =>
 	{
 		handleResult(result, a_daiAuctionCostNow, 'daiAuctionCost', "dai");
 	});
@@ -826,8 +831,8 @@ function updateRadAuctionTimer(){
 
 // Current cost for rad auction
 function updateRadAuctionCostNow() {
-	let _currentTimestamp = (new Date()).getTime() / 1000; // from ms to s
-	contract.ComputeAuction(a_radAuctionTimer, a_radAuctionCost, _currentTimestamp).then((result) =>
+	let _currentTimestamp = parseInt((new Date()).getTime() / 1000); // from ms to s
+	contract.ComputeAuction(a_radAuctionTimer.toString(), a_radAuctionCost.toString(), _currentTimestamp.toString()).then((result) =>
 	{
 		handleResult(result, a_radAuctionCostNow, 'radAuctionCost', "string");
 	});
@@ -1045,6 +1050,15 @@ let h_hatchShroomTier = 1;
 
 function changeShroomTier(__tier) {
 	h_hatchShroomTier = __tier;
+}
+
+// find the first power of 4 we can use with input rads
+function checkMultipleFour(__rad) {
+	let _four = 4;
+	while(_four < __rad) {
+		_four = _four * 4;
+	}
+	return _four / 4;
 }
 
 const hatchShrooms = async() => {
