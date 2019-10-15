@@ -1170,7 +1170,7 @@ const findDaiAnomaly = async() => {
 	try {
 		console.log("about to send transaction findDAIanomaly");
 		const findMyDaiAnomaly = await contract.FindAnomaly(0, h_anomalyLand, h_anomalyTargetId, h_anomalyWeight[0], h_anomalyWeight[1], h_anomalyWeight[2], h_anomalyWeight[3], {
-			value: ethers.utils.parseEther(a_daiAuctionCostNow)
+			value: ethers.utils.parseEther(a_daiAuctionCostNow[0])
 		})
 
 		console.log("found anomaly successfully");
@@ -1184,7 +1184,7 @@ const findRadAnomaly = async() => {
 	try {
 		console.log("about to send transaction findRADanomaly");
 		const findMyRadAnomaly = await contract.FindAnomaly(a_radAuctionCostNow, h_anomalyLand, h_anomalyTargetId, h_anomalyWeight[0], h_anomalyWeight[1], h_anomalyWeight[2], h_anomalyWeight[3], {
-			value: ethers.utils.parseEther(0)
+			value: 0
 		})
 
 		console.log("found anomaly successfully");
