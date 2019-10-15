@@ -716,7 +716,7 @@ function updateDaiAuctionCostNow() {
 		// for some reason, the exact cost doesn't work
 		// we refund the difference anyway, so multiply requirement
 		result = ethers.utils.formatEther(result);
-		result = result * 1.2;
+		result = parseFloat(result * 1.2).toFixed(4);
 		handleResult(result, a_daiAuctionCostNow, 'daiAuctionCost', "none");
 	});
 }
