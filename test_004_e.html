@@ -72,13 +72,26 @@
             <hr>
             <h3>GENERAL STUFF</h3>
             <br>
-            <h5>DAI Anomaly</h5>
-            <h6>Base auction cost: <span id="daiAuctionCost">?</span></h6>
-			<h6>Auction started at: <span id="daiAuctionTimer">?</span></h6>
+            <div class="row">
+                <div class="col-sm">
+                    <h5>DAI Anomaly</h5>
+                    <h6>Auction started at: <span id="daiAuctionTimer">?</span></h6>
+                    <button onclick="">BUY DAI ANOMALY</button> (not working yet)
+                    <h6>Auction cost: <span id="daiAuctionCost">?</span> DAI</h6>
+                </div>
+                <div class="col-sm">
+                     <h5>RAD Anomaly</h5>
+                    <h6>Auction started at: <span id="radAuctionTimer">?</span></h6>
+                    <button onclick="">BUY RAD ANOMALY</button> (not working yet)
+                    <h6>Auction cost: <span id="radAuctionCost">?</span> RADS</h6>
+                </div>
+            </div>
+            <h6>Change <button id="anomalyLand" onclick="updateTargetType('land')">Land</button> or <button id="anomalyProd" onclick="updateTargetType('prod')">Prod</button></h6>
+            <h6><span id="anomalyTargetType">?</span> to target: <input type="text" id="anomalyTargetId" onInput="updateTargetId(this.value)" value="1" size="1"></h6>
+            <h6>(between 1 and 8 for tier, 1 and 64 for land)</h6>
+            <h6>Weights: <input type="text" id="anomalyWeight0" onInput="updateWeight(0, this.value, 'anomalyWeight0')" value="1" size="1"><input type="text" id="anomalyWeight1" onInput="updateWeight(1, this.value, 'anomalyWeight1')" value="1" size="1"><input type="text" id="anomalyWeight2" onInput="updateWeight(2, this.value, 'anomalyWeight2')" value="1" size="1"><input type="text" id="anomalyWeight3" onInput="updateWeight(3, this.value, 'anomalyWeight3')" value="1" size="1"></h6>
+            <h6>(between 0 and 4 for each weight)</h6>            
             <br>
-            <h5>RAD Anomaly</h5>
-            <h6>Base auction cost: <span id="radAuctionCost">?</span></h6>
-			<h6>Auction started at: <span id="radAuctionTimer">?</span></h6>
             <br>
             <hr>
             <h3>MY STUFF</h3>

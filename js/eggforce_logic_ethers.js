@@ -58,9 +58,9 @@ function useReadOnlyProvider() {
 }
 
 // VARIABLES
-
 var a_daiAuctionCost = [0];
 var a_daiAuctionTimer = [0];
+var a_daiAuctionCostNow = [0];
 var a_end = [0];
 var a_globalRad = [0];
 var a_joinCost = [0];
@@ -68,7 +68,12 @@ var a_launch = [0];
 var a_plantamidDaiCost = [0];
 var a_radAuctionCost = [0];
 var a_radAuctionTimer = [0];
+var a_radAuctionCostNow = [0];
 var a_tribeRad = [0];
+
+var h_anomalyLand = true; // whether land or prod is targeted on anomaly buy
+var h_anomalyTargetId = 0;
+var h_anomalyWeight = [0, 0, 0, 0];
 
 var h_selectedLand = 1; // base land selected for land update
 var h_selectedTier = 1; // base tier for Eggoa Plantamid
@@ -174,6 +179,8 @@ function controlLoop1(){
 	updateGoamidTimer();
 	updateLastRadTimer();
 	updateLastShroomTimer();
+	updateSelectedLandTimer(h_selectedLand);
+	updateNestTextTimer();
 	setTimeout(controlLoop1, 1000);
 }
 
@@ -182,7 +189,8 @@ function controlLoop4() {
 	if(signer != 0) {
 		updateAccount();
 	}
-
+	updateDaiAuctionCostNow();
+	updateRadAuctionCostNow();
     setTimeout(controlLoop4, 4000);
 }
 
@@ -321,6 +329,20 @@ function updateLastShroomTimer() {
 	document.getElementById('lastShroom').innerHTML = convertTime(m_lastShroom);
 }
 
+function updateSelectedLandTimer(__id) {
+	contract.land(__id).then((result) =>
+	{
+		t_land[__id].lastLand = result.lastLand.toString();
+		document.getElementById('landLast').innerHTML = convertTime(t_land[__id].lastLand);
+	});
+}
+
+function updateNestTextTimer() {
+	for(let i = 1; i <= m_tier; i++) {
+		updateNestText(i);
+	}
+}
+
 // change land button to "attack" or "collect" depending if player is lord of h_selectedland
 let d_landButton = document.getElementById('landButton');
 
@@ -403,6 +425,8 @@ function updateTerritory(){
 }
 */
 
+// restricts __number between __min and __max
+// updates appropriate __html element
 function checkBoundaries(__number, __html, __min, __max) {
 	if(__number > __max) {
 		__number = __max;
@@ -413,18 +437,38 @@ function checkBoundaries(__number, __html, __min, __max) {
 	return __number;
 }
 
+function updateTargetType(__type) {
+	if(__type == 'land') {
+		h_anomalyLand = true;
+		document.getElementById('anomalyTargetType').innerHTML = 'Land';
+	}
+	else if(__type == 'prod') {
+		h_anomalyLand = false;
+		document.getElementById('anomalyTargetType').innerHTML = 'Prod';
+	}
+}
+
+function updateTargetId(__id) {
+
+	if(h_anomalyLand == true) {
+		__id = checkBoundaries(__id, 'anomalyTargetId', 1, 64);
+	}
+	else if(h_anomalyLand == false) {
+		__id = checkBoundaries(__id, 'anomalyTargetId', 1, 8);
+	}
+
+	h_anomalyTargetId = __id;
+}
+
+function updateWeight(__weight, __number, __html) {
+
+	__number = checkBoundaries(__number, __html, 0, 4);
+
+	h_anomalyWeight[__weight] = __number;
+}
+
 function updateTerritory(__id) {
 
-	/*
-	// make sure __id is within boundaries
-	if(__id > 64) {
-		__id = 64;
-		document.getElementById('landSelector').value = __id;
-	} else if(__id < 1) {
-		__id = 1;
-		document.getElementById('landSelector').value = __id;
-	}
-	*/
 	__id = checkBoundaries(__id, 'landSelector', 1, 64);
 
 	// initialize t_land if previously undefined
@@ -647,7 +691,7 @@ function updateCollectedTribeRad(__player){
 function updateDaiAuctionCost(){
 	contract.daiAuctionCost().then((result) =>
 	{
-		handleResult(result, a_daiAuctionCost, 'daiAuctionCost', "dai");
+		handleResult(result, a_daiAuctionCost, 0, "dai");
 	})
 }
 
@@ -657,6 +701,15 @@ function updateDaiAuctionTimer(){
 	{
 		handleResult(result, a_daiAuctionTimer, 0, "none");
 	})
+}
+
+// Current cost for DAI auction
+function updateDaiAuctionCostNow() {
+	let _currentTimestamp = (new Date()).getTime() / 1000; // from ms to s
+	contract.ComputeAuction(a_daiAuctionTimer, a_daiAuctionCost, _currentTimestamp).then((result) =>
+	{
+		handleResult(result, a_daiAuctionCostNow, 'daiAuctionCost', "dai");
+	});
 }
 
 // DAI Plantamid for player
@@ -759,7 +812,7 @@ function updateRad(__player){
 function updateRadAuctionCost(){
 	contract.radAuctionCost().then((result) =>
 	{
-		handleResult(result, a_radAuctionCost, 'radAuctionCost', "string");
+		handleResult(result, a_radAuctionCost, 0, "string");
 	})
 }
 
@@ -767,8 +820,17 @@ function updateRadAuctionCost(){
 function updateRadAuctionTimer(){
 	contract.radAuctionTimer().then((result) =>
 	{
-		handleResult(result, a_radAuctionTimer, 'radAuctionTimer', "none");
+		handleResult(result, a_radAuctionTimer, 0, "none");
 	})
+}
+
+// Current cost for rad auction
+function updateRadAuctionCostNow() {
+	let _currentTimestamp = (new Date()).getTime() / 1000; // from ms to s
+	contract.ComputeAuction(a_radAuctionTimer, a_radAuctionCost, _currentTimestamp).then((result) =>
+	{
+		handleResult(result, a_radAuctionCostNow, 'radAuctionCost', "string");
+	});
 }
 
 // Owned Shrooms for player (from land grabs)
@@ -1001,6 +1063,7 @@ const harvestRads = async() => {
 		console.log("about to try to harvest rads");
 		const harvestMyRads = await contract.HarvestRad()
 		console.log("harvested rads !");
+		updateRad(m_account); // probably replace this with event logging later
 	} catch (error) {
 		console.log("Error: couldn't harvest due to ", error);
 	}
@@ -1084,5 +1147,34 @@ const claimTribeRads = async () => {
 		console.log("success!");
 	} catch (error) {
 		console.log("Error: couldn't get tribe rads ", error);
+	}
+}
+
+
+// FIND DAI ANOMALY
+const findDaiAnomaly = async() => {
+	try {
+		console.log("about to send transaction findDAIanomaly");
+		const findMyDaiAnomaly = await contract.FindAnomaly(0, h_anomalyLand, h_anomalyTargetId, h_anomalyWeight[0], h_anomalyWeight[1], h_anomalyWeight[2], h_anomalyWeight[3], {
+			value: ethers.utils.parseEther(a_daiAuctionCostNow)
+		})
+
+		console.log("found anomaly successfully");
+	} catch (error) {
+		console.log("Error: ", error); //fires as the contract reverted the payment
+	}
+}
+
+// FIND RAD ANOMALY
+const findRadAnomaly = async() => {
+	try {
+		console.log("about to send transaction findRADanomaly");
+		const findMyRadAnomaly = await contract.FindAnomaly(a_radAuctionCostNow, h_anomalyLand, h_anomalyTargetId, h_anomalyWeight[0], h_anomalyWeight[1], h_anomalyWeight[2], h_anomalyWeight[3], {
+			value: ethers.utils.parseEther(0)
+		})
+
+		console.log("found anomaly successfully");
+	} catch (error) {
+		console.log("Error: ", error); //fires as the contract reverted the payment
 	}
 }
