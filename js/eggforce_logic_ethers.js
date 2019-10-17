@@ -1105,10 +1105,10 @@ function changeAttackLandTier(__tier) {
 	h_attackLandTier = __tier;
 
 	// check player power, then calculate his chance to win
-	contract.ComputeForce(h_selectedLand, h_landWeight, m_account, __tier).then((result) =>
+	contract.ComputeForce(h_selectedLand, h_landWeight, m_account, h_attackLandTier).then((result) =>
 	{
 		handleResult(result, m_power, 'attackPower', "string");
-		let _winRate = parseInt(m_power / (m_power + t_land[h_selectedLand].power));
+		let _winRate = parseInt(m_power * 100 / (m_power + t_land[h_selectedLand].power));
 		document.getElementById('winRate').innerHTML = _winRate;
 	});
 }
