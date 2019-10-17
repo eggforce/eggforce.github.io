@@ -1,7 +1,7 @@
 // INITIALIZE WEB3
 
 let contract;
-let contractAddress = "0xfe91Df2a735a9d26f0b5Ccbc516820E96b01078c"; // v007
+let contractAddress = "0x6Cf592D1687041147a20C6CC1504715864A52752"; // v008
 let provider;
 let signer = 0;
 
@@ -79,6 +79,9 @@ var h_selectedLand = 1; // base land selected for land update
 var h_selectedTier = 1; // base tier for Eggoa Plantamid
 var h_selectedFloor = 1; // base rise for Dai Plantamid
 
+var h_upgradeTier = 1; // selected tier for Eggoa Upgrade
+var h_upgradeWeight = [0, 0, 0, 0];
+
 var m_balance = [0];
 var m_collectedTribeRad = [0];
 var m_daiPlantamid = [0];
@@ -94,6 +97,8 @@ var m_tier = [0];
 var m_tribe = [0];
 var m_tribeChange = [0];
 var m_unlockTierRadCost = [0];
+var m_upgradeCost = [0];
+var m_upgradeWeightSum = [0];
 
 var n_sacrificeAmount = [0];
 var n_floorDaiCost = [0];
@@ -356,23 +361,6 @@ function updateLandButton() {
 	}
 }
 
-// html update for upgrade costs
-var d_upgradeCost = [];
-d_upgradeCost[1] = document.getElementById('upgradeCost1');
-d_upgradeCost[2] = document.getElementById('upgradeCost2');
-d_upgradeCost[3] = document.getElementById('upgradeCost3');
-d_upgradeCost[4] = document.getElementById('upgradeCost4');
-d_upgradeCost[5] = document.getElementById('upgradeCost5');
-d_upgradeCost[6] = document.getElementById('upgradeCost6');
-d_upgradeCost[7] = document.getElementById('upgradeCost7');
-d_upgradeCost[8] = document.getElementById('upgradeCost8');
-
-function updateHTMLupgradeCost() {
-	for(i = 1; i <= m_tier; i++) {
-		d_upgradeCost[i].innerHTML = s_upgradeRadCost[i];
-	}
-}
-
 // READ ONLY ETHERS
 
 // if signer isn't 0, check if player changes accounts
@@ -435,6 +423,31 @@ function checkBoundaries(__number, __html, __min, __max) {
 	}
 	document.getElementById(__html).value = __number;
 	return __number;
+}
+
+// selected tier of eggoas to use for UpgradeEggoa
+function updateUpgradeTier(__tier) {
+	__tier = checkBoundaries(__tier, 'tierToUpgrade', 1, m_tier[0]);
+	h_upgradeTier = __tier;
+
+	updateUpgradeCost();
+}
+
+function updateUpgradeWeight(__weight, __number, __html) {
+	__number = checkBoundaries(__number, __html, 0, 999); // 999 upgrades at once ought to be enough for anyone...
+	h_upgradeWeight[__weight] = __number;
+
+	m_upgradeWeightSum = getArraySum(h_upgradeWeight);
+
+	updateUpgradeCost();
+}
+
+function getArraySum(__array) {
+	let _sum = 0;
+	for(let i = 0; i < __array.length; i++) {
+		_sum += __array[i];
+	}
+	return _sum;
 }
 
 function updateTargetType(__type) {
@@ -921,13 +934,10 @@ function updateUnlockCost() {
 
 // Get Rad cost for next upgrade of given Eggoa
 function updateUpgradeCost() {
-	for(let i = 1; i <= m_tier; i++) {
-		contract.ComputeUpgradeCost(m_nest[i].level).then((result) =>
-		{
-			s_upgradeRadCost[i] = result.toString();
-		});
-	}
-	updateHTMLupgradeCost();
+	contract.ComputeUpgradeCost(m_nest[h_upgradeTier].level, m_upgradeWeightSum).then((result) =>
+	{
+		handleResult(result, m_upgradeCost, 'upgradeCost', "string");
+	});
 }
 
 // Get Rads player can harvest
@@ -1129,15 +1139,10 @@ let s_upgradeTier = 1;
 
 let s_upgradeStat = [1, 1, 1, 1];
 
-function selectTierThenUpgrade(__tier) {
-	s_upgradeTier = __tier;
-	upgradeGoa();
-}
-
 const upgradeGoa = async() => {
 	try {
 		console.log("upgrading eggoas...");
-		const collectMyShrooms = await contract.UpgradeEggoa(s_upgradeTier, s_upgradeRadCost[s_upgradeTier], s_upgradeStat[0], s_upgradeStat[1], s_upgradeStat[2], s_upgradeStat[3])
+		const upgradeMyEggoa = await contract.UpgradeEggoa(s_upgradeTier, s_upgradeStat[0], s_upgradeStat[1], s_upgradeStat[2], s_upgradeStat[3])
 		console.log("success!");
 	} catch (error) {
 		console.log("Error: couldn't collect ", error);

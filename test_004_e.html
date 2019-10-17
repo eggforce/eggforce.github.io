@@ -8,7 +8,7 @@
 		<br>
 		<div class="container" align="center">
 			<div class="container">
-				<h1 class="display-1">EGGFORCE test 007</h1>
+				<h1 class="display-1">EGGFORCE test 008</h1>
 				<br>		
 			</div>
 			<br>
@@ -128,55 +128,48 @@
                 <div class="col-sm">
                     <h6>TIER 1</h6>
                     <span id="tier1">?</span>
-                    <button onclick="selectTierThenUpgrade(1)">Upgrade</button>
-                    <h6>(Cost: <span id="upgradeCost1">?</span> Rads)</h6>
                 </div>
                 <div class="col-sm">
                     <h6>TIER 2</h6>
-                    <span id="tier2">?</span>
-                    <button onclick="selectTierThenUpgrade(2)">Upgrade</button>
-                    <h6>(Cost: <span id="upgradeCost2">?</span> Rads)</h6>
+                    <span id="tier2">?</span>>
                 </div>
                 <div class="col-sm">
                     <h6>TIER 3</h6>
                     <span id="tier3">?</span>
-                    <button onclick="selectTierThenUpgrade(3)">Upgrade</button>
-                    <h6>(Cost: <span id="upgradeCost3">?</span> Rads)</h6>
                 </div>
                 <div class="col-sm">
                     <h6>TIER 4</h6>
                     <span id="tier4">?</span>
-                    <button onclick="selectTierThenUpgrade(4)">Upgrade</button>
-                    <h6>(Cost: <span id="upgradeCost4">?</span> Rads)</h6>
                 </div>
             </div>
             <br>
             <div class="row">
                 <div class="col-sm">
                     <h6>TIER 5</h6>
-                    <span id="tier5">?</span>
-                    <button onclick="selectTierThenUpgrade(5)">Upgrade</button>
-                    <h6>(Cost: <span id="upgradeCost5">?</span> Rads)</h6>
+                    <span id="tier5">?</span>6>
                 </div>
                 <div class="col-sm">
                     <h6>TIER 6</h6>
                     <span id="tier6">?</span>
-                    <button onclick="selectTierThenUpgrade(6)">Upgrade</button>
-                    <h6>(Cost: <span id="upgradeCost6">?</span> Rads)</h6>
                 </div>
                 <div class="col-sm">
                     <h6>TIER 7</h6>
                     <span id="tier7">?</span>
-                    <button onclick="selectTierThenUpgrade(7)">Upgrade</button>
-                    <h6>(Cost: <span id="upgradeCost7">?</span> Rads)</h6>
                 </div>
                 <div class="col-sm">
                     <h6>TIER 8</h6>
-                    <span id="tier8">?</span>
-                    <button onclick="selectTierThenUpgrade(8)">Upgrade</button>
-                    <h6>(Cost: <span id="upgradeCost8">?</span> Rads)</h6>
+                    <span id="tier8">?</span>6>
                 </div>
             </div>
+            <br>
+            <h5>UPGRADE EGGOA</h5>
+            <br>
+            <h6>Tier: <input type="text" id="tierToUpgrade" onInput="updateUpgradeTier(this.value)" value="1" size="1"></h6>
+            <h6>(between 1 and 8 for tier)</h6>
+            <h6>Weights: <input type="text" id="upgradeWeight0" onInput="updateUpgradeWeight(0, this.value, 'upgradeWeight0')" value="1" size="1"><input type="text" id="upgradeWeight1" onInput="updateUpgradeWeight(1, this.value, 'upgradeWeight1')" value="1" size="1"><input type="text" id="upgradeWeight2" onInput="updateUpgradeWeight(2, this.value, 'upgradeWeight2')" value="1" size="1"><input type="text" id="upgradeWeight3" onInput="updateUpgradeWeight(3, this.value, 'upgradeWeight3')" value="1" size="1"></h6>
+            <h6>(each weight will give +4 to the selected stat)</h6>
+            <h6>Upgrade cost: <span id="upgradeCost">?</span> RADS</h6>
+            <button onclick="upgradeGoa()">Upgrade Eggoa</button>            
             <hr>
   
             
