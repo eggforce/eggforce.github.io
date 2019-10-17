@@ -1108,7 +1108,7 @@ function changeAttackLandTier(__tier) {
 	contract.ComputeForce(h_selectedLand, h_landWeight, m_account, h_attackLandTier).then((result) =>
 	{
 		handleResult(result, m_power, 'attackPower', "string");
-		let _winRate = parseInt(m_power * 100 / (m_power + t_land[h_selectedLand].power));
+		let _winRate = parseInt(m_power) * 100 / (parseInt(m_power) + parseInt(t_land[h_selectedLand].power));
 		document.getElementById('winRate').innerHTML = _winRate;
 	});
 }
