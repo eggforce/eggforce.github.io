@@ -95,6 +95,7 @@ var m_eggoaPlantamid = [0];
 var m_lastRad = [0];
 var m_lastShroom = [0];
 var m_openedChest = false;
+var m_power = [0];
 var m_rad = [0];
 var m_radToHarvest = [0];
 var m_shroom = [0];
