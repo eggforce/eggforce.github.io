@@ -234,6 +234,7 @@ function refreshData(){
 	updateUpgradeCost();
 	updateRadToHarvest();
 	updateJoinOrChange();
+	updateTribeRadToClaim();
 }
 
 //** UTILITIES **//
@@ -324,6 +325,12 @@ function convertTime(__timestamp){
 }
 
 //** LOCAL FUNCTIONS **//
+
+// Check available tribe rads
+
+function updateTribeRadToClaim() {
+	document.getElementById('tribeRadToClaim').innerHTML = parseInt(a_tribeRad) - parseInt(m_collectedTribeRad);	
+} 
 
 // Calculate DAI earnings for player, based on his proportion of earned rads
 // Check if game is over and if player has opened chest too
@@ -997,7 +1004,7 @@ function updateTribeChange(__player){
 function updateTribeRad(__tribe){
 	contract.tribeRad(__tribe).then((result) =>
 	{
-		handleResult(result, a_tribeRad, 'tribeRad', "string");
+		handleResult(result, a_tribeRad, 0, "string");
 	});
 }
 
@@ -1091,7 +1098,12 @@ const startGame = async() => {
 let h_attackLandTier = 1;
 
 function changeAttackLandTier(__tier) {
+	checkBoundaries(__tier, 'attackLandTierSelector', 1, m_tier[0]);
 	h_attackLandTier = __tier;
+}
+
+function checkAttackTimerThenAttack(__tier) {
+
 }
 
 const attackLand = async() => {
@@ -1244,14 +1256,11 @@ const withdrawDai = async() => {
 // UpgradeEggoa - TEST
 // (TODO) let player pick upgradeStat. total should be 4
 // WORKS
-let s_upgradeTier = 1;
-
-let s_upgradeStat = [1, 1, 1, 1];
 
 const upgradeGoa = async() => {
 	try {
 		console.log("upgrading eggoas...");
-		const upgradeMyEggoa = await contract.UpgradeEggoa(s_upgradeTier, s_upgradeStat[0], s_upgradeStat[1], s_upgradeStat[2], s_upgradeStat[3])
+		const upgradeMyEggoa = await contract.UpgradeEggoa(h_upgradeTier, h_upgradeWeight[0], h_upgradeWeight[1], h_upgradeWeight[2], h_upgradeWeight[3])
 		console.log("success!");
 	} catch (error) {
 		console.log("Error: couldn't collect ", error);
