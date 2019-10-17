@@ -116,9 +116,9 @@
                 </div>
             </div>
             <h6>Change <button id="anomalyLand" onclick="updateTargetType('land')">Land</button> or <button id="anomalyProd" onclick="updateTargetType('prod')">Prod</button></h6>
-            <h6><span id="anomalyTargetType">?</span> to target: <input type="text" id="anomalyTargetId" onInput="updateTargetId(this.value)" value="1" size="1"></h6>
+            <h6><span id="anomalyTargetType">?</span> to target: <input type="text" id="anomalyTargetId" onInput="updateTargetId(this.value)" value="0" size="1"></h6>
             <h6>(between 1 and 8 for tier, 1 and 64 for land)</h6>
-            <h6>Weights: <input type="text" id="anomalyWeight0" onInput="updateWeight(0, this.value, 'anomalyWeight0')" value="1" size="1"><input type="text" id="anomalyWeight1" onInput="updateWeight(1, this.value, 'anomalyWeight1')" value="1" size="1"><input type="text" id="anomalyWeight2" onInput="updateWeight(2, this.value, 'anomalyWeight2')" value="1" size="1"><input type="text" id="anomalyWeight3" onInput="updateWeight(3, this.value, 'anomalyWeight3')" value="1" size="1"></h6>
+            <h6>Weights: <input type="text" id="anomalyWeight0" onInput="updateWeight(0, this.value, 'anomalyWeight0')" value="0" size="1"><input type="text" id="anomalyWeight1" onInput="updateWeight(1, this.value, 'anomalyWeight1')" value="0" size="1"><input type="text" id="anomalyWeight2" onInput="updateWeight(2, this.value, 'anomalyWeight2')" value="0" size="1"><input type="text" id="anomalyWeight3" onInput="updateWeight(3, this.value, 'anomalyWeight3')" value="0" size="1"></h6>
             <h6>(between 0 and 4 for each weight)</h6>            
             <br>
             <br>
@@ -151,7 +151,7 @@
             <div class="row">
                 <div class="col-sm">
                     <h6>TIER 5</h6>
-                    <span id="tier5">?</span>6>
+                    <span id="tier5">?</span>
                 </div>
                 <div class="col-sm">
                     <h6>TIER 6</h6>
@@ -163,15 +163,15 @@
                 </div>
                 <div class="col-sm">
                     <h6>TIER 8</h6>
-                    <span id="tier8">?</span>6>
+                    <span id="tier8">?</span>
                 </div>
             </div>
             <br>
             <h5>UPGRADE EGGOA</h5>
             <br>
-            <h6>Tier: <input type="text" id="tierToUpgrade" onInput="updateUpgradeTier(this.value)" value="1" size="1"></h6>
+            <h6>Tier: <input type="text" id="tierToUpgrade" onInput="updateUpgradeTier(this.value)" value="0" size="1"></h6>
             <h6>(between 1 and 8 for tier)</h6>
-            <h6>Weights: <input type="text" id="upgradeWeight0" onInput="updateUpgradeWeight(0, this.value, 'upgradeWeight0')" value="1" size="1"><input type="text" id="upgradeWeight1" onInput="updateUpgradeWeight(1, this.value, 'upgradeWeight1')" value="1" size="1"><input type="text" id="upgradeWeight2" onInput="updateUpgradeWeight(2, this.value, 'upgradeWeight2')" value="1" size="1"><input type="text" id="upgradeWeight3" onInput="updateUpgradeWeight(3, this.value, 'upgradeWeight3')" value="1" size="1"></h6>
+            <h6>Weights: <input type="text" id="upgradeWeight0" onInput="updateUpgradeWeight(0, this.value, 'upgradeWeight0')" value="0" size="1"><input type="text" id="upgradeWeight1" onInput="updateUpgradeWeight(1, this.value, 'upgradeWeight1')" value="0" size="1"><input type="text" id="upgradeWeight2" onInput="updateUpgradeWeight(2, this.value, 'upgradeWeight2')" value="0" size="1"><input type="text" id="upgradeWeight3" onInput="updateUpgradeWeight(3, this.value, 'upgradeWeight3')" value="0" size="1"></h6>
             <h6>(each weight will give +4 to the selected stat)</h6>
             <h6>Upgrade cost: <span id="upgradeCost">?</span> RADS</h6>
             <button onclick="upgradeGoa()">Upgrade Eggoa</button>            

@@ -435,7 +435,7 @@ function updateUpgradeTier(__tier) {
 
 function updateUpgradeWeight(__weight, __number, __html) {
 	__number = checkBoundaries(__number, __html, 0, 999); // 999 upgrades at once ought to be enough for anyone...
-	h_upgradeWeight[__weight] = __number;
+	h_upgradeWeight[__weight] = parseInt(__number);
 
 	m_upgradeWeightSum = getArraySum(h_upgradeWeight);
 
