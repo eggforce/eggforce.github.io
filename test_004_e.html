@@ -51,6 +51,7 @@
                         <h6>You have <span id="shroom">?</span> Shrooms</h6>
                         <h6>Hatch them using <input type="text" id="shroomRad" onInput="changeShroomRad(this.value)" value="0" size="1"> rads</h6>
                         <h6>Tier of Eggoa to hatch: <input type="text" id="shroomTier" oninput="changeShroomTier(this.value)" value="1" size="1"></h6>
+                        <h6>You will get <span id="shroomEggoa">?</span> Eggoas</h6>
                         <button onclick="hatchShrooms()">Hatch Shrooms</button>
                         <br>
                         <h6>Last Shroom collection: <span id="lastShroom">?</span></h6>
@@ -121,6 +122,14 @@
             </div>
             <br>
             <h6>Attack Land with Eggoas of tier <input type="text" id="attackLandTierSelector" onInput="changeAttackLandTier(this.value)" value="1" size="1"></h6>
+            <div class="row">
+                <div class="col-sm">
+                    <h6>Power: <span id="attackPower">?</span></h6>
+                </div>
+                <div class="col-sm">
+                    <h6>Chance to win: <span id="winRate">?</span>%</h6>
+                </div>
+            </div>
 			<span id="landButton">?</span>
 			<br>
             <hr>

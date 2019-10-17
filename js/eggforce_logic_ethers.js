@@ -76,6 +76,8 @@ var h_anomalyLand = true; // whether land or prod is targeted on anomaly buy
 var h_anomalyTargetId = 0;
 var h_anomalyWeight = [0, 0, 0, 0];
 
+var h_landWeight = 0;
+
 var h_selectedLand = 1; // base land selected for land update
 var h_selectedTier = 1; // base tier for Eggoa Plantamid
 var h_selectedFloor = 1; // base rise for Dai Plantamid
@@ -218,14 +220,14 @@ function refreshData(){
 	//updateNest(m_account);
 	updateOpenedChest(m_account);
 	updateLastRad(m_account);
-	updateLastShroom(m_account);
-	updateGlobalRad();
+	updateLastShroom(m_account);	
 	updateDaiPlantamid(m_account);
 	updateEggoaPlantamid(m_account);
 	updateEarnedRad(m_account);
 	updateBalance(m_account);
 	updateCollectedTribeRad(m_account);
 	updatePlayerChest();
+	updateGlobalRad();
 	updateChest();
 	updateDaiAuctionCost();
 	updateDaiAuctionTimer();
@@ -569,10 +571,10 @@ function updateTerritory(__id) {
 		{
 			contract.tribe(result.lord).then((result3) =>
 			{
-				let _landWeight = parseInt(result2[0]) + parseInt(result2[1]) + parseInt(result2[2]) + parseInt(result2[3]);
-				console.log(_landWeight);
-				if(_landWeight == 0) { _landWeight = 1};
-				contract.ComputeForce(__id, _landWeight, result.lord, result.eggoa).then((result4) =>
+				h_landWeight = parseInt(result2[0]) + parseInt(result2[1]) + parseInt(result2[2]) + parseInt(result2[3]);
+				//console.log(_landWeight);
+				if(h_landWeight == 0) { h_landWeight = 1};
+				contract.ComputeForce(__id, h_landWeight, result.lord, result.eggoa).then((result4) =>
 				{
 					t_land[__id].lord = result.lord;
 					t_land[__id].lastLand = result.lastLand.toString();
@@ -1100,6 +1102,14 @@ let h_attackLandTier = 1;
 function changeAttackLandTier(__tier) {
 	checkBoundaries(__tier, 'attackLandTierSelector', 1, m_tier[0]);
 	h_attackLandTier = __tier;
+
+	// check player power, then calculate his chance to win
+	contract.ComputeForce(h_selectedLand, h_landWeight, m_account, __tier).then((result) =>
+	{
+		handleResult(result, m_power, 'attackPower', "string");
+		let _winRate = parseInt(m_power / (m_power + t_land[h_selectedLand].power));
+		document.getElementById('winRate').innerHTML = _winRate;
+	});
 }
 
 function checkAttackTimerThenAttack(__tier) {
@@ -1178,13 +1188,36 @@ const raiseDaimid = async() => {
 let h_hatchShroomRad = 0;
 
 function changeShroomRad(__rad) {
-	h_hatchShroomRad = __rad;
+	let _finalRad = checkMultipleFour(__rad);
+	h_hatchShroomRad = _finalRad;
+	document.getElementById('shroomRad').innerHTML = _finalRad;
+	computeShroomEggoa();
 }
 
 let h_hatchShroomTier = 1;
 
 function changeShroomTier(__tier) {
 	h_hatchShroomTier = __tier;
+	computeShroomEggoa();
+}
+
+// check how many eggoas we get for given input
+function computeShroomEggoa() {
+
+	// calculate multiplier
+	let _remainder = h_hatchShroomRad;
+	let _power = 2;
+	while(_remainder >= 4) {
+		_remainder = _remainder / 4;
+		_power++;
+	}
+	_power -= h_hatchShroomTier;
+
+	// multiply m_shroom to get number of eggoas
+	m_shroomEggoa = parseInt(m_shroom) * parseInt(_power);
+
+	// update html
+	document.getElementById('shroomEggoa').innerHTML = m_shroomEggoa;
 }
 
 // find the first power of 4 we can use with input rads
