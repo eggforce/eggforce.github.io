@@ -80,6 +80,8 @@ var h_selectedLand = 1; // base land selected for land update
 var h_selectedTier = 1; // base tier for Eggoa Plantamid
 var h_selectedFloor = 1; // base rise for Dai Plantamid
 
+var h_selectedTribe = 0; // selected tribe to join game - or to change tribe
+
 var h_upgradeTier = 1; // selected tier for Eggoa Upgrade
 var h_upgradeWeight = [0, 0, 0, 0];
 
@@ -231,6 +233,7 @@ function refreshData(){
 	updateRadAuctionTimer();
 	updateUpgradeCost();
 	updateRadToHarvest();
+	updateJoinOrChange();
 }
 
 //** UTILITIES **//
@@ -331,7 +334,7 @@ function updatePlayerChest() {
 
 	// avoid NaN. Even if inaccurate, this doesn't matter
 	if(a_globalRad == 0) { a_globalRad = 1};
-	
+
 	let _playerShare = parseFloat(a_chest * m_earnedRad / a_globalRad).toFixed(6);
 	m_playerChest = _playerShare;
 
@@ -353,6 +356,20 @@ function updatePlayerChest() {
 	}
 }
 
+// Show "join" or "changeTribe" button based on whether played has joined game already
+function updateJoinOrChange() {
+	d_joinOrChange = document.getElementById('joinOrChange');
+	d_joinOrChangeButton = document.getElementById('joinOrChangeButton');
+
+	if(m_tier[0] > 0) {
+		d_joinOrChange.innerHTML = 'changing tribe';
+		d_joinOrChangeButton.innerHTML = '<button onclick="changeTribe()">Change Tribe</button>'
+	}
+	else {
+		d_joinOrChange.innerHTML = 'joining the game';
+		d_joinOrChangeButton.innerHTML = '<button onclick="joinGame()">Join Game</button>'
+	}
+}
 
 // Timers
 
@@ -623,6 +640,23 @@ function updateNestValue(__player, __tier){
 	})
 }
 */
+
+function selectTribe(__tribe) {
+	h_selectedTribe = __tribe;
+	d_selectedTribe = document.getElementById('selectedTribe');
+	switch(__tribe){
+		case 1: d_selectedTribe.innerHTML = 'Crimson';
+		break;
+		case 2: d_selectedTribe.innerHTML = 'Blu';
+		break;
+		case 3: d_selectedTribe.innerHTML = 'Greg';
+		break;
+		case 4: d_selectedTribe.innerHTML = 'Lumi';
+		break;
+	}
+}
+
+
 // Nest stat array
 function updateNestValue(__player, __tier){
 	contract.GetNestStat(__player, __tier).then((result) =>
@@ -1076,11 +1110,24 @@ let m_tribeChoice = 1;
 const joinGame = async() => {
 	try {
 		console.log("about to send transaction joingame");
-		const joinTheGame = await contract.JoinGame(m_tribeChoice, {
+		const joinTheGame = await contract.JoinGame(h_selectedTribe, {
 		  value: ethers.utils.parseEther(a_joinCost[0])
 		})
 
 		console.log("joined the game successfully");
+	  } catch (error) {
+		console.log("Error: ", error); //fires as the contract reverted the payment
+	  }
+}
+
+const changeTribe = async() => {
+	try {
+		console.log("about to send transaction changetribe");
+		const changeMyTribe = await contract.ChangeTribe(h_selectedTribe, {
+		  value: ethers.utils.parseEther(a_joinCost[0])
+		})
+
+		console.log("changed tribe successfully");
 	  } catch (error) {
 		console.log("Error: ", error); //fires as the contract reverted the payment
 	  }
