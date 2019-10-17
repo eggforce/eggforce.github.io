@@ -13,6 +13,9 @@
 			</div>
             <br>
             <hr>
+            <h3>REWARD CHEST: <span id="chest">?</span> [POA]</h3>
+            <h6>(To be distributed on round end, proportionately to rads earned)</h6>
+            <br>
             <button onclick="joinGame()">Join Game</button>
             <h6>(Cost : <span id="joinCost">?</span> POA)</h6>
             <hr>
@@ -218,9 +221,7 @@
             <hr>
             <h5>POA CHEST</h5>
             <br>
-            <h6>You've won: <span id="openedChest">(do that later)</span></h6>
-            <button onclick="openRewardChest()">Open Chest</button>
-            <h6>(Can't open before game end)</h6>
+            <h6><span id="playerChest">(do that later)</span></h6>
             <br>
             
             <hr><hr>
@@ -229,14 +230,11 @@
             <div class="row">
                     <div class="col-sm">
                         <button onClick="getContractOwner()">Get Contract Owner</button>
-                        <br><span id="contractOwner">?</span>
+                        <h6><span id="contractOwner">?</span></h6>
                     </div>
                     <div class="col-sm">
                         <button onClick="startGame()">StartGame</button>
-                    </div>
-                    <div class="col-sm">
-                        
-                        <br>
+                        <h6>(Dev only)</h6>
                     </div>
                 </div>
             <hr><hr>

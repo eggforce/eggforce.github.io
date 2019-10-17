@@ -58,6 +58,7 @@ function useReadOnlyProvider() {
 }
 
 // VARIABLES
+var a_chest = [0];
 var a_daiAuctionCost = [0];
 var a_daiAuctionTimer = [0];
 var a_daiAuctionCostNow = [0];
@@ -222,6 +223,8 @@ function refreshData(){
 	updateEarnedRad(m_account);
 	updateBalance(m_account);
 	updateCollectedTribeRad(m_account);
+	updatePlayerChest();
+	updateChest();
 	updateDaiAuctionCost();
 	updateDaiAuctionTimer();
 	updateRadAuctionCost();
@@ -241,25 +244,42 @@ function formatEthAdr(__adr){
 // hh:mm:ss if < |24h|, x days if >= |24h|
 function convertTime(__timestamp){
 
-	let _currentTimestamp = (new Date()).getTime() / 1000; // from ms to s
+	let _currentTimestamp = parseInt((new Date()).getTime() / 1000); // from ms to s
 	let _time = __timestamp - _currentTimestamp;
-
-	let _hours = Math.floor(_time / 3600);
-	let _days = parseFloat(_hours / 24).toFixed(0);
-	let _minutes = Math.floor((_time % 3600) / 60);
-	let _seconds = parseFloat((_time % 3600) % 60).toFixed(0);
-
+	//console.log(_time);
 	let _positive = true;
+
+	let _days = 0;
+	let _hours = 0;
+	let _minutes = 0;
+	let _seconds = 0;
 
 	let _returnString = "";
 
-	if(_hours >= 24 || _hours <= -24){
-		if(_hours <= -24){
-			_positive = false;
+	if(_time < 0) {
+		_positive = false;
+	}
+
+	if(_positive == true) {
+		_hours = Math.floor(_time / 3600);
+		_days = parseFloat(_hours / 24).toFixed(0);
+		_minutes = Math.floor((_time % 3600) / 60);
+		_seconds = parseFloat((_time % 3600) % 60).toFixed(0);
+	}
+	else {
+		_hours = Math.ceil(_time / 3600);
+		_days = parseFloat(_hours / 24).toFixed(0);
+		_minutes = Math.ceil((_time % 3600) / 60);
+		_seconds = parseFloat((_time % 3600) % 60).toFixed(0);
+	}
+
+	if(_hours >= 24 || _hours <= -24) {
+
+		if(_positive == false) {
 			_days = -_days;
 		}
 
-		if(_days == 1){
+		if(_days == 1) {
 			_returnString = _days + " day from now";
 			if(_positive == false){
 				_returnString = _days + " day ago";
@@ -271,21 +291,13 @@ function convertTime(__timestamp){
 			}
 		}
 			
-	} else if(_hours >= 0) {
-		if(_hours < 0) {
-			_positive = false;
-			_hours = -_hours;
-
-		}
+	} else if(_hours >= 0 && _positive == true) {
 
 		if(_hours < 10) { _hours = "0" + _hours }
 		if(_minutes < 10) { _minutes = "0" + _minutes }
 		if(_seconds < 10) { _seconds = "0" + _seconds }
 
 		_returnString =  _hours + ":" + _minutes + ":" + _seconds;
-		/*if(_positive == false){
-			_returnString = _returnString + " ago";
-		}*/
 
 	} else {
 		_hours = -_hours;
@@ -309,6 +321,40 @@ function convertTime(__timestamp){
 }
 
 //** LOCAL FUNCTIONS **//
+
+// Calculate DAI earnings for player, based on his proportion of earned rads
+// Check if game is over and if player has opened chest too
+
+function updatePlayerChest() {
+
+	let d_playerChest = document.getElementById('playerChest');
+
+	// avoid NaN. Even if inaccurate, this doesn't matter
+	if(a_globalRad == 0) { a_globalRad = 1};
+	
+	let _playerShare = parseFloat(a_chest * m_earnedRad / a_globalRad).toFixed(6);
+	m_playerChest = _playerShare;
+
+	// has player opened his chest already?
+	if(m_openedChest == true) {
+		d_playerChest.innerHTML = "You've opened your POA chest before, and won " + m_playerChest + " POA. Good job!";
+	}
+
+	// is the game over?
+	let _currentTimestamp = parseInt((new Date()).getTime() / 1000); // from ms to s
+	let _time = a_end - _currentTimestamp;
+	if(_time < 0 && m_openedChest == false) {
+		d_playerChest.innerHTML = "You have won " + m_playerChest + " POA!<br><button onclick='openRewardChest()'>Open Chest</button>";
+	}
+
+	// if the game is still ongoing, give estimation
+	else if(_time >= 0) {
+		d_playerChest.innerHTML = "Your estimated earnings: " + m_playerChest + " POA.";
+	}
+}
+
+
+// Timers
 
 function updateLaunchTimer() {
 	document.getElementById('launch').innerHTML = convertTime(a_launch);
@@ -374,7 +420,7 @@ function updateAccount() {
 	let addressPromise = signer.getAddress().then(function(result){
 		m_account = result;
 		document.getElementById('account').innerHTML = formatEthAdr(m_account);
-		console.log(m_account);
+		//console.log(m_account);
 		refreshData();
 	});
 }
@@ -627,11 +673,19 @@ function updateNest(__player ) {
 }
 
 // Update nest text for m_account
-function updateNestText(__tier){
+function updateNestText(__tier) {
+
+		// check if "time until attack" is a negative by searching for "ago"
+		// if true, convert it into "ready!"
+		let _timeUntilAttack = convertTime(m_nest[__tier].attackNext);
+		if (_timeUntilAttack.indexOf('ago') > -1) {
+			_timeUntilAttack = "ready!";
+		}
+
 		doc_m_nest[__tier].innerHTML = 
 		"<h6>Amount: " + m_nest[__tier].amount + "</h6>" +
 		"<h6>Level: " + m_nest[__tier].level + "</h6>" +
-		"<h6>Time until attack: " + convertTime(m_nest[__tier].attackNext) + "</h6>" +
+		"<h6>Time until attack: " + _timeUntilAttack + "</h6>" +
 		"<h6>Lord of Land: " + m_nest[__tier].ownedLand + "</h6>" +
 		"<h6>Stats: " + m_nest[__tier].stat0 + "/" + m_nest[__tier].stat1 + "/" + m_nest[__tier].stat2 + "/" + m_nest[__tier].stat3;
 }
@@ -702,6 +756,14 @@ function updateCollectedTribeRad(__player){
 			handleResult(result, o_collectedTribeRad, 'otherCollectedTribeRad', "string");
 		}
 	});
+}
+
+// Current chest
+function updateChest() {
+	contract.chest().then((result) =>
+	{
+		handleResult(result, a_chest, 'chest', "dai");
+	})
 }
 
 // Base cost for DAI auction
@@ -1015,7 +1077,7 @@ const joinGame = async() => {
 	try {
 		console.log("about to send transaction joingame");
 		const joinTheGame = await contract.JoinGame(m_tribeChoice, {
-		  value: ethers.utils.parseEther("0.01")
+		  value: ethers.utils.parseEther(a_joinCost[0])
 		})
 
 		console.log("joined the game successfully");
