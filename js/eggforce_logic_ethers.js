@@ -72,6 +72,11 @@ var a_radAuctionTimer = [0];
 var a_radAuctionCostNow = [0];
 var a_tribeRad = [0];
 
+var a_tierProd = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+for(let k = 1; k < 9; k++){
+	a_tierProd[k] = [0, 0, 0, 0];
+}
+
 var h_anomalyLand = true; // whether land or prod is targeted on anomaly buy
 var h_anomalyTargetId = 0;
 var h_anomalyWeight = [0, 0, 0, 0];
@@ -202,6 +207,7 @@ function controlLoop4() {
 	}
 	updateDaiAuctionCostNow();
 	updateRadAuctionCostNow();
+	updateTierProdHtml();
     setTimeout(controlLoop4, 4000);
 }
 
@@ -238,6 +244,7 @@ function refreshData(){
 	updateRadToHarvest();
 	updateJoinOrChange();
 	updateTribeRadToClaim();
+	updateTierProd();
 }
 
 //** UTILITIES **//
@@ -461,6 +468,37 @@ function getContractOwner() {
 			});
 }
 
+// Tier prod (all 8)
+function updateTierProd() {
+	for(let i = 1; i < 9; i++) {
+		contract.GetTierProd(i).then((result) =>
+		{
+			a_tierProd[i][0] = result[0].toString();
+			a_tierProd[i][1] = result[1].toString();
+			a_tierProd[i][2] = result[2].toString();
+			a_tierProd[i][3] = result[3].toString();
+		});
+	}
+}
+
+var d_tierProd = [
+	0,
+	document.getElementById('tier1prod'),
+	document.getElementById('tier2prod'),
+	document.getElementById('tier3prod'),
+	document.getElementById('tier4prod'),
+	document.getElementById('tier5prod'),
+	document.getElementById('tier6prod'),
+	document.getElementById('tier7prod'),
+	document.getElementById('tier8prod')
+]
+
+function updateTierProdHtml() {
+	for(let i = 1; i < 9; i++) {
+		d_tierProd[i].innerHTML = a_tierProd[i][0] + "/" + a_tierProd[i][1] + "/" + a_tierProd[i][2] + "/" + a_tierProd[i][3];
+	}	
+}
+
 // Territory stats (all 64)
 /*
 function updateTerritory(){
@@ -496,6 +534,16 @@ function checkBoundaries(__number, __html, __min, __max) {
 	}
 	document.getElementById(__html).value = __number;
 	return __number;
+}
+
+function checkBoundariesWithCb(__number, __html, __min, __max, __callback) {
+	if(__number > __max) {
+		__number = __max;
+	} else if (__number < __min) {
+		__number = __min;
+	}
+	document.getElementById(__html).value = __number;
+	__callback(__number);
 }
 
 // selected tier of eggoas to use for UpgradeEggoa
@@ -577,24 +625,28 @@ function updateTerritory(__id) {
 				if(h_landWeight == 0) { h_landWeight = 1};
 				contract.ComputeForce(__id, h_landWeight, result.lord, result.eggoa).then((result4) =>
 				{
-					t_land[__id].lord = result.lord;
-					t_land[__id].lastLand = result.lastLand.toString();
-					t_land[__id].level = result.level.toString();
-					t_land[__id].tribe = result3.toString();
-					t_land[__id].stat0 = result2[0].toString();
-					t_land[__id].stat1 = result2[1].toString();
-					t_land[__id].stat2 = result2[2].toString();
-					t_land[__id].stat3 = result2[3].toString();
-					t_land[__id].power = result4.toString();
+					contract.ComputeLandShroom(__id).then((result5) =>
+					{
+						t_land[__id].lord = result.lord;
+						t_land[__id].lastLand = result.lastLand.toString();
+						t_land[__id].level = result.level.toString();
+						t_land[__id].tribe = result3.toString();
+						t_land[__id].stat0 = result2[0].toString();
+						t_land[__id].stat1 = result2[1].toString();
+						t_land[__id].stat2 = result2[2].toString();
+						t_land[__id].stat3 = result2[3].toString();
+						t_land[__id].power = result4.toString();
+						t_land[__id].shroom = result5.toString();
 
-					// update all the HTML bits
-					updateLand(__id);
+						// update all the HTML bits
+						updateLand(__id);
 
-					// update status message
-					document.getElementById('w3q_land').innerHTML = "Up to date.";
+						// update status message
+						document.getElementById('w3q_land').innerHTML = "Up to date.";
 
-					// update possible action
-					updateLandButton();
+						// update possible action
+						updateLandButton();
+					});
 				});
 			});
 		});
@@ -615,6 +667,7 @@ function updateLand(__id){
 	document.getElementById('landPower').innerHTML = t_land[__id].power;
 	document.getElementById('landLevel').innerHTML = t_land[__id].level;
 	document.getElementById('landTribe').innerHTML = t_land[__id].tribe;
+	document.getElementById('landShroom').innerHTML = t_land[__id].shroom;
 	document.getElementById('landStat').innerHTML = t_land[__id].stat0 + "/" + t_land[__id].stat1 + "/" + t_land[__id].stat2 + "/" + t_land[__id].stat3;
 
 	// call changeAttackLandTier for proper % to show
@@ -735,16 +788,6 @@ function updateNestText(__tier) {
 		"<h6>Time until attack: " + _timeUntilAttack + "</h6>" +
 		"<h6>Lord of Land: " + m_nest[__tier].ownedLand + "</h6>" +
 		"<h6>Stats: " + m_nest[__tier].stat0 + "/" + m_nest[__tier].stat1 + "/" + m_nest[__tier].stat2 + "/" + m_nest[__tier].stat3;
-}
-
-// Tier prod (all 4)
-function updateTierProd(){
-	for(let i = 0; i < 4; i++){
-		contract.GetTierProd(i).then((result) =>
-		{
-			console.log(result.toString());
-		});
-	}
 }
 
 // Current block, then block details
@@ -1119,9 +1162,11 @@ const startGame = async() => {
 let h_attackLandTier = 1;
 
 function changeAttackLandTier(__tier) {
-	checkBoundaries(__tier, 'attackLandTierSelector', 1, m_tier[0]);
-	h_attackLandTier = __tier;
+	checkBoundariesWithCb(__tier, 'attackLandTierSelector', 1, m_tier[0], changeAttackLandTierCallback);
+}
 
+function changeAttackLandTierCallback(__tier) {
+	h_attackLandTier = __tier;
 	// check player power, and update html
 	let _power = m_nest[h_attackLandTier].stat0 * t_land[h_selectedLand].stat0 
 	+ m_nest[h_attackLandTier].stat1 * t_land[h_selectedLand].stat1 
