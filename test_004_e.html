@@ -6,7 +6,7 @@
 	</head>
 	<body>
 		<br>
-		<div class="container" align="center">
+		<div class="container" style="text-align:center;">
 			<div class="container">
 				<h1 class="display-1">EGGFORCE test 008</h1>
 				<br>		
@@ -49,7 +49,7 @@
                         <h5>SHROOMS</h5>
                         <br>
                         <h6>You have <span id="shroom">?</span> Shrooms</h6>
-                        <h6>Hatch them using <input type="text" id="shroomRad" onInput="changeShroomRad(this.value)" value="0" size="1"> rads</h6>
+                        <h6>Hatch them using <input type="text" id="shroomRad" oninput="changeShroomRad(this.value)" value="0" size="1"> rads</h6>
                         <h6>Tier of Eggoa to hatch: <input type="text" id="shroomTier" oninput="changeShroomTier(this.value)" value="1" size="1"></h6>
                         <h6>You will get <span id="shroomEggoa">?</span> Eggoas</h6>
                         <button onclick="hatchShrooms()">Hatch Shrooms</button>
@@ -61,7 +61,7 @@
                         <br>
                         <h6>Tribe: <span id="tribe">?</span></h6>
                         <h6>Number of Tribe Changes: <span id="tribeChange">?</span></h6>
-                        <h6>Balance: <span id="balance">?</span> DAI</h6> <button onclick="withdrawDai()">Withdraw Balance</button>
+                        <h6>Balance: <span id="balance">?</span> POA</h6> <button onclick="withdrawDai()">Withdraw Balance</button>
                 </div>
                 <div class="col-sm">
                     <h5>RADS</h5>
@@ -121,7 +121,7 @@
                 </div>
             </div>
             <br>
-            <h6>Attack Land with Eggoas of tier <input type="text" id="attackLandTierSelector" onInput="changeAttackLandTier(this.value)" value="1" size="1"></h6>
+            <h6>Attack Land with Eggoas of tier <input type="text" id="attackLandTierSelector" oninput="changeAttackLandTier(this.value)" value="1" size="1"></h6>
             <div class="row">
                 <div class="col-sm">
                     <h6>Power: <span id="attackPower">?</span></h6>
@@ -137,10 +137,10 @@
             <br>
             <div class="row">
                 <div class="col-sm">
-                    <h5>DAI Anomaly</h5>
+                    <h5>POA Anomaly</h5>
                     <h6>Auction started at: <span id="daiAuctionTimer">?</span></h6>
-                    <button onclick="findDaiAnomaly()">BUY DAI ANOMALY</button>
-                    <h6>Auction cost: <span id="daiAuctionCost">?</span> DAI</h6>
+                    <button onclick="findDaiAnomaly()">BUY POA ANOMALY</button>
+                    <h6>Auction cost: <span id="daiAuctionCost">?</span> POA</h6>
                 </div>
                 <div class="col-sm">
                      <h5>RAD Anomaly</h5>
@@ -220,17 +220,17 @@
                     <h6>Eggoa Plantamid Floor: <span id="eggoaPlantamid">?</span></h6>
                     <br>
                     <h5>Sacrifice Eggoas to raise Floor</h5>
-                    <h6>Tier to sacrifice: <input type="text" id="tierSacrifice" onInput="getSacrificeAmount(this.value)" value="1" size="1"></h6>
+                    <h6>Tier to sacrifice: <input type="text" id="tierSacrifice" oninput="getSacrificeAmount(this.value)" value="1" size="1"></h6>
                     <h6>(You will sacrifice <span id="sacrificeAmount">?</span> Eggoas)</h6>
                     <button onclick="raiseGoamid()">Raise Goamid</button>
                 </div>
                 <div class="col-sm">
-                    <h6>Dai Plantamid Floor: <span id="daiPlantamid">?</span></h6>
+                    <h6>Poa Plantamid Floor: <span id="daiPlantamid">?</span></h6>
                     <br>
-                    <h5>Spend Dai [POA] to raise Floor by 1 or more levels</h5>
-                    <h6>Number of Floors: <input type="text" id="floorsAdded" onInput="getFloorDaiCost(this.value)" value="1" size="1"></h6>
-                    <h6>(You will spend <span id="floorDaiCost">?</span> Dai [POA])</h6>
-                    <button onclick="raiseDaimid()">Raise Daimid</button>
+                    <h5>Spend Poa to raise Floor by 1 or more levels</h5>
+                    <h6>Number of Floors: <input type="text" id="floorsAdded" oninput="getFloorDaiCost(this.value)" value="1" size="1"></h6>
+                    <h6>(You will spend <span id="floorDaiCost">?</span> POA)</h6>
+                    <button onclick="raiseDaimid()">Raise Poamid</button>
                 </div>
             </div>                    
             <br>

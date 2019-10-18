@@ -121,7 +121,7 @@ var m_nest = [
 	{ amount: 0, level: 0, attackNext: 0, ownedLand: 0, stat0: 1, stat1: 0, stat2: 0, stat3: 0 },
 	{ amount: 0, level: 0, attackNext: 0, ownedLand: 0, stat0: 1, stat1: 0, stat2: 0, stat3: 0 },
 	{ amount: 0, level: 0, attackNext: 0, ownedLand: 0, stat0: 1, stat1: 0, stat2: 0, stat3: 0 } 
-];	
+];
 
 // Doc array
 var doc_m_nest = [
@@ -616,6 +616,9 @@ function updateLand(__id){
 	document.getElementById('landLevel').innerHTML = t_land[__id].level;
 	document.getElementById('landTribe').innerHTML = t_land[__id].tribe;
 	document.getElementById('landStat').innerHTML = t_land[__id].stat0 + "/" + t_land[__id].stat1 + "/" + t_land[__id].stat2 + "/" + t_land[__id].stat3;
+
+	// call changeAttackLandTier for proper % to show
+	changeAttackLandTier(h_selectedTier);
 }
 /*
 // Land stat array
@@ -991,8 +994,23 @@ function updateTier(__player){
 function updateTribe(__player){
 	contract.tribe(__player).then((result) =>
 	{
-		handleResult(result, m_tribe, 'tribe', "string");
+		handleResult(result, m_tribe, 0, "string");
+		updateTribeName();
 	});
+}
+
+function updateTribeName() {
+	d_tribe = document.getElementById('tribe');
+	switch(m_tribe[0]){
+		case 1: d_tribe.innerHTML = 'Crimson';
+		break;
+		case 2: d_tribe.innerHTML = 'Blu';
+		break;
+		case 3: d_tribe.innerHTML = 'Greg';
+		break;
+		case 4: d_tribe.innerHTML = 'Lumi';
+		break;
+	}
 }
 
 // Number of times player changed tribes
@@ -1104,14 +1122,34 @@ function changeAttackLandTier(__tier) {
 	checkBoundaries(__tier, 'attackLandTierSelector', 1, m_tier[0]);
 	h_attackLandTier = __tier;
 
-	// check player power, then calculate his chance to win
-	contract.ComputeForce(h_selectedLand, h_landWeight, m_account, h_attackLandTier).then((result) =>
-	{
-		handleResult(result, m_power, 'attackPower', "string");
-		let _winRate = parseInt(m_power) * 100 / (parseInt(m_power) + parseInt(t_land[h_selectedLand].power));
-		document.getElementById('winRate').innerHTML = _winRate;
-	});
+	// check player power, and update html
+	let _power = m_nest[h_attackLandTier].stat0 * t_land[h_selectedLand].stat0 
+	+ m_nest[h_attackLandTier].stat1 * t_land[h_selectedLand].stat1 
+	+ m_nest[h_attackLandTier].stat2 * t_land[h_selectedLand].stat2 
+	+ m_nest[h_attackLandTier].stat3 * t_land[h_selectedLand].stat3;
+	_power = _power * m_nest[h_attackLandTier].amount * (parseInt(m_daiPlantamid) + parseInt(m_eggoaPlantamid) + parseInt(1));
+	_power = parseInt(_power / h_landWeight);
+	document.getElementById('attackPower').innerHTML = _power;
+
+	// compute chance to win, update html
+	let _winRate = (parseInt(_power) * 100) / (parseInt(_power) + parseInt(t_land[h_selectedLand].power));
+	_winRate = parseFloat(_winRate).toFixed(2);
+	document.getElementById('winRate').innerHTML = _winRate;
 }
+
+/*
+// multiply each stat by tier and land weight 
+            for(uint256 i = 0; i < BASE_STAT; i++){
+                _power = _power.add(eggoaNest[__fighter][__fighterTier].stat[i].mul(__fighterTier).mul(land[__land].stat[i]));
+            }
+            
+            // mutiply by amount of eggoa, then plantamid
+            _power = _power.mul(eggoaNest[__fighter][__fighterTier].amount);
+            _power = _power.mul(daiPlantamid[__fighter].add(eggoaPlantamid[__fighter]).add(1));
+            
+            // divide by land weight
+            _power = _power.div(__landWeight);
+*/
 
 function checkAttackTimerThenAttack(__tier) {
 
@@ -1190,8 +1228,9 @@ let h_hatchShroomRad = 0;
 
 function changeShroomRad(__rad) {
 	let _finalRad = checkMultipleFour(__rad);
+	console.log(_finalRad);
 	h_hatchShroomRad = _finalRad;
-	document.getElementById('shroomRad').innerHTML = _finalRad;
+	//document.getElementById('shroomRad').value = _finalRad; // breaks multiple digit input
 	computeShroomEggoa();
 }
 
@@ -1224,7 +1263,7 @@ function computeShroomEggoa() {
 // find the first power of 4 we can use with input rads
 function checkMultipleFour(__rad) {
 	let _four = 4;
-	while(_four < __rad) {
+	while(_four <= __rad) {
 		_four = _four * 4;
 	}
 	return _four / 4;
@@ -1353,5 +1392,3 @@ const findRadAnomaly = async() => {
 		console.log("Error: ", error); //fires as the contract reverted the payment
 	}
 }
-
-//
