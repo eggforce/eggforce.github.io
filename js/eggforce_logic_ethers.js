@@ -1001,7 +1001,7 @@ function updateTribe(__player){
 
 function updateTribeName() {
 	d_tribe = document.getElementById('tribe');
-	switch(m_tribe[0]){
+	switch(parseInt(m_tribe)){
 		case 1: d_tribe.innerHTML = 'Crimson';
 		break;
 		case 2: d_tribe.innerHTML = 'Blu';
