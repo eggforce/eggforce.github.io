@@ -1428,7 +1428,8 @@ const findDaiAnomaly = async() => {
 const findRadAnomaly = async() => {
 	try {
 		console.log("about to send transaction findRADanomaly");
-		const findMyRadAnomaly = await contract.FindAnomaly(a_radAuctionCostNow, h_anomalyLand, h_anomalyTargetId, h_anomalyWeight[0], h_anomalyWeight[1], h_anomalyWeight[2], h_anomalyWeight[3], {
+		let _radToSend = (parseInt(a_radAuctionCostNow) + parseInt(1));
+		const findMyRadAnomaly = await contract.FindAnomaly(_radToSend, h_anomalyLand, h_anomalyTargetId, h_anomalyWeight[0], h_anomalyWeight[1], h_anomalyWeight[2], h_anomalyWeight[3], {
 			value: 0
 		})
 
