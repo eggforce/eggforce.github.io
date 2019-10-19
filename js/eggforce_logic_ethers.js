@@ -1111,7 +1111,7 @@ var d_scrollLog = document.getElementById('scrollLog');
 function date24() {
 	d = new Date();
 	e_date = d.toTimeString();
-	e_date = datetext.split(' ')[0];
+	e_date = e_date.split(' ')[0];
 }	
 
 function handleEvent(__string) {
