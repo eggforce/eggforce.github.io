@@ -349,9 +349,6 @@ function updatePlayerChest() {
 
 	let d_playerChest = document.getElementById('playerChest');
 
-	// avoid NaN. Even if inaccurate, this doesn't matter
-	if(a_globalRad == 0) { a_globalRad = 1};
-
 	let _playerShare = parseFloat(a_chest * m_earnedRad / a_globalRad).toFixed(6);
 	m_playerChest = _playerShare;
 
@@ -709,16 +706,15 @@ function updateNestValue(__player, __tier){
 
 function selectTribe(__tribe) {
 	h_selectedTribe = __tribe;
-	d_selectedTribe = document.getElementById('selectedTribe');
-	switch(__tribe){
-		case 1: d_selectedTribe.innerHTML = 'Crimson';
-		break;
-		case 2: d_selectedTribe.innerHTML = 'Blu';
-		break;
-		case 3: d_selectedTribe.innerHTML = 'Greg';
-		break;
-		case 4: d_selectedTribe.innerHTML = 'Lumi';
-		break;
+	document.getElementById('selectedTribe').innerHTML = findTribeName(__tribe);
+}
+
+function findTribeName(__number) {
+	switch(__number){
+		case 1: return 'Crimson';
+		case 2: return 'Blu';
+		case 3: return 'Greg';
+		case 4: return 'Lumi';
 	}
 }
 
@@ -1043,17 +1039,7 @@ function updateTribe(__player){
 }
 
 function updateTribeName() {
-	d_tribe = document.getElementById('tribe');
-	switch(parseInt(m_tribe)){
-		case 1: d_tribe.innerHTML = 'Crimson';
-		break;
-		case 2: d_tribe.innerHTML = 'Blu';
-		break;
-		case 3: d_tribe.innerHTML = 'Greg';
-		break;
-		case 4: d_tribe.innerHTML = 'Lumi';
-		break;
-	}
+	document.getElementById('tribe').innerHTML = findTribeName(parseInt(m_tribe));
 }
 
 // Number of times player changed tribes
@@ -1207,11 +1193,14 @@ function checkAttackTimerThenAttack(__tier) {
 
 const attackLand = async() => {
 	try {
-		console.log("about to send transaction");
+		//console.log("about to send transaction");
+		notificationSend('About to attack Land ' + h_selectedLand + '...');
 		const attackThisLand = await contract.AttackTerritory(h_selectedLand, h_attackLandTier)
-		console.log("sent attackland tx successfully");
+		notificationSuccess('Attacking Land ' + h_selectedLand + '!');
+		//console.log("sent attackland tx successfully");
 	} catch(error) {
-		console.log("Error: ", error);
+		//console.log("Error: ", error);
+		notificationError();
 	}
 }
 
@@ -1220,27 +1209,32 @@ let m_tribeChoice = 1;
 
 const joinGame = async() => {
 	try {
-		console.log("about to send transaction joingame");
+		//console.log("about to send transaction joingame");
+		notificationSend('About to join game...');
 		const joinTheGame = await contract.JoinGame(h_selectedTribe, {
 		  value: ethers.utils.parseEther(a_joinCost[0])
 		})
-
-		console.log("joined the game successfully");
+		notificationSuccess('Joining game!');
+		//console.log("joined the game successfully");
 	  } catch (error) {
-		console.log("Error: ", error); //fires as the contract reverted the payment
+		//console.log("Error: ", error); //fires as the contract reverted the payment
+		notificationError();
 	  }
 }
 
 const changeTribe = async() => {
 	try {
-		console.log("about to send transaction changetribe");
+		//console.log("about to send transaction changetribe");
+		let _newTribe = findTribeName(parseInt(h_selectedTribe));
+		notificationSend('About to change to ' + _newTribe + ' Tribe');
 		const changeMyTribe = await contract.ChangeTribe(h_selectedTribe, {
 		  value: ethers.utils.parseEther(a_joinCost[0])
 		})
-
-		console.log("changed tribe successfully");
+		notificationSuccess('Changing Tribe!');
+		//console.log("changed tribe successfully");
 	  } catch (error) {
-		console.log("Error: ", error); //fires as the contract reverted the payment
+		//console.log("Error: ", error);
+		notificationError();
 	  }
 }
 
@@ -1248,26 +1242,30 @@ const changeTribe = async() => {
 // WORKS
 const raiseGoamid = async() => {
 	try {
-		console.log("about to send transaction raiseeggoaplantamid");
+		//console.log("about to send transaction raiseeggoaplantamid");
+		notificationSend('About to raise the Goa Plantamid with a sacrifice of ' + n_sacrificeAmount[0] + ' Eggoas');
 		const raiseMyGoamid = await contract.RaiseEggoaPlantamid(h_selectedTier)
-
-		console.log("raised the plantamid successfully");
+		notificationSuccess('Raising the Goa Plantamid!');
+		//console.log("raised the plantamid successfully");
 	} catch (error) {
-		console.log("Error: ", error); //fires as the contract reverted the payment
+		//console.log("Error: ", error); 
+		notificationError();
 	}
 }
 
 // WORKS
 const raiseDaimid = async() => {
 	try {
-		console.log("about to send transaction raisedaiplantamid");
+		//console.log("about to send transaction raisedaiplantamid");
+		notificationSend('About to raise POA Plantamid by ' + h_selectedFloor + ' floors using ' + n_floorDaiCost[0] + " POA");
 		const raiseMyGoamid = await contract.RaiseDaiPlantamid(h_selectedFloor, {
 			value: ethers.utils.parseEther(n_floorDaiCost[0])
 		})
-
-		console.log("raised the plantamid successfully");
+		notificationSuccess('Raising the POA Plantamid!');
+		//console.log("raised the plantamid successfully");
 	} catch (error) {
-		console.log("Error: ", error); //fires as the contract reverted the payment
+		//console.log("Error: ", error); 
+		notificationError();
 	}
 }
 
@@ -1321,23 +1319,28 @@ function checkMultipleFour(__rad) {
 
 const hatchShrooms = async() => {
 	try {
-		console.log("about to try to hatch shrooms");
+		//console.log("about to try to hatch shrooms");
+		notificationSend('About to hatch Shrooms into tier ' + h_hatchShroomTier + ' Eggoas, using ' + h_hatchShroomRad + ' RADS');
 		const hatchMyShrooms = await contract.HatchShroom(h_hatchShroomTier, h_hatchShroomRad)
-		console.log("hatched shrooms !");
+		//console.log("hatched shrooms !");
+		notificationSuccess('Hatching Shrooms!');
 	} catch (error) {
-		console.log("Error: couldn't hatch shrooms due to ", error);
+		//console.log("Error: couldn't hatch shrooms due to ", error);
+		notificationError();
 	}
 } 
 
 // Harvest Rads - WORKS
 const harvestRads = async() => {
 	try {
-		console.log("about to try to harvest rads");
+		//console.log("about to try to harvest rads");
+		notificationSend('About to harvest rads...');
 		const harvestMyRads = await contract.HarvestRad()
-		console.log("harvested rads !");
-		updateRad(m_account); // probably replace this with event logging later
+		//console.log("harvested rads !");
+		notificationSuccess('Harvesting Rads!');
 	} catch (error) {
-		console.log("Error: couldn't harvest due to ", error);
+		//console.log("Error: couldn't harvest due to ", error);
+		notificationError();
 	}
 } 
 
@@ -1345,11 +1348,14 @@ const harvestRads = async() => {
 // (TODO) Add condition for button to appear: h_selectedLand must = player owned lands
 const collectShrooms = async() => {
 	try {
-		console.log("about to collect shrooms");
+		//console.log("about to collect shrooms");
+		notificationSend('About to collect shrooms...');
 		const collectMyShrooms = await contract.CollectShroom(h_selectedLand)
-		console.log("collected shrooms !");
+		//console.log("collected shrooms !");
+		notificationSuccess('Collecting Shrooms!');
 	} catch (error) {
-		console.log("Error: couldn't collect ", error);
+		//console.log("Error: couldn't collect ", error);
+		notificationError();
 	}
 } 
 
@@ -1357,22 +1363,29 @@ const collectShrooms = async() => {
 // (TODO) run ComputeUnlockCost and disable/enable action based on m_rad evaluation
 const unlockNextTier = async() => {
 	try {
-		console.log("about to unlock tier");
+		let _tier = parseInt(m_tier[0]) + parseInt(1);
+		//console.log("about to unlock tier");
+		notificationSend('About to unlock tier ' + _tier);
 		const unlockMyNextTier = await contract.UnlockTier()
-		console.log("unlocked tier!");
+		//console.log("unlocked tier!");
+		notificationSuccess('Unlocking tier ' + _tier);
 	} catch (error) {
-		console.log("Error: couldn't unlock ", error);
+		//console.log("Error: couldn't unlock ", error);
+		notificationError();
 	}
 }
 
 // WithdrawBalance - TEST
 const withdrawDai = async() => {
 	try {
-		console.log("withdrawing all the internet money...");
+		//console.log("withdrawing all the internet money...");
+		notificationSend('About to withdraw POA...');
 		const withdrawMyBalance= await contract.WithdrawBalance()
-		console.log("you are now a rich man!");
+		//console.log("you are now a rich man!");
+		notificationSuccess('POA incoming to your wallet!');
 	} catch (error) {
-		console.log("Error: stole all your money ", error);
+		//console.log("Error: stole all your money ", error);
+		notificationError();
 	}
 }
 
@@ -1382,11 +1395,14 @@ const withdrawDai = async() => {
 
 const upgradeGoa = async() => {
 	try {
-		console.log("upgrading eggoas...");
+		//console.log("upgrading eggoas...");
+		notificationSend('Upgrading tier' + h_upgradeTier + ' Eggoas: +' + h_upgradeWeight[0] + '/' + h_upgradeWeight[1] + '/' + h_upgradeWeight[2] + '/' + h_upgradeWeight[3]);
 		const upgradeMyEggoa = await contract.UpgradeEggoa(h_upgradeTier, h_upgradeWeight[0], h_upgradeWeight[1], h_upgradeWeight[2], h_upgradeWeight[3])
-		console.log("success!");
+		//console.log("success!");
+		notificationSuccess('Eggoas upgraded!');
 	} catch (error) {
-		console.log("Error: couldn't collect ", error);
+		//console.log("Error: couldn't collect ", error);
+		notificationError();
 	}
 } 
 
@@ -1394,11 +1410,14 @@ const upgradeGoa = async() => {
 
 const openRewardChest = async () => {
 	try {
-		console.log("opening dai chest...");
+		//console.log("opening dai chest...");
+		notificationSend('Opening POA chest...');
 		const openMyChest = await contract.OpenChest()
-		console.log("success!");
+		//console.log("success!");
+		notificationSuccess('Your wallet grows fatter!');
 	} catch (error) {
-		console.log("Error: couldn't open ", error);
+		//console.log("Error: couldn't open ", error);
+		notificationError();
 	}
 }
 
@@ -1406,11 +1425,14 @@ const openRewardChest = async () => {
 
 const claimTribeRads = async () => {
 	try {
-		console.log("claiming tribe rad...");
+		//console.log("claiming tribe rad...");
+		notificationSend('Claiming tribe rad...');
 		const claimMyTribeRads = await contract.ClaimTribeRad()
-		console.log("success!");
+		//console.log("success!");
+		notificationSuccess('Got RADS from tribe!');
 	} catch (error) {
-		console.log("Error: couldn't get tribe rads ", error);
+		//console.log("Error: couldn't get tribe rads ", error);
+		notificationError();
 	}
 }
 
@@ -1418,14 +1440,16 @@ const claimTribeRads = async () => {
 // FIND DAI ANOMALY - WORKSish. deploy v8 and test
 const findDaiAnomaly = async() => {
 	try {
-		console.log("about to send transaction findDAIanomaly");
+		//console.log("about to send transaction findDAIanomaly");
+		notificationSend('Searching for POA Anomaly...');
 		const findMyDaiAnomaly = await contract.FindAnomaly(0, h_anomalyLand, h_anomalyTargetId, h_anomalyWeight[0], h_anomalyWeight[1], h_anomalyWeight[2], h_anomalyWeight[3], {
 			value: ethers.utils.parseEther(a_daiAuctionCostNow[0])
 		})
-
-		console.log("found anomaly successfully");
+		//console.log("found anomaly successfully");
+		notificationSuccess('Found POA Anomaly!');
 	} catch (error) {
-		console.log("Error: ", error); //fires as the contract reverted the payment
+		//console.log("Error: ", error);
+		notificationError();
 	}
 }
 
