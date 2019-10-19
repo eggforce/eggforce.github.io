@@ -1126,7 +1126,7 @@ function beginEventLogging() {
 	
 	contract.on("JoinedGame", (sender, tribe, event) => {
 		console.log("New player: " + sender + " has joined tribe " + tribe.toString());
-		let _string = "<br>[" + e_date + "] A new member for the " + findTribeName(tribe.toString()) + " Tribe: " + formatEthAdr(sender) + " joined the game.");
+		let _string = "<br>[" + e_date + "] A new member for the " + findTribeName(tribe.toString()) + " Tribe: " + formatEthAdr(sender) + " joined the game.";
 		handleEvent(_string);
 	});
 
