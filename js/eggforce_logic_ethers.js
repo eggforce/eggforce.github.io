@@ -706,10 +706,10 @@ function updateNestValue(__player, __tier){
 
 function selectTribe(__tribe) {
 	h_selectedTribe = __tribe;
-	document.getElementById('selectedTribe').innerHTML = findTribeName(__tribe);
+	document.getElementById('selectedTribe').innerHTML = switchTribeName(__tribe);
 }
 
-function findTribeName(__number) {
+function switchTribeName(__number) {
 	switch(__number){
 		case 1: return 'Crimson';
 		case 2: return 'Blu';
@@ -1039,7 +1039,7 @@ function updateTribe(__player){
 }
 
 function updateTribeName() {
-	document.getElementById('tribe').innerHTML = findTribeName(parseInt(m_tribe));
+	document.getElementById('tribe').innerHTML = switchTribeName(parseInt(m_tribe));
 }
 
 // Number of times player changed tribes
@@ -1108,7 +1108,7 @@ var d_eventLog = document.getElementById('eventLog');
 var d_scrollLog = document.getElementById('scrollLog');
 
 function date24() {
-	d = new Date();
+	let d = new Date();
 	d = d.toTimeString();
 	d = d.split(' ')[0];
 	return d;
@@ -1119,13 +1119,60 @@ function handleEvent(__string) {
 	d_scrollLog.scrollTop = d_scrollLog.scrollHeight;
 }
 
+function truncateEther(__eth) {
+	let e = ethers.utils.formatEther(__eth);
+	e = parseFloat(e).toFixed(6);
+	return e;
+}
+
+/*
+	DONE event StartedGame (uint256 launch, uint256 end);
+    DONE event WithdrewBalance (address sender, uint256 eth);
+    DONE event OpenedChest (address sender, uint256 eth);
+    DONE event JoinedGame (address sender, uint256 tribe);
+    TESTED event HarvestedRad (address sender, uint256 rad);
+    DONE event ClaimedTribeRad (address sender, uint256 rad);
+    DONE event ChangedTribe (address sender, uint256 tribe);
+    DONE event FoundAnomaly (address sender, uint eth, uint rad, bool land, uint stat0, uint stat1, uint stat2, uint stat3);
+    DONE event UnlockedTier (address sender, uint256 tier);
+    DONE event HatchedShroom (address sender, uint256 rad, uint256 tier, uint256 eggoa);
+    DONE event CollectedShroom (address sender, uint256 land, uint256 shroom);
+    DONE event DiscoveredLand (address sender, uint256 land);
+    DONE event TookOverLand (address sender, uint256 land);
+    DONE event WonLandFight (address sender, address lord, uint powerSender, uint powerLord, uint result, uint shroom, uint eggoa);
+    DONE event LostLandFight (address sender, address lord, uint powerSender, uint powerLord, uint result, uint eggoa);
+    DONE event UpgradedEggoa (address sender, uint rad, uint tier, uint stat0, uint stat1, uint stat2, uint stat3);
+    DONE event RaisedEggoaPlantamid (address sender, uint tier, uint eggoa, uint plantamid);
+	DONE event RaisedDaiPlantamid (address sender, uint eth, uint upgrade, uint plantamid);
+*/
+
 function beginEventLogging() {
 	
 	console.log("event logging begins");
-	
+	/*
+	contract.on(" ", (sender, eth, event) => {
+		let _string = formatEthAdr(sender) + ethers.utils.formatEther(eth);
+		handleEvent(_string);
+	});
+	*/
+	contract.on("StartedGame", (launch, end, event) => {
+		let _string = "The game has started! It will end " + convertTimestamp(end) + ". May the best egg win.";
+		handleEvent(_string);
+	});
+
+	contract.on("WithdrewBalance", (sender, eth, event) => {
+		let _string = formatEthAdr(sender) + " has withdrawn " + truncateEther(eth) + " POA to his wallet." ;
+		handleEvent(_string);
+	});
+
+	contract.on("OpenedChest", (sender, eth, event) => {
+		let _string = formatEthAdr(sender) + " opens their reward chest! They win " + ethers.utils.formatEther(eth) + " POA.";
+		handleEvent(_string);
+	});
+
 	contract.on("JoinedGame", (sender, tribe, event) => {
 		console.log("New player: " + sender + " has joined tribe " + tribe.toString());
-		let _string = "A new member for the " + findTribeName(tribe.toString()) + " Tribe: " + formatEthAdr(sender) + " joined the game.";
+		let _string = "A new member for the " + switchTribeName(tribe.toString()) + " Tribe: " + formatEthAdr(sender) + " joined the game.";
 		handleEvent(_string);
 	});
 
@@ -1134,6 +1181,100 @@ function beginEventLogging() {
 		let _string = formatEthAdr(sender) + " harvested " + rad.toString() + " rads.";
 		handleEvent(_string);
 	});
+
+	contract.on("ClaimedTribeRad", (sender, rad, event) => { // add tribe on next contract
+		console.log(sender + " claimed " + rad.toString() + " rads from their Tribe chest.");
+		let _string = formatEthAdr(sender) + " claimed " + rad.toString() + " rads from their Tribe chest.";
+		handleEvent(_string);
+	});
+
+	contract.on("ChangedTribe", (sender, tribe, event) => {
+		console.log(sender + " renounces their old ways and joins the " + switchTribeName(tribe.toString()));
+		let _string = formatEthAdr(sender) + " renounces their old ways and joins the " + switchTribeName(tribe.toString()) + ".";
+		handleEvent(_string);
+	});
+
+	// change "eth" to "cost" for contract v9
+	contract.on("FoundAnomaly", (sender, eth, rad, land, stat0, stat1, stat2, stat3, event) => {
+		let _string = formatEthAdr(sender) + " finds an Anomaly using ";
+
+		// check if anomaly is dai or poa
+		if(rad == 0) {
+			_string += truncateEther(eth) + " POA. "; 
+		} 
+		else {
+			_string += eth.toString() + " rads. ";
+		}
+
+		// check if target is land or prod
+		if(land == true) {
+			_string += "Land ";
+		}
+		else {
+			_string += "Tier ";
+		}
+		
+		// add stats then send string
+		_string += "addIdLater weight is changed to " + stat0.toString() + "/" + stat1.toString() + "/" + stat2.toString() + "/" + stat3.toString() + ".";
+		handleEvent(_string);
+	});
+
+	contract.on("UnlockedTier", (sender, tier, event) => {
+		let _string = formatEthAdr(sender) + " unlocks tier " + tier.toString() + ".";
+		handleEvent(_string);
+	});
+
+	// "eggoa" is technically "shroom". change eggoa for shroom in v9, add eggoa
+	contract.on("HatchedShroom", (sender, rad, tier, eggoa, event) => {
+		let _string = formatEthAdr(sender) + " hatches " + eggoa.toString() + " shrooms with " + rad.toString() + " rads into X eggoas of tier " + tier.toString() + ".";
+		handleEvent(_string);
+	});
+
+	contract.on("CollectedShroom", (sender, land, shroom, event) => {
+		let _string = formatEthAdr(sender) + ", lord of land " + land.toString() + ", collected " + shroom.toString() + " shrooms.";
+		handleEvent(_string);
+	});
+
+	contract.on("DiscoveredLand", (sender, land, event) => {
+		let _string = "All hail " + formatEthAdr(sender) + ", discoverer of land " + land.toString(); + "!";
+		handleEvent(_string);
+	});
+
+	contract.on("TookOverLand", (sender, land, event) => {
+		let _string = formatEthAdr(sender) + " snatches land " + land.toString() + " (previously abandoned).";
+		handleEvent(_string);
+	});
+
+	// add land as 3rd argument in contract v9
+	contract.on("WonLandFight", (sender, lord, powerSender, powerLord, result, shroom, eggoa, event) => {
+		let _powerSender = powerSender.toString();
+		let _powerLord = powerLord.toString();
+		let _winChance = parseFloat(_powerSender) / (parseFloat(_powerSender) + parseFloat(_powerLord));
+		let _string = formatEthAdr(sender) + ", with a " + _winChance + " to win, takes land X from " + formatEthAdr(lord) + "! " + formatEthAdr(lord) + " loses " + eggoa.toString() + " Eggoas.";
+		handleEvent(_string);
+	});
+	
+	// add land as 3rd argument in contract v9
+	contract.on("LostLandFight", (sender, lord, powerSender, powerLord, result, eggoa, event) => {
+		let _string = formatEthAdr(lord) + " defends his land against " + formatEthAdr(sender) + ", who loses " + eggoa.toString() + "Eggoas.";
+		handleEvent(_string);
+	});
+
+	contract.on("UpgradedEggoa", (sender, rad, tier, stat0, stat1, stat2, stat3, event) => {
+		let _string = formatEthAdr(sender) + " uses " + rad.toString() + " rads to upgrade his tier " + tier.toString() + " Eggoas. Bonus stats: " + stat0.toString() + "/" + stat1.toString() + "/" + stat2.toString() + "/" + stat3.toString(); + ".";
+		handleEvent(_string);
+	});
+
+	contract.on("RaisedEggoaPlantamid", (sender, tier, eggoa, plantamid, event) => {
+		let _string = formatEthAdr(sender) + " sacrifices " + eggoa.toString() + " Eggoas of tier " + tier.toString() + " to raise his Plantamid to floor " + plantamid.toString(); + ".";
+		handleEvent(_string);
+	});
+
+    contract.on("RaisedEggoaPlantamid", (sender, eth, upgrade, plantamid, event) => {
+		let _string = formatEthAdr(sender) + " spends " + truncateEther(eth) + " POA to raise his Plantamid by " + upgrade.toString() + " floors, reaching floor " + plantamid.toString(); + ".";
+		handleEvent(_string);
+	});
+
 }
 
 
@@ -1249,7 +1390,7 @@ const joinGame = async() => {
 const changeTribe = async() => {
 	try {
 		//console.log("about to send transaction changetribe");
-		let _newTribe = findTribeName(parseInt(h_selectedTribe));
+		let _newTribe = switchTribeName(parseInt(h_selectedTribe));
 		notificationSend('About to change to ' + _newTribe + ' Tribe');
 		const changeMyTribe = await contract.ChangeTribe(h_selectedTribe, {
 		  value: ethers.utils.parseEther(a_joinCost[0])
