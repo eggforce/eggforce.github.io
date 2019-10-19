@@ -29,3 +29,13 @@ h1 {
   -o-filter: brightness(80%);
   -ms-filter: brightness(80%);
 }
+
+/* 
+// gn-lifespan from simpleNotification
+// Hide the progress bar!
+// Doesn't seem to work... I changed it in simpleNotification.css instead
+*/
+
+.gn-lifespan {
+  display: hidden !important;
+}

@@ -1177,8 +1177,13 @@ function changeAttackLandTierCallback(__tier) {
 	document.getElementById('attackPower').innerHTML = _power;
 
 	// compute chance to win, update html
+	if(typeof myVar !== 'undefined') {
 	let _winRate = (parseInt(_power) * 100) / (parseInt(_power) + parseInt(t_land[h_selectedLand].power));
 	_winRate = parseFloat(_winRate).toFixed(2);
+	} 
+	else {
+		_winRate = 100;
+	}
 	document.getElementById('winRate').innerHTML = _winRate;
 }
 
@@ -1427,14 +1432,57 @@ const findDaiAnomaly = async() => {
 // FIND RAD ANOMALY - WORKS
 const findRadAnomaly = async() => {
 	try {
-		console.log("about to send transaction findRADanomaly");
+		//console.log("about to send transaction findRADanomaly");
 		let _radToSend = (parseInt(a_radAuctionCostNow) + parseInt(1));
+		notificationSend('Searching for Rad Anomaly...');
 		const findMyRadAnomaly = await contract.FindAnomaly(_radToSend, h_anomalyLand, h_anomalyTargetId, h_anomalyWeight[0], h_anomalyWeight[1], h_anomalyWeight[2], h_anomalyWeight[3], {
 			value: 0
 		})
-
-		console.log("found anomaly successfully");
+		//console.log("found anomaly successfully");
+		notificationSuccess('Found Rad Anomaly!');
 	} catch (error) {
-		console.log("Error: ", error); //fires as the contract reverted the payment
+		//console.log("Error: ", error);
+		notificationError();
 	}
+}
+
+// Notifications
+function notificationSend(__text) {
+	SimpleNotification.warning({text: __text},			
+	{position: 'bottom-right', removeAllOnDisplay: 'true'});
+}
+
+function notificationSuccess(__text) {
+	SimpleNotification.success({text: __text},			
+	{position: 'bottom-right', removeAllOnDisplay: 'true'});
+}
+
+// Generic error
+function notificationError() {
+	SimpleNotification.error({text: "ERROR: Couldn't send tx (invalid state)"},
+	{position: 'bottom-right', removeAllOnDisplay: 'true'});
+}
+
+/*
+SimpleNotification._options = {
+	position: 'bottom-right'
+};
+*/
+function simpleTest() {
+	SimpleNotification.warning({
+		//title: 'Title', // The title of the notification
+		//image: 'url', // Optional image displayed inside the notification
+		text: 'Content', // Content of the notification
+		// Optional list of buttons to interact with the notification
+		/*buttons: [{
+			value: 'Confirm', // The text inside the button
+			type: 'success', // The type of the button, same as for the notifications
+			onClick: (notification) => {
+				// The onClick function receive the notification from which the button has been clicked
+				// You can call notification.remove(), notification.close() or notification.closeFadeout()
+				// if you wish to remove the notification by clicking on  the buttons
+			}
+		}]*/
+	}, {position: 'bottom-right'});
+	setTimeout(function(){ SimpleNotification.success({text: 'We did it!'}, {position: 'bottom-right', removeAllOnDisplay: true}); }, 2000);
 }
