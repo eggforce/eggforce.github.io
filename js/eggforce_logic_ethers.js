@@ -1103,12 +1103,37 @@ function updateRadToHarvest() {
 
 // Events
 
+// Conversion of Date to hh:mm:ss
+var e_date;
+var d_eventLog = document.getElementById('eventLog');
+var d_scrollLog = document.getElementById('scrollLog');
+
+function date24() {
+	d = new Date();
+	e_date = d.toTimeString();
+	e_date = datetext.split(' ')[0];
+}	
+
+function handleEvent(__string) {
+	date24();
+	d_eventLog.innerHTML += __string;
+	d_scrollLog.scrollTop = d_scrollLog.scrollHeight;
+}
+
 function beginEventLogging() {
 	
 	console.log("event logging begins");
 	
 	contract.on("JoinedGame", (sender, tribe, event) => {
 		console.log("New player: " + sender + " has joined tribe " + tribe.toString());
+		let _string = "<br>[" + e_date + "] A new member for the " + findTribeName(tribe.toString()) + " Tribe: " + formatEthAdr(sender) + " joined the game.");
+		handleEvent(_string);
+	});
+
+	contract.on("HarvestedRad", (sender, rad, event) => {
+		console.log(sender + " harvested " + rad.toString() + " rads");
+		let _string = "<br>[" + e_date + "] " + formatEthAdr(sender) + " harvested " + rad.toString() + " rads.";
+		handleEvent(_string);
 	});
 }
 
@@ -1429,7 +1454,7 @@ const claimTribeRads = async () => {
 		notificationSend('Claiming tribe rad...');
 		const claimMyTribeRads = await contract.ClaimTribeRad()
 		//console.log("success!");
-		notificationSuccess('Got RADS from tribe!');
+		notificationSuccess('Getting RADS from tribe!');
 	} catch (error) {
 		//console.log("Error: couldn't get tribe rads ", error);
 		notificationError();
@@ -1446,7 +1471,7 @@ const findDaiAnomaly = async() => {
 			value: ethers.utils.parseEther(a_daiAuctionCostNow[0])
 		})
 		//console.log("found anomaly successfully");
-		notificationSuccess('Found POA Anomaly!');
+		notificationSuccess('Finding POA Anomaly!');
 	} catch (error) {
 		//console.log("Error: ", error);
 		notificationError();
@@ -1463,7 +1488,7 @@ const findRadAnomaly = async() => {
 			value: 0
 		})
 		//console.log("found anomaly successfully");
-		notificationSuccess('Found Rad Anomaly!');
+		notificationSuccess('Finding Rad Anomaly!');
 	} catch (error) {
 		//console.log("Error: ", error);
 		notificationError();
@@ -1471,20 +1496,21 @@ const findRadAnomaly = async() => {
 }
 
 // Notifications
+
 function notificationSend(__text) {
 	SimpleNotification.warning({text: __text},			
-	{position: 'bottom-right', removeAllOnDisplay: 'true'});
+	{position: 'bottom-left', removeAllOnDisplay: 'true'});
 }
 
 function notificationSuccess(__text) {
 	SimpleNotification.success({text: __text},			
-	{position: 'bottom-right', removeAllOnDisplay: 'true'});
+	{position: 'bottom-left', removeAllOnDisplay: 'true'});
 }
 
 // Generic error
 function notificationError() {
-	SimpleNotification.error({text: "ERROR: Couldn't send tx (invalid state)"},
-	{position: 'bottom-right', removeAllOnDisplay: 'true'});
+	SimpleNotification.error({text: "ERROR: Couldn't send transaction."},
+	{position: 'bottom-left', removeAllOnDisplay: 'true'});
 }
 
 /*
