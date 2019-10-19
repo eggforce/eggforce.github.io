@@ -1104,19 +1104,18 @@ function updateRadToHarvest() {
 // Events
 
 // Conversion of Date to hh:mm:ss
-var e_date;
 var d_eventLog = document.getElementById('eventLog');
 var d_scrollLog = document.getElementById('scrollLog');
 
 function date24() {
 	d = new Date();
-	e_date = d.toTimeString();
-	e_date = e_date.split(' ')[0];
+	d = d.toTimeString();
+	d = d.split(' ')[0];
+	return d;
 }	
 
 function handleEvent(__string) {
-	date24();
-	d_eventLog.innerHTML += __string;
+	d_eventLog.innerHTML += "<br>[" + date24() + "] " + __string;
 	d_scrollLog.scrollTop = d_scrollLog.scrollHeight;
 }
 
@@ -1126,13 +1125,13 @@ function beginEventLogging() {
 	
 	contract.on("JoinedGame", (sender, tribe, event) => {
 		console.log("New player: " + sender + " has joined tribe " + tribe.toString());
-		let _string = "<br>[" + e_date + "] A new member for the " + findTribeName(tribe.toString()) + " Tribe: " + formatEthAdr(sender) + " joined the game.";
+		let _string = "A new member for the " + findTribeName(tribe.toString()) + " Tribe: " + formatEthAdr(sender) + " joined the game.";
 		handleEvent(_string);
 	});
 
 	contract.on("HarvestedRad", (sender, rad, event) => {
 		console.log(sender + " harvested " + rad.toString() + " rads");
-		let _string = "<br>[" + e_date + "] " + formatEthAdr(sender) + " harvested " + rad.toString() + " rads.";
+		let _string = formatEthAdr(sender) + " harvested " + rad.toString() + " rads.";
 		handleEvent(_string);
 	});
 }
