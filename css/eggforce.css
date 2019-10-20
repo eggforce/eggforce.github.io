@@ -39,3 +39,14 @@ h1 {
 .gn-lifespan {
   display: hidden !important;
 }
+
+/*
+// scroll-box for events
+*/
+
+.scroll-box {
+	width: 100%; 
+	overflow: auto; 
+	overflow-x: hidden; 
+	height: 128px;
+}
