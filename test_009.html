@@ -1,0 +1,329 @@
+<html>
+	<head>
+        <link href="https://fonts.googleapis.com/css?family=Cairo|Exo&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="css/simpleNotification.css">
+		<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+		<link rel="stylesheet" type="text/css" href="css/eggforce.css">
+	</head>
+	<body>
+		<br>
+		<div class="container" style="text-align:center;">
+			<div class="container">
+				<h1 class="display-1">EGGFORCE test 009</h1>
+				<br>		
+			</div>
+            <br>
+            <hr>
+            <h3>REWARD CHEST: <span id="chest">?</span> [POA]</h3>
+            <h6>(To be distributed on round end, proportionately to rads earned)</h6>
+            <br>
+            <h6>Select your Tribe before <span id="joinOrChange">?</span></h6>
+            <br>
+            
+            <div class="row">
+                <div class="col-sm">
+                    <img src="img/goa_crimson.svg" height="64" onclick="selectTribe(1)">
+                    <h6>Crimson</h6>
+                </div>
+                <div class="col-sm">
+                    <img src="img/goa_blu.svg" height="64" onclick="selectTribe(2)">
+                    <h6>Blu</h6>
+                </div>
+                <div class="col-sm">
+                    <img src="img/goa_greg.svg" height="64" onclick="selectTribe(3)">
+                    <h6>Greg</h6>
+                </div>
+                <div class="col-sm">
+                    <img src="img/goa_lumi.svg" height="64" onclick="selectTribe(4)">
+                    <h6>Lumi</h6>
+                </div>
+            </div>
+            <h6>Selected Tribe: <span id="selectedTribe">?</span></h6>
+            <span id="joinOrChangeButton"><button onclick="joinGame()">Join Game</button></span>
+            <h6>(Cost: <span id="joinCost">?</span> POA)</h6>
+            <hr>
+            <h4>EVENTS</h4>
+            <br>
+            <div class="row">
+                <div class="col-sm-2">
+
+                </div>
+                <div class="col-sm">
+                    <div class="scroll-box" id="scrollLog" style="text-align:left;">
+                        <p><span id="eventLog">[Waiting for events...]</span></p>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    
+                </div>
+            </div>
+            <br>
+            <hr>
+            <h4>MY STUFF</h3>
+            <h5>Account = <span id="account">?</span></h3>
+            <br>
+            <div class="row">
+                <div class="col-sm">
+                        <h5>SHROOMS</h5>
+                        <br>
+                        <h6>You have <span id="shroom">?</span> Shrooms</h6>
+                        <h6>Hatch them using <input type="text" id="shroomRad" oninput="changeShroomRad(this.value)" value="0" size="4"> rads</h6>
+                        <h6>(Each power of 10: +1 multiplier)</h6>
+                        <h6>Tier of Eggoa to hatch: <input type="text" id="shroomTier" oninput="changeShroomTier(this.value)" value="1" size="1"></h6>
+                        <h6>(Multiplier is divided by tier)</h6>
+                        <h6>You will get <span id="shroomEggoa">?</span> Eggoas</h6>
+                        <button onclick="hatchShrooms()">Hatch Shrooms</button>
+                        <br>
+                        <h6>Last Shroom hatch: <span id="lastShroom">?</span></h6>
+                </div>
+                <div class="col-sm">
+                        <h5>TRIBE</h5>
+                        <br>
+                        <h6>Tribe: <span id="tribe">?</span></h6>
+                        <h6>Number of Tribe Changes: <span id="tribeChange">?</span></h6>
+                        <h6>Balance: <span id="balance">?</span> POA</h6> <button onclick="withdrawDai()">Withdraw Balance</button>
+                </div>
+                <div class="col-sm">
+                    <h5>RADS</h5>
+                    <br>
+                    <h6>You have <span id="rad">?</span> RADS</h6>
+                        <h6>Rads ready for Harvest: <span id="radToHarvest">?</span></h6>
+                        <button onclick="harvestRads()">Harvest Rads</button>
+                        <br>
+                        <h6>Last Rad collection: <span id="lastRad">?</span></h6>
+                        <br>
+                        <h6>Rads available to claim: <span id="tribeRadToClaim">?</span></h6>
+                        <button onclick="claimTribeRads()">Claim Tribe Rads</button>
+                        <br>
+                        <h6>You have previously claimed: <span id="collectedTribeRad">?</span> RADS</h6>
+                        <br>
+                        <h6>Earned Rads: <span id="earnedRad">?</span></h6>                    
+                </div>
+            </div>
+            
+            <br>
+            <hr>
+            <br>
+            <div class="row">
+                <div class="col-sm">
+                    <h4>Select Land (1 to 64) <input type="text" id="landSelector" onInput="updateTerritory(this.value)" value="1" size="1"></h4>
+                </div>
+                <div class="col-sm">
+                    <h5><span id="w3q_land">?</span></h5>
+                </div>
+            </div>     
+            <br>
+            <div class="row">
+                <div class="col-sm">
+                    <h5>Land Level:</h5>
+                    <span id="landLevel">?</span>
+                </div>
+                <div class="col-sm">
+                    <h5>Land Stats:</h5>
+                    <span id="landStat">?</span>
+                </div>
+
+                <div class="col-sm">
+                    <h5>Current Lord:</h5>
+                    <span id="landLord">?</span>
+                </div>
+                <div class="col-sm">
+                    <h5>Lord Power:</h5>
+                    <span id="landPower">?</span>
+                </div>
+                <div class="col-sm">
+                    <h5>Lord Tribe:</h5>
+                    <span id="landTribe">?</span>
+                </div>
+                <div class="col-sm">
+                    <h5>Last Shroom Harvest:</h5>
+                    <span id="landLast">?</span>
+                </div>
+                <div class="col-sm">
+                    <h5>Shrooms to Harvest:</h5>
+                    <span id="landShroom">?</span>
+                </div>
+            </div>
+            <br>
+            <h6>Attack Land with Eggoas of tier <input type="text" id="attackLandTierSelector" oninput="changeAttackLandTier(this.value)" value="1" size="1"></h6>
+            <div class="row">
+                <div class="col-sm">
+                    <h6>Power: <span id="attackPower">?</span></h6>
+                </div>
+                <div class="col-sm">
+                    <h6>Chance to win: <span id="winRate">?</span>%</h6>
+                </div>
+            </div>
+			<span id="landButton">?</span>
+			<br>
+            <hr>
+            <h3>GENERAL STUFF</h3>
+            <br>
+            <div class="row">
+                <div class="col-sm">
+                    <h5>POA Anomaly</h5>
+                    <h6>Auction started at: <span id="daiAuctionTimer">?</span></h6>
+                    <button onclick="findDaiAnomaly()">BUY POA ANOMALY</button>
+                    <h6>Auction cost: <span id="daiAuctionCost">?</span> POA</h6>
+                </div>
+                <div class="col-sm">
+                     <h5>RAD Anomaly</h5>
+                    <h6>Auction started at: <span id="radAuctionTimer">?</span></h6>
+                    <button onclick="findRadAnomaly()">BUY RAD ANOMALY</button>
+                    <h6>Auction cost: <span id="radAuctionCost">?</span> RADS</h6>
+                </div>
+            </div>
+            <h6>Change <button id="anomalyLand" onclick="updateTargetType('land')">Land</button> or <button id="anomalyProd" onclick="updateTargetType('prod')">Prod</button></h6>
+            <h6><span id="anomalyTargetType">?</span> to target: <input type="text" id="anomalyTargetId" onInput="updateTargetId(this.value)" value="0" size="1"></h6>
+            <h6>(between 1 and 8 for tier, 1 and 64 for land)</h6>
+            <h6>Weights: <input type="text" id="anomalyWeight0" onInput="updateWeight(0, this.value, 'anomalyWeight0')" value="0" size="1"><input type="text" id="anomalyWeight1" onInput="updateWeight(1, this.value, 'anomalyWeight1')" value="0" size="1"><input type="text" id="anomalyWeight2" onInput="updateWeight(2, this.value, 'anomalyWeight2')" value="0" size="1"><input type="text" id="anomalyWeight3" onInput="updateWeight(3, this.value, 'anomalyWeight3')" value="0" size="1"></h6>
+            <h6>(between 0 and 4 for each weight)</h6>            
+            <br>
+            <br>
+            <hr>
+
+            <br>
+            <h5>My Nest: </h5>
+            <h6>Best Tier unlocked: <span id="tier">?</span></h5>
+            <h6><button onclick="unlockNextTier()">Unlock Next Tier</button></h6>
+            <h6>(Cost: <span id="unlockTierRadCost">?</span> Rads)</h6>
+            <div class="row">
+                <div class="col-sm">
+                    <h6>TIER 1</h6>
+                    <span id="tier1">?</span>
+                    <br>
+                    <h6>Tier weight: <span id="tier1prod">?</span></h6>
+                    <hr>
+                </div>
+                <div class="col-sm">
+                    <h6>TIER 2</h6>
+                    <span id="tier2">?</span>
+                    <br>
+                    <h6>Tier weight: <span id="tier2prod">?</span></h6>
+                    <hr>
+                </div>
+                <div class="col-sm">
+                    <h6>TIER 3</h6>
+                    <span id="tier3">?</span>
+                    <br>
+                    <h6>Tier weight: <span id="tier3prod">?</span></h6>
+                    <hr>
+                </div>
+                <div class="col-sm">
+                    <h6>TIER 4</h6>
+                    <span id="tier4">?</span>
+                    <br>
+                    <h6>Tier weight: <span id="tier4prod">?</span></h6>
+                    <hr>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-sm">
+                    <h6>TIER 5</h6>
+                    <span id="tier5">?</span>
+                    <br>
+                    <h6>Tier weight: <span id="tier5prod">?</span></h6>
+                    <hr>
+                </div>
+                <div class="col-sm">
+                    <h6>TIER 6</h6>
+                    <span id="tier6">?</span>
+                    <br>
+                    <h6>Tier weight: <span id="tier6prod">?</span></h6>
+                    <hr>
+                </div>
+                <div class="col-sm">
+                    <h6>TIER 7</h6>
+                    <span id="tier7">?</span>
+                    <br>
+                    <h6>Tier weight: <span id="tier7prod">?</span></h6>
+                    <hr>
+                </div>
+                <div class="col-sm">
+                    <h6>TIER 8</h6>
+                    <span id="tier8">?</span>
+                    <br>
+                    <h6>Tier weight: <span id="tier8prod">?</span></h6>
+                    <hr>
+                </div>
+            </div>
+            <br>
+            <h5>UPGRADE EGGOA</h5>
+            <br>
+            <h6>Tier: <input type="text" id="tierToUpgrade" onInput="updateUpgradeTier(this.value)" value="0" size="1"></h6>
+            <h6>(between 1 and 8 for tier)</h6>
+            <h6>Weights: <input type="text" id="upgradeWeight0" onInput="updateUpgradeWeight(0, this.value, 'upgradeWeight0')" value="0" size="1"><input type="text" id="upgradeWeight1" onInput="updateUpgradeWeight(1, this.value, 'upgradeWeight1')" value="0" size="1"><input type="text" id="upgradeWeight2" onInput="updateUpgradeWeight(2, this.value, 'upgradeWeight2')" value="0" size="1"><input type="text" id="upgradeWeight3" onInput="updateUpgradeWeight(3, this.value, 'upgradeWeight3')" value="0" size="1"></h6>
+            <h6>(each weight will give +1 to the selected stat)</h6>
+            <h6>Upgrade cost: <span id="upgradeCost">?</span> RADS</h6>
+            <button onclick="upgradeGoa()">Upgrade Eggoa</button>            
+            <hr>
+  
+            
+            <hr>
+            <h5>MY PLANTAMIDS</h5>
+            <br>
+            <div class="row">
+                <div class="col-sm">
+                    <h6>Eggoa Plantamid Floor: <span id="eggoaPlantamid">?</span></h6>
+                    <br>
+                    <h5>Sacrifice Eggoas to raise Floor</h5>
+                    <h6>Tier to sacrifice: <input type="text" id="tierSacrifice" oninput="getSacrificeAmount(this.value)" value="1" size="1"></h6>
+                    <h6>(You will sacrifice <span id="sacrificeAmount">?</span> Eggoas)</h6>
+                    <button onclick="raiseGoamid()">Raise Goamid</button>
+                </div>
+                <div class="col-sm">
+                    <h6>Poa Plantamid Floor: <span id="daiPlantamid">?</span></h6>
+                    <br>
+                    <h5>Spend Poa to raise Floor by 1 or more levels</h5>
+                    <h6>Number of Floors: <input type="text" id="floorsAdded" oninput="getFloorDaiCost(this.value)" value="1" size="1"></h6>
+                    <h6>(You will spend <span id="floorDaiCost">?</span> POA)</h6>
+                    <button onclick="raiseDaimid()">Raise Poamid</button>
+                </div>
+            </div>                    
+            <br>
+            <hr>
+            
+            <br>
+            <hr>
+            <br>
+            
+            <br>
+            <hr>
+            <h5>GAME STATS</h5>
+            <br>
+            <h6>Game start: <span id="launch">?</span></h6>
+            <h6>Game end: <span id="end">?</span></h6>
+            <br>
+            <h6>Total number of Rads earned by all players: <span id="globalRad">?</span></h6>
+            <br>
+            <hr>
+            <h5>POA CHEST</h5>
+            <br>
+            <h6><span id="playerChest">(do that later)</span></h6>
+            <br>           
+            <hr><hr>
+            <h5>MISC FUNCTIONS</h5>
+            <br>
+            <div class="row">
+                <div class="col-sm">
+                    <button onClick="getContractOwner()">Get Contract Owner</button>
+                    <h6><span id="contractOwner">?</span></h6>
+                </div>
+                <div class="col-sm">
+                    <button onClick="startGame()">StartGame</button>
+                    <h6>(Dev only)</h6>
+                </div>
+            </div>
+            <hr><hr>
+            <h6>Simple Notification Test <button onclick="simpleTest()">Click Me</button></h6>
+        </div>
+        <!-- simpleNotification -->
+        <script src="js/simpleNotification.js"></script>
+		<!-- etherjs -->
+		<script src="js/ethers-v4.min.js"></script>
+		<!-- Eggforce -->
+		<script src="js/abi_009.js"></script>
+		<script src="js/eggforce_logic_009.js"></script>
+	</body>
+</html>
