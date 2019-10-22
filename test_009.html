@@ -39,7 +39,7 @@
                 </div>
             </div>
             <h6>Selected Tribe: <span id="selectedTribe">?</span></h6>
-            <span id="joinOrChangeButton"><button onclick="joinGame()">Join Game</button></span>
+            <span id="joinOrChangeButton"><button class="btn btn-danger" onclick="joinGame()">Join Game</button></span>
             <h6>(Cost: <span id="joinCost">?</span> POA)</h6>
             <hr>
             <h4>EVENTS</h4>
@@ -71,7 +71,7 @@
                     <h6>Multiplier: <input type="text" id="shroomMult" oninput="changeShroomMult(this.value)" value="1" size="1">
                     <h6>Cost = <span id="shroomCost">?</span> RAD</h6>
                     <h6>You will get <span id="shroomEggoa">?</span> Eggoas</h6>
-                    <h6><button onclick="checkShroomCostThenHatch()">Hatch Shrooms</button></h6>
+                    <h6><button class="btn btn-success" onclick="checkShroomCostThenHatch()">Hatch Shrooms</button></h6>
                     <br>
                     <h6>Last Shroom hatch: <span id="lastShroom">?</span></h6>
                 </div>
@@ -80,19 +80,19 @@
                         <br>
                         <h6>Tribe: <span id="tribe">?</span></h6>
                         <h6>Number of Tribe Changes: <span id="tribeChange">?</span></h6>
-                        <h6>Balance: <span id="balance">?</span> POA</h6> <button onclick="withdrawDai()">Withdraw Balance</button>
+                        <h6>Balance: <span id="balance">?</span> POA</h6> <button class="btn btn-success" onclick="withdrawDai()">Withdraw Balance</button>
                 </div>
                 <div class="col-sm">
                     <h5>RADS</h5>
                     <br>
                     <h6>You have <span id="rad">?</span> RADS</h6>
                         <h6>Rads ready for Harvest: <span id="radToHarvest">?</span></h6>
-                        <button onclick="harvestRads()">Harvest Rads</button>
+                        <button class="btn btn-success" onclick="harvestRads()">Harvest Rads</button>
                         <br>
                         <h6>Last Rad collection: <span id="lastRad">?</span></h6>
                         <br>
                         <h6>Rads available to claim: <span id="tribeRadToClaim">?</span></h6>
-                        <button onclick="claimTribeRads()">Claim Tribe Rads</button>
+                        <button class="btn btn-success" onclick="claimTribeRads()">Claim Tribe Rads</button>
                         <br>
                         <h6>You have previously claimed: <span id="collectedTribeRad">?</span> RADS</h6>
                         <br>
@@ -156,27 +156,28 @@
 			<span id="landButton">?</span>
 			<br>
             <hr>
-            <h3>GENERAL STUFF</h3>
+            <h3>FIND ANOMALY</h3>
             <br>
+            <h6>Choose what to change: <button id="anomalyLand" class="btn btn-info btn-sm" onclick="updateTargetType('land')">Land</button> or <button id="anomalyProd" class="btn btn-info btn-sm" onclick="updateTargetType('prod')">Prod</button></h6>
+            <h6><span id="anomalyTargetType">?</span> to target: <input type="text" id="anomalyTargetId" onInput="updateTargetId(this.value)" value="0" size="1"></h6>
+            <h6>(between 1 and 8 for tier, 1 and 64 for land)</h6>
+            <h6>Weights: <input type="text" id="anomalyWeight0" onInput="updateWeight(0, this.value, 'anomalyWeight0')" value="0" size="1"><input type="text" id="anomalyWeight1" onInput="updateWeight(1, this.value, 'anomalyWeight1')" value="0" size="1"><input type="text" id="anomalyWeight2" onInput="updateWeight(2, this.value, 'anomalyWeight2')" value="0" size="1"><input type="text" id="anomalyWeight3" onInput="updateWeight(3, this.value, 'anomalyWeight3')" value="0" size="1"></h6>
+            <h6>(between 0 and 4 for each weight)</h6> 
             <div class="row">
                 <div class="col-sm">
                     <h5>POA Anomaly</h5>
-                    <h6>Auction started at: <span id="daiAuctionTimer">?</span></h6>
-                    <button onclick="findDaiAnomaly()">BUY POA ANOMALY</button>
+                    <h6>Auction started <span id="daiAuctionTimer">?</span></h6>
+                    <button class="btn btn-danger" onclick="findDaiAnomaly()">BUY POA ANOMALY</button>
                     <h6>Auction cost: <span id="daiAuctionCost">?</span> POA</h6>
                 </div>
                 <div class="col-sm">
                      <h5>RAD Anomaly</h5>
-                    <h6>Auction started at: <span id="radAuctionTimer">?</span></h6>
-                    <button onclick="findRadAnomaly()">BUY RAD ANOMALY</button>
+                    <h6>Auction started <span id="radAuctionTimer">?</span></h6>
+                    <button class="btn btn-success" onclick="findRadAnomaly()">BUY RAD ANOMALY</button>
                     <h6>Auction cost: <span id="radAuctionCost">?</span> RADS</h6>
                 </div>
             </div>
-            <h6>Change <button id="anomalyLand" onclick="updateTargetType('land')">Land</button> or <button id="anomalyProd" onclick="updateTargetType('prod')">Prod</button></h6>
-            <h6><span id="anomalyTargetType">?</span> to target: <input type="text" id="anomalyTargetId" onInput="updateTargetId(this.value)" value="0" size="1"></h6>
-            <h6>(between 1 and 8 for tier, 1 and 64 for land)</h6>
-            <h6>Weights: <input type="text" id="anomalyWeight0" onInput="updateWeight(0, this.value, 'anomalyWeight0')" value="0" size="1"><input type="text" id="anomalyWeight1" onInput="updateWeight(1, this.value, 'anomalyWeight1')" value="0" size="1"><input type="text" id="anomalyWeight2" onInput="updateWeight(2, this.value, 'anomalyWeight2')" value="0" size="1"><input type="text" id="anomalyWeight3" onInput="updateWeight(3, this.value, 'anomalyWeight3')" value="0" size="1"></h6>
-            <h6>(between 0 and 4 for each weight)</h6>            
+            
             <br>
             <br>
             <hr>
@@ -184,7 +185,7 @@
             <br>
             <h5>My Nest: </h5>
             <h6>Best Tier unlocked: <span id="tier">?</span></h5>
-            <h6><button onclick="unlockNextTier()">Unlock Next Tier</button></h6>
+            <h6><button class="btn btn-success" onclick="unlockNextTier()">Unlock Next Tier</button></h6>
             <h6>(Cost: <span id="unlockTierRadCost">?</span> Rads)</h6>
             <div class="row">
                 <div class="col-sm">
@@ -255,7 +256,7 @@
             <h6>Weights: <input type="text" id="upgradeWeight0" onInput="updateUpgradeWeight(0, this.value, 'upgradeWeight0')" value="0" size="1"><input type="text" id="upgradeWeight1" onInput="updateUpgradeWeight(1, this.value, 'upgradeWeight1')" value="0" size="1"><input type="text" id="upgradeWeight2" onInput="updateUpgradeWeight(2, this.value, 'upgradeWeight2')" value="0" size="1"><input type="text" id="upgradeWeight3" onInput="updateUpgradeWeight(3, this.value, 'upgradeWeight3')" value="0" size="1"></h6>
             <h6>(each weight will give +1 to the selected stat)</h6>
             <h6>Upgrade cost: <span id="upgradeCost">?</span> RADS</h6>
-            <button onclick="upgradeGoa()">Upgrade Eggoa</button>            
+            <button class="btn btn-success" onclick="upgradeGoa()">Upgrade Eggoa</button>            
             <hr>
   
             
@@ -269,7 +270,7 @@
                     <h5>Sacrifice Eggoas to raise Floor</h5>
                     <h6>Tier to sacrifice: <input type="text" id="tierSacrifice" oninput="getSacrificeAmount(this.value)" value="1" size="1"></h6>
                     <h6>(You will sacrifice <span id="sacrificeAmount">?</span> Eggoas)</h6>
-                    <button onclick="raiseGoamid()">Raise Goamid</button>
+                    <button class="btn btn-success" onclick="raiseGoamid()">Raise Goamid</button>
                 </div>
                 <div class="col-sm">
                     <h6>Poa Plantamid Floor: <span id="daiPlantamid">?</span></h6>
@@ -277,7 +278,7 @@
                     <h5>Spend Poa to raise Floor by 1 or more levels</h5>
                     <h6>Number of Floors: <input type="text" id="floorsAdded" oninput="getFloorDaiCost(this.value)" value="1" size="1"></h6>
                     <h6>(You will spend <span id="floorDaiCost">?</span> POA)</h6>
-                    <button onclick="raiseDaimid()">Raise Poamid</button>
+                    <button class="btn btn-danger" onclick="raiseDaimid()">Raise Poamid</button>
                 </div>
             </div>                    
             <br>

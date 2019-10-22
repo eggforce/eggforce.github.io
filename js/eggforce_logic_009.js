@@ -188,6 +188,7 @@ function initializeBlockchainData(){
 	updateTerritory(1);
 	getSacrificeAmount(1);
 	getFloorDaiCost(1);
+	getShroomCost();
 }
 
 //Fast loop every second
@@ -211,6 +212,7 @@ function controlLoop4() {
 	updateDaiAuctionCostNow();
 	updateRadAuctionCostNow();
 	updateTierProdHtml();
+	updatePlayerChest();
     setTimeout(controlLoop4, 4000);
 }
 
@@ -369,7 +371,7 @@ function updatePlayerChest() {
 	let _currentTimestamp = parseInt((new Date()).getTime() / 1000); // from ms to s
 	let _time = a_end - _currentTimestamp;
 	if(_time < 0 && m_openedChest == false) {
-		d_playerChest.innerHTML = "You have won " + m_playerChest + " POA!<br><button onclick='openRewardChest()'>Open Chest</button>";
+		d_playerChest.innerHTML = "You have won " + m_playerChest + " POA!<br><button class='btn btn-success'  onclick='openRewardChest()'>Open Chest</button>";
 	}
 
 	// if the game is still ongoing, give estimation
@@ -385,11 +387,11 @@ function updateJoinOrChange() {
 
 	if(m_tier[0] > 0) {
 		d_joinOrChange.innerHTML = 'changing tribe';
-		d_joinOrChangeButton.innerHTML = '<button onclick="changeTribe()">Change Tribe</button>'
+		d_joinOrChangeButton.innerHTML = '<button class="btn btn-danger" onclick="changeTribe()">Change Tribe</button>'
 	}
 	else {
 		d_joinOrChange.innerHTML = 'joining the game';
-		d_joinOrChangeButton.innerHTML = '<button onclick="joinGame()">Join Game</button>'
+		d_joinOrChangeButton.innerHTML = '<button class="btn btn-danger" onclick="joinGame()">Join Game</button>'
 	}
 }
 
@@ -443,11 +445,11 @@ let d_landButton = document.getElementById('landButton');
 
 function updateLandButton() {
 	if(t_land[h_selectedLand].lord == m_account) {
-		d_landButton.innerHTML = '<button onClick="collectShrooms()">Collect Shrooms</button>';
+		d_landButton.innerHTML = '<button class="btn btn-success" onClick="collectShrooms()">Collect Shrooms</button>';
 	} else if (t_land[h_selectedLand].tribe == m_tribe) {
 		d_landButton.innerHTML = 'Land Owned by a Tribe Member';
 	} else {
-		d_landButton.innerHTML = '<button onClick="attackLand()">Attack Land</button>';
+		d_landButton.innerHTML = '<button class="btn btn-success" onClick="attackLand()">Attack Land</button>';
 	}
 }
 
@@ -1290,7 +1292,7 @@ function beginEventLogging() {
 	});
 
     contract.on("RaisedDaiPlantamid", (sender, eth, upgrade, plantamid, event) => {
-		let _string = formatEthAdr(sender) + " spends " + truncateEther(eth) + " POA to raise his Plantamid by " + upgrade.toString() + " floors, reaching floor " + plantamid.toString(); + ".";
+		let _string = formatEthAdr(sender) + " spends " + truncateEther(eth) + " POA to raise his Plantamid by " + upgrade.toString() + " floor(s), reaching floor " + plantamid.toString(); + ".";
 		handleEvent(_string);
 	});
 
@@ -1441,7 +1443,7 @@ const raiseGoamid = async() => {
 const raiseDaimid = async() => {
 	try {
 		//console.log("about to send transaction raisedaiplantamid");
-		notificationSend('About to raise POA Plantamid by ' + h_selectedFloor + ' floors using ' + n_floorDaiCost[0] + " POA");
+		notificationSend('About to raise POA Plantamid by ' + h_selectedFloor + ' floor(s) using ' + n_floorDaiCost[0] + " POA");
 		const raiseMyGoamid = await contract.RaiseDaiPlantamid(h_selectedFloor, {
 			value: ethers.utils.parseEther(n_floorDaiCost[0])
 		})
@@ -1496,7 +1498,7 @@ function computeShroomEggoa() {
 const hatchShrooms = async() => {
 	try {
 		//console.log("about to try to hatch shrooms");
-		notificationSend('About to hatch Shrooms into tier ' + h_hatchShroomTier + ' Eggoas, using ' + h_hatchShroomRad + ' RADS');
+		notificationSend('About to hatch Shrooms into tier ' + h_hatchShroomTier + ' Eggoas, using ' + h_hatchShroomRad + ' RADs');
 		const hatchMyShrooms = await contract.HatchShroom(h_hatchShroomTier, h_hatchShroomMult)
 		//console.log("hatched shrooms !");
 		notificationSuccess('Hatching Shrooms!');
@@ -1510,10 +1512,10 @@ const hatchShrooms = async() => {
 const harvestRads = async() => {
 	try {
 		//console.log("about to try to harvest rads");
-		notificationSend('About to harvest rads...');
+		notificationSend('About to harvest RADs...');
 		const harvestMyRads = await contract.HarvestRad()
 		//console.log("harvested rads !");
-		notificationSuccess('Harvesting Rads!');
+		notificationSuccess('Harvesting RADs!');
 	} catch (error) {
 		//console.log("Error: couldn't harvest due to ", error);
 		notificationError();
