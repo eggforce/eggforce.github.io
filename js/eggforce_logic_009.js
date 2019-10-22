@@ -1473,7 +1473,9 @@ function changeShroomTier(__tier) {
 }
 
 function getShroomCost() {
-	return MULT_COST ** (parseInt(h_hatchShroomMult) * parseInt(h_hatchShroomTier));
+	let _cost = MULT_COST ** (parseInt(h_hatchShroomMult) + parseInt(h_hatchShroomTier));
+	document.getElementById('shroomCost').innerHTML = _cost;
+	return _cost;
 }
 
 function checkShroomCostThenHatch() {
