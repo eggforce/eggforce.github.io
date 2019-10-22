@@ -58,6 +58,9 @@ function useReadOnlyProvider() {
 }
 
 // VARIABLES
+
+const MULT_COST = 10;
+
 var a_chest = [0];
 var a_daiAuctionCost = [0];
 var a_daiAuctionTimer = [0];
@@ -1241,8 +1244,8 @@ function beginEventLogging() {
 	});
 
 	// "eggoa" is technically "shroom". change eggoa for shroom in v9, add eggoa
-	contract.on("HatchedShroom", (sender, rad, tier, eggoa, event) => {
-		let _string = formatEthAdr(sender) + " hatches " + eggoa.toString() + " shrooms with " + rad.toString() + " rads into X eggoas of tier " + tier.toString() + ".";
+	contract.on("HatchedShroom", (sender, rad, tier, shroom, eggoa, event) => {
+		let _string = formatEthAdr(sender) + " hatches " + shroom.toString() + " shrooms with " + rad.toString() + " rads into " + eggoa.toString() + " eggoas of tier " + tier.toString() + ".";
 		handleEvent(_string);
 	});
 
@@ -1252,7 +1255,7 @@ function beginEventLogging() {
 	});
 
 	contract.on("DiscoveredLand", (sender, land, event) => {
-		let _string = "All hail " + formatEthAdr(sender) + ", discoverer of land " + land.toString(); + "!";
+		let _string = "All hail " + formatEthAdr(sender) + "! This famed explorer plants his flag on land " + land.toString(); + ".";
 		handleEvent(_string);
 	});
 
@@ -1451,58 +1454,48 @@ const raiseDaimid = async() => {
 }
 
 
-// Hatch Shrooms using h_hatchShroomRad into Eggoas of h_hatchShroomTier
+// Hatch Shrooms using h_hatchShroomMult into Eggoas of h_hatchShroomTier
 // METAMASK FAILS IF h_hatchShroomRad > m_rad
 let h_hatchShroomRad = 0;
+let h_hatchShroomMult = 1;
+let h_hatchShroomTier = 1;
 
-function changeShroomRad(__rad) {
-	let _finalRad = checkMultipleFour(__rad);
-	console.log(_finalRad);
-	h_hatchShroomRad = _finalRad;
-	//document.getElementById('shroomRad').value = _finalRad; // breaks multiple digit input
+function changeShroomMult(__mult) {
+	h_hatchShroomMult = __mult;
+	h_hatchShroomRad = getShroomCost();
 	computeShroomEggoa();
 }
 
-let h_hatchShroomTier = 1;
-
 function changeShroomTier(__tier) {
 	h_hatchShroomTier = __tier;
+	h_hatchShroomRad = getShroomCost();
 	computeShroomEggoa();
+}
+
+function getShroomCost() {
+	return MULT_COST ** (parseInt(h_hatchShroomMult) * parseInt(h_hatchShroomTier));
+}
+
+function checkShroomCostThenHatch() {
+	if(h_hatchShroomRad > m_rad) {
+		notificationCondition('Not enough RADs for selected tier/multiplier');
+	}
+	else {
+		hatchShrooms();
+	}
 }
 
 // check how many eggoas we get for given input
 function computeShroomEggoa() {
-
-	// calculate multiplier
-	let _remainder = h_hatchShroomRad;
-	let _power = 2;
-	while(_remainder >= 4) {
-		_remainder = _remainder / 4;
-		_power++;
-	}
-	_power -= h_hatchShroomTier;
-
-	// multiply m_shroom to get number of eggoas
-	m_shroomEggoa = parseInt(m_shroom) * parseInt(_power);
-
-	// update html
+	m_shroomEggoa = parseInt(m_shroom) * parseInt(h_hatchShroomMult);
 	document.getElementById('shroomEggoa').innerHTML = m_shroomEggoa;
-}
-
-// find the first power of 4 we can use with input rads
-function checkMultipleFour(__rad) {
-	let _four = 4;
-	while(_four <= __rad) {
-		_four = _four * 4;
-	}
-	return _four / 4;
 }
 
 const hatchShrooms = async() => {
 	try {
 		//console.log("about to try to hatch shrooms");
 		notificationSend('About to hatch Shrooms into tier ' + h_hatchShroomTier + ' Eggoas, using ' + h_hatchShroomRad + ' RADS');
-		const hatchMyShrooms = await contract.HatchShroom(h_hatchShroomTier, h_hatchShroomRad)
+		const hatchMyShrooms = await contract.HatchShroom(h_hatchShroomTier, h_hatchShroomMult)
 		//console.log("hatched shrooms !");
 		notificationSuccess('Hatching Shrooms!');
 	} catch (error) {
@@ -1653,6 +1646,12 @@ const findRadAnomaly = async() => {
 
 // Notifications
 
+function notificationCondition(__text) {
+	SimpleNotification.message({text: __text},			
+	{position: 'bottom-left', removeAllOnDisplay: 'true'});
+}
+
+
 function notificationSend(__text) {
 	SimpleNotification.warning({text: __text},			
 	{position: 'bottom-left', removeAllOnDisplay: 'true'});
@@ -1692,3 +1691,16 @@ function simpleTest() {
 	}, {position: 'bottom-right'});
 	setTimeout(function(){ SimpleNotification.success({text: 'We did it!'}, {position: 'bottom-right', removeAllOnDisplay: true}); }, 2000);
 }
+
+// OBSOLETE STUFF BELOW
+
+/*
+// find the first power of 4 we can use with input rads
+function checkMultipleFour(__rad) {
+	let _four = 4;
+	while(_four <= __rad) {
+		_four = _four * 4;
+	}
+	return _four / 4;
+}
+*/

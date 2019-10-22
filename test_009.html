@@ -62,19 +62,18 @@
             <h4>MY STUFF</h3>
             <h5>Account = <span id="account">?</span></h3>
             <br>
-            <div class="row">
+            <div class="row" style="text-align:left;">
                 <div class="col-sm">
-                        <h5>SHROOMS</h5>
-                        <br>
-                        <h6>You have <span id="shroom">?</span> Shrooms</h6>
-                        <h6>Hatch them using <input type="text" id="shroomRad" oninput="changeShroomRad(this.value)" value="0" size="4"> rads</h6>
-                        <h6>(Each power of 10: +1 multiplier)</h6>
-                        <h6>Tier of Eggoa to hatch: <input type="text" id="shroomTier" oninput="changeShroomTier(this.value)" value="1" size="1"></h6>
-                        <h6>(Multiplier is divided by tier)</h6>
-                        <h6>You will get <span id="shroomEggoa">?</span> Eggoas</h6>
-                        <button onclick="hatchShrooms()">Hatch Shrooms</button>
-                        <br>
-                        <h6>Last Shroom hatch: <span id="lastShroom">?</span></h6>
+                    <h5>SHROOMS</h5>
+                    <br>
+                    <h6>You have <span id="shroom">?</span> Shrooms</h6>                        
+                    <h6>Tier of Eggoa to hatch: <input type="text" id="shroomTier" oninput="changeShroomTier(this.value)" value="1" size="1"></h6>
+                    <h6>Multiplier: <input type="text" id="shroomMult" oninput="changeShroomMult(this.value)" value="1" size="1">/h6>
+                    <h6>Cost = <span id="shroomCost">?</span> RAD</h6>
+                    <h6>You will get <span id="shroomEggoa">?</span> Eggoas</h6>
+                    <h6><button onclick="checkShroomCostThenHatch()">Hatch Shrooms</button></h6>
+                    <br>
+                    <h6>Last Shroom hatch: <span id="lastShroom">?</span></h6>
                 </div>
                 <div class="col-sm">
                         <h5>TRIBE</h5>
