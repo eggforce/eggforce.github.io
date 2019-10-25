@@ -4,6 +4,7 @@ let contract;
 let contractAddress = "0x5A2ECC2bc8e9f6c8783C90Af97d8b934C9b68dbf"; // v009
 let provider;
 let signer = 0;
+let filter;
 
 var m_account = "0xABF3E252006D805Cce3C7219A929B83465F2a46e"; // should be "", setup for local tests
 document.getElementById('account').innerHTML = formatEthAdr(m_account);
@@ -60,6 +61,8 @@ function useReadOnlyProvider() {
 // VARIABLES
 
 const MULT_COST = 10;
+const PAST_BLOCKS = 12 * 60 * 24 * 2 * 10; // 12 blocks per minute, 60min per hour, 24h in a day
+const POA_BLOCK_TIME = 5.4;
 
 var a_chest = [0];
 var a_daiAuctionCost = [0];
@@ -180,7 +183,8 @@ function startLoop(){
 }
 
 //One-time init
-function initializeBlockchainData(){
+function initializeBlockchainData() {
+	initializeFilter();
 	refreshData();
 	updateJoinCost();
 	updateLaunchTimestamp();
@@ -220,6 +224,27 @@ function controlLoop4() {
 function controlLoop60(){
 	refreshData();
     setTimeout(controlLoop60, 60000);
+}
+
+// Get past block, current block, current time to get past events and compute their timestamps
+function initializeFilter() {
+	provider.getBlockNumber().then((current) => { 
+		f_fromBlock = current - PAST_BLOCKS;
+	});
+	provider.getBlockNumber().then((current2) => {
+		f_currentBlock = current2;
+	});
+	f_currentTime = getCurrentTime();
+}
+
+// Current block, then block details
+function updateCurrentBlock(){
+	provider.getBlockNumber().then((blockNumber) => {
+		console.log("Current block number: " + blockNumber);
+		provider.getBlock().then((result) => {
+			console.log(result.timestamp);
+		})
+	});
 }
 
 function refreshData(){
@@ -262,6 +287,17 @@ function formatEthAdr(__adr){
 // Returns current time in seconds
 function getCurrentTime() {
 	return parseInt((new Date()).getTime() / 1000);
+}
+
+// Returns timestamp in hh:mm:ss
+function getTimeFromBlock(__block) {
+	let _dif = parseInt(f_currentBlock) - parseInt(__block);
+	console.log(_dif);
+	let _time = parseInt(f_currentTime) - parseInt(_dif * POA_BLOCK_TIME);
+	console.log(_time);
+	let _date = new Date(1000 * _time).toISOString().substr(11, 8);
+	console.log(_date);
+	return _date;
 }
 
 // Convert timestamp in seconds into readable date
@@ -1135,8 +1171,8 @@ function date24() {
 	return d;
 }	
 
-function handleEvent(__string) {
-	d_eventLog.innerHTML += "<br>[" + date24() + "] " + __string;
+function handleEvent(__string, __block) {
+	d_eventLog.innerHTML += "<br>[" + getTimeFromBlock(__block) + "] " + __string;
 	d_scrollLog.scrollTop = d_scrollLog.scrollHeight;
 }
 
@@ -1146,25 +1182,18 @@ function truncateEther(__eth) {
 	return e;
 }
 
+// Event logging
+
+// Store past events here
+var eventArray = [];
+
+// Testing array sorting
 /*
-	DONE event StartedGame (uint256 launch, uint256 end);
-    DONE event WithdrewBalance (address sender, uint256 eth);
-    DONE event OpenedChest (address sender, uint256 eth);
-    DONE event JoinedGame (address sender, uint256 tribe);
-    TESTED event HarvestedRad (address sender, uint256 rad);
-    TESTED event ClaimedTribeRad (address sender, uint256 rad);
-    DONE event ChangedTribe (address sender, uint256 tribe);
-    TESTED POA event FoundAnomaly (address sender, uint eth, uint rad, bool land, uint stat0, uint stat1, uint stat2, uint stat3);
-    DONE event UnlockedTier (address sender, uint256 tier);
-    TESTED event HatchedShroom (address sender, uint256 rad, uint256 tier, uint256 eggoa);
-    TESTED event CollectedShroom (address sender, uint256 land, uint256 shroom);
-    DONE event DiscoveredLand (address sender, uint256 land);
-    DONE event TookOverLand (address sender, uint256 land);
-    DONE event WonLandFight (address sender, address lord, uint powerSender, uint powerLord, uint result, uint shroom, uint eggoa);
-    DONE event LostLandFight (address sender, address lord, uint powerSender, uint powerLord, uint result, uint eggoa);
-    TESTED event UpgradedEggoa (address sender, uint rad, uint tier, uint stat0, uint stat1, uint stat2, uint stat3);
-    TESTED event RaisedEggoaPlantamid (address sender, uint tier, uint eggoa, uint plantamid);
-	DONE event RaisedDaiPlantamid (address sender, uint eth, uint upgrade, uint plantamid);
+var eventObjTest = { text: "This is a string", block: 123};
+var eventObjTest2 = { text: "Also a string", block: 44};
+eventArray.push(eventObjTest);
+eventArray.push(eventObjTest2);
+eventArray.sort(function(a,b) {return (a.block - b.block);} );
 */
 
 function beginEventLogging() {
@@ -1176,43 +1205,79 @@ function beginEventLogging() {
 		handleEvent(_string);
 	});
 	*/
+
+	let eventNumber = 0;
+
+	// event.blockNumber then converting it to timestamp through a local assumption of blocktime
+	// isn't as reliable as event.getBlock().timestamp, but not sure how to get the later working
+
 	contract.on("StartedGame", (launch, end, event) => {
 		let _string = "The game has started! It will end " + convertTime(end) + ". May the best egg win.";
-		handleEvent(_string);
+		handleEvent(_string, event.blockNumber);
+
+		//testing block numbers
+		eventNumber++;
+		console.log("blocknumber for event " + eventNumber + ": " + event.blockNumber);
 	});
 
 	contract.on("WithdrewBalance", (sender, eth, event) => {
 		let _string = formatEthAdr(sender) + " has withdrawn " + truncateEther(eth) + " POA to his wallet." ;
-		handleEvent(_string);
+		handleEvent(_string, event.blockNumber);
+
+				//testing block numbers
+				eventNumber++;
+				console.log("blocknumber for event " + eventNumber + ": " + event.blockNumber);
 	});
 
 	contract.on("OpenedChest", (sender, eth, event) => {
 		let _string = formatEthAdr(sender) + " opens their reward chest! They win " + ethers.utils.formatEther(eth) + " POA.";
-		handleEvent(_string);
+		handleEvent(_string, event.blockNumber);
+
+				//testing block numbers
+				eventNumber++;
+				console.log("blocknumber for event " + eventNumber + ": " + event.blockNumber);
 	});
 
 	contract.on("JoinedGame", (sender, tribe, event) => {
 		console.log("New player: " + sender + " has joined tribe " + tribe.toString());
 		let _string = "A new member for the " + switchTribeName(tribe.toString()) + " Tribe: " + formatEthAdr(sender) + " joined the game.";
-		handleEvent(_string);
+		console.log("eVent blocknumber for JoinedGame: " + event.blockNumber);
+		handleEvent(_string, event.blockNumber);
+
+				//testing block numbers
+				eventNumber++;
+				console.log("blocknumber for event " + eventNumber + ": " + event.blockNumber);
 	});
 
 	contract.on("HarvestedRad", (sender, rad, event) => {
 		console.log(sender + " harvested " + rad.toString() + " rads");
 		let _string = formatEthAdr(sender) + " harvested " + rad.toString() + " rads.";
-		handleEvent(_string);
+		console.log("eVent blocknumber for HarvestedRad: " + event.blockNumber);
+		handleEvent(_string, event.blockNumber);
+
+				//testing block numbers
+				eventNumber++;
+				console.log("blocknumber for event " + eventNumber + ": " + event.blockNumber);
 	});
 
 	contract.on("ClaimedTribeRad", (sender, rad, event) => { // add tribe on next contract
 		console.log(sender + " claimed " + rad.toString() + " rads from their Tribe chest.");
 		let _string = formatEthAdr(sender) + " claimed " + rad.toString() + " rads from their Tribe chest.";
-		handleEvent(_string);
+		handleEvent(_string, event.blockNumber);
+
+				//testing block numbers
+				eventNumber++;
+				console.log("blocknumber for event " + eventNumber + ": " + event.blockNumber);
 	});
 
 	contract.on("ChangedTribe", (sender, tribe, event) => {
 		console.log(sender + " renounces their old ways and joins the " + switchTribeName(tribe.toString()));
 		let _string = formatEthAdr(sender) + " renounces their old ways and joins the " + switchTribeName(tribe.toString()) + ".";
-		handleEvent(_string);
+		handleEvent(_string, event.blockNumber);
+
+				//testing block numbers
+				eventNumber++;
+				console.log("blocknumber for event " + eventNumber + ": " + event.blockNumber);
 	});
 
 	// change "eth" to "cost" for contract v9
@@ -1237,33 +1302,45 @@ function beginEventLogging() {
 		
 		// add stats then send string
 		_string += "addIdLater weight is changed to " + stat0.toString() + "/" + stat1.toString() + "/" + stat2.toString() + "/" + stat3.toString() + ".";
-		handleEvent(_string);
+		handleEvent(_string, event.blockNumber);
 	});
 
 	contract.on("UnlockedTier", (sender, tier, event) => {
 		let _string = formatEthAdr(sender) + " unlocks tier " + tier.toString() + ".";
-		handleEvent(_string);
+		handleEvent(_string, event.blockNumber);
 	});
 
 	// "eggoa" is technically "shroom". change eggoa for shroom in v9, add eggoa
 	contract.on("HatchedShroom", (sender, rad, tier, shroom, eggoa, event) => {
 		let _string = formatEthAdr(sender) + " hatches " + shroom.toString() + " shrooms with " + rad.toString() + " rads into " + eggoa.toString() + " eggoas of tier " + tier.toString() + ".";
-		handleEvent(_string);
+		handleEvent(_string, event.blockNumber);
+
+				//testing block numbers
+				eventNumber++;
+				console.log("blocknumber for event " + eventNumber + ": " + event.blockNumber);
 	});
 
 	contract.on("CollectedShroom", (sender, land, shroom, event) => {
 		let _string = formatEthAdr(sender) + ", lord of land " + land.toString() + ", collected " + shroom.toString() + " shrooms.";
-		handleEvent(_string);
+		handleEvent(_string, event.blockNumber);
+
+				//testing block numbers
+				eventNumber++;
+				console.log("blocknumber for event " + eventNumber + ": " + event.blockNumber);
 	});
 
 	contract.on("DiscoveredLand", (sender, land, event) => {
 		let _string = "All hail " + formatEthAdr(sender) + "! This famed explorer plants his flag on land " + land.toString(); + ".";
-		handleEvent(_string);
+		handleEvent(_string, event.blockNumber);
+
+				//testing block numbers
+				eventNumber++;
+				console.log("blocknumber for event " + eventNumber + ": " + event.blockNumber);
 	});
 
 	contract.on("TookOverLand", (sender, land, event) => {
 		let _string = formatEthAdr(sender) + " snatches land " + land.toString() + " (previously abandoned).";
-		handleEvent(_string);
+		handleEvent(_string, event.blockNumber);
 	});
 
 	// add land as 3rd argument in contract v9
@@ -1272,51 +1349,90 @@ function beginEventLogging() {
 		let _powerLord = powerLord.toString();
 		let _winChance = parseFloat(_powerSender) / (parseFloat(_powerSender) + parseFloat(_powerLord));
 		let _string = formatEthAdr(sender) + ", with a " + _winChance + " to win, takes land X from " + formatEthAdr(lord) + "! " + formatEthAdr(lord) + " loses " + eggoa.toString() + " Eggoas.";
-		handleEvent(_string);
+		handleEvent(_string, event.blockNumber);
 	});
 	
 	// add land as 3rd argument in contract v9
 	contract.on("LostLandFight", (sender, lord, powerSender, powerLord, result, eggoa, event) => {
 		let _string = formatEthAdr(lord) + " defends his land against " + formatEthAdr(sender) + ", who loses " + eggoa.toString() + "Eggoas.";
-		handleEvent(_string);
+		handleEvent(_string, event.blockNumber);
 	});
 
 	contract.on("UpgradedEggoa", (sender, rad, tier, stat0, stat1, stat2, stat3, event) => {
 		let _string = formatEthAdr(sender) + " uses " + rad.toString() + " rads to upgrade his tier " + tier.toString() + " Eggoas. Bonus stats: " + stat0.toString() + "/" + stat1.toString() + "/" + stat2.toString() + "/" + stat3.toString(); + ".";
-		handleEvent(_string);
+		handleEvent(_string, event.blockNumber);
+
+				//testing block numbers
+				eventNumber++;
+				console.log("blocknumber for event " + eventNumber + ": " + event.blockNumber);
 	});
 
 	contract.on("RaisedEggoaPlantamid", (sender, tier, eggoa, plantamid, event) => {
 		let _string = formatEthAdr(sender) + " sacrifices " + eggoa.toString() + " Eggoas of tier " + tier.toString() + " to raise his Plantamid to floor " + plantamid.toString(); + ".";
-		handleEvent(_string);
+		handleEvent(_string, event.blockNumber);
+
+				//testing block numbers
+				eventNumber++;
+				console.log("blocknumber for event " + eventNumber + ": " + event.blockNumber);
 	});
 
     contract.on("RaisedDaiPlantamid", (sender, eth, upgrade, plantamid, event) => {
 		let _string = formatEthAdr(sender) + " spends " + truncateEther(eth) + " POA to raise his Plantamid by " + upgrade.toString() + " floor(s), reaching floor " + plantamid.toString(); + ".";
-		handleEvent(_string);
+		handleEvent(_string, event.blockNumber);
+
+				//testing block numbers
+				eventNumber++;
+				console.log("blocknumber for event " + eventNumber + ": " + event.blockNumber);
 	});
 
 }
 
+var events;
+
+
+
+function getPastEvents() {
+
+	filter = {
+		address: contractAddress,
+		fromBlock: f_fromBlock,
+		toBlock: "latest"
+	};
+
+	// this sets the event logging from the start block, and triggers it instantly
+	// need to set dates based on block time!
+	provider.resetEventsBlock(f_fromBlock);
+
+	/*let iface = new ethers.utils.Interface(abi);
+
+	provider.getLogs(filter).then((logs) => {
+		console.log(logs);
+		events = logs.map((log) => iface.parseLog(log));
+		console.log(events);
+		for(let e = 0; e < logs.length; e++) {
+			if(logs[e].topics == "0xf145761ccef32f84b8528f66139cc490a4c4723a07b1b101ae9d33cad484adef") {
+				console.log("we got a hit, captain");
+			}
+		}	
+	});
+	/*
+	contract.on(filter, (launch, end, event) => {
+		let _string = "The game has started! It will end " + convertTime(end) + ". May the best egg win.";
+		handleEvent(_string);
+	});
+	/*filter = contract.filters.JoinedGame();
+	contract.queryFilter(filter, f_fromBlock, f_toBlock, (result) => {
+		console.log(result);
+	});
+	*/
+}
 
 
 // WRITE ETHERS
 
 // (TODO - MOST FUNCTIONS) call appropriate refresh function to show updated data
 
-/*
-function startGame() {
-				// Sending a tx?? 
-				// Error: unknown transaction override _hex
 
-				//weiToSend = weiToSend.toString();
-				//console.log(weiToSend);
-				contract.StartGame(weiToSend).then((result) =>
-				{
-					console.log(result);
-				});
-}
-*/
 const startGame = async() => {
 	try {
 		console.log("about to send transaction");
