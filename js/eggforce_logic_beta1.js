@@ -756,7 +756,7 @@ function updateLand(__id){
 	document.getElementById('landLord').innerHTML = formatEthAdr(t_land[__id].lord);
 	document.getElementById('landPower').innerHTML = t_land[__id].power;
 	document.getElementById('landLevel').innerHTML = t_land[__id].level;
-	document.getElementById('landTribe').innerHTML = t_land[__id].tribe;
+	document.getElementById('landTribe').innerHTML = switchTribeName(parseInt(t_land[__id].tribe));
 	document.getElementById('landShroom').innerHTML = t_land[__id].shroom;
 	document.getElementById('landStat').innerHTML = t_land[__id].stat0 + "/" + t_land[__id].stat1 + "/" + t_land[__id].stat2 + "/" + t_land[__id].stat3;
 
@@ -1276,24 +1276,24 @@ function beginEventLogging() {
 
 	contract.on("JoinedGame", (sender, tribe, event) => {
 		console.log("New player: " + sender + " has joined tribe " + tribe.toString());
-		let _string = "A new member for the " + switchTribeName(tribe.toString()) + " Tribe: " + formatEthAdr(sender) + " joined the game.";
-		console.log("eVent blocknumber for JoinedGame: " + event.blockNumber);
+		let _string = "A new member for the " + switchTribeName(parseInt(tribe.toString())) + " Tribe: " + formatEthAdr(sender) + " joined the game.";
+		//console.log("eVent blocknumber for JoinedGame: " + event.blockNumber);
 		handleEvent(_string, event.blockNumber);
 
 				//testing block numbers
 				eventNumber++;
-				console.log("blocknumber for event " + eventNumber + ": " + event.blockNumber);
+				//console.log("blocknumber for event " + eventNumber + ": " + event.blockNumber);
 	});
 
 	contract.on("HarvestedRad", (sender, rad, event) => {
 		console.log(sender + " harvested " + rad.toString() + " rads");
 		let _string = formatEthAdr(sender) + " harvested " + rad.toString() + " rads.";
-		console.log("eVent blocknumber for HarvestedRad: " + event.blockNumber);
+		//console.log("eVent blocknumber for HarvestedRad: " + event.blockNumber);
 		handleEvent(_string, event.blockNumber);
 
 				//testing block numbers
 				eventNumber++;
-				console.log("blocknumber for event " + eventNumber + ": " + event.blockNumber);
+				//console.log("blocknumber for event " + eventNumber + ": " + event.blockNumber);
 	});
 
 	contract.on("ClaimedTribeRad", (sender, rad, event) => { // add tribe on next contract
@@ -1308,7 +1308,7 @@ function beginEventLogging() {
 
 	contract.on("ChangedTribe", (sender, tribe, event) => {
 		console.log(sender + " renounces their old ways and joins the " + switchTribeName(tribe.toString()));
-		let _string = formatEthAdr(sender) + " renounces their old ways and joins the " + switchTribeName(tribe.toString()) + ".";
+		let _string = formatEthAdr(sender) + " renounces their old ways and joins the " + switchTribeName(parseInt(tribe.toString())) + ".";
 		handleEvent(_string, event.blockNumber);
 
 				//testing block numbers
@@ -1366,7 +1366,7 @@ function beginEventLogging() {
 	});
 
 	contract.on("DiscoveredLand", (sender, land, event) => {
-		let _string = "All hail " + formatEthAdr(sender) + "! This famed explorer plants his flag on land " + land.toString(); + ".";
+		let _string = "All hail " + formatEthAdr(sender) + "! This famed explorer plants his flag on land " + land.toString() + ".";
 		handleEvent(_string, event.blockNumber);
 
 				//testing block numbers
@@ -1395,7 +1395,7 @@ function beginEventLogging() {
 	});
 
 	contract.on("UpgradedEggoa", (sender, rad, tier, stat0, stat1, stat2, stat3, event) => {
-		let _string = formatEthAdr(sender) + " uses " + rad.toString() + " rads to upgrade his tier " + tier.toString() + " Eggoas. Bonus stats: " + stat0.toString() + "/" + stat1.toString() + "/" + stat2.toString() + "/" + stat3.toString(); + ".";
+		let _string = formatEthAdr(sender) + " uses " + rad.toString() + " rads to upgrade his tier " + tier.toString() + " Eggoas. Bonus stats: " + stat0.toString() + "/" + stat1.toString() + "/" + stat2.toString() + "/" + stat3.toString() + ".";
 		handleEvent(_string, event.blockNumber);
 
 				//testing block numbers
@@ -1404,7 +1404,7 @@ function beginEventLogging() {
 	});
 
 	contract.on("RaisedEggoaPlantamid", (sender, tier, eggoa, plantamid, event) => {
-		let _string = formatEthAdr(sender) + " sacrifices " + eggoa.toString() + " Eggoas of tier " + tier.toString() + " to raise his Plantamid to floor " + plantamid.toString(); + ".";
+		let _string = formatEthAdr(sender) + " sacrifices " + eggoa.toString() + " Eggoas of tier " + tier.toString() + " to raise his Plantamid to floor " + plantamid.toString() + ".";
 		handleEvent(_string, event.blockNumber);
 
 				//testing block numbers
@@ -1413,7 +1413,7 @@ function beginEventLogging() {
 	});
 
     contract.on("RaisedDaiPlantamid", (sender, eth, upgrade, plantamid, event) => {
-		let _string = formatEthAdr(sender) + " spends " + truncateEther(eth) + " POA to raise his Plantamid by " + upgrade.toString() + " floor(s), reaching floor " + plantamid.toString(); + ".";
+		let _string = formatEthAdr(sender) + " spends " + truncateEther(eth) + " POA to raise his Plantamid by " + upgrade.toString() + " floor(s), reaching floor " + plantamid.toString() + ".";
 		handleEvent(_string, event.blockNumber);
 
 				//testing block numbers
@@ -1501,13 +1501,11 @@ function changeAttackLandTierCallback(__tier) {
 	document.getElementById('attackPower').innerHTML = _power;
 
 	// compute chance to win, update html
-	if(typeof myVar !== 'undefined') {
-	let _winRate = (parseInt(_power) * 100) / (parseInt(_power) + parseInt(t_land[h_selectedLand].power));
-	_winRate = parseFloat(_winRate).toFixed(2);
+	let _winRate = 100;
+	if(typeof t_land[h_selectedLand].power !== 'undefined') {
+		_winRate = (parseInt(_power) * 100) / (parseInt(_power) + parseInt(t_land[h_selectedLand].power));
+		_winRate = parseFloat(_winRate).toFixed(2);
 	} 
-	else {
-		_winRate = 100;
-	}
 	document.getElementById('winRate').innerHTML = _winRate;
 }
 
