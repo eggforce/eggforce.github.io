@@ -1,7 +1,7 @@
 // INITIALIZE WEB3
 
 let contract;
-let contractAddress = "0x5A2ECC2bc8e9f6c8783C90Af97d8b934C9b68dbf"; // v009
+let contractAddress = "0x8E51bD6A69b59f486E7E7aB4102fD4970e07E1BC"; // beta 1
 let provider;
 let signer = 0;
 let filter;
@@ -69,6 +69,7 @@ var a_daiAuctionCost = [0];
 var a_daiAuctionTimer = [0];
 var a_daiAuctionCostNow = [0];
 var a_end = [0];
+var a_gameState = 0;
 var a_globalRad = [0];
 var a_joinCost = [0];
 var a_launch = [0];
@@ -216,9 +217,9 @@ function controlLoop4() {
 	updateDaiAuctionCostNow();
 	updateRadAuctionCostNow();
 	updateTierProdHtml();
-	updatePlayerChest();
-	checkGameState();
-	updateGameState();
+    updatePlayerChest();
+    checkGameState();
+    updateGameState();
     setTimeout(controlLoop4, 4000);
 }
 
@@ -433,6 +434,38 @@ function updateJoinOrChange() {
 	}
 }
 
+// Check if game hasn't started (0), is ongoing (1), has ended (2)
+function checkGameState() {
+    _currentTimestamp = getCurrentTime();
+    if(a_end[0] < _currentTimestamp) {
+        if(a_end[0] !== 0) {
+            a_gameState = 2;
+        }
+        else {
+            a_gameState = 0;
+        }
+    }
+    else {
+        a_gameState = 1;
+    }
+}
+
+d_gameState = document.getElementById('gameState');
+
+function updateGameState() {
+    let _string = "";
+    if(a_gameState == 1) {
+        _string = "<h3>THE GAME IS ACTIVE</h3><h5>Collect RADs to win part of the reward chest</h5>"; 
+    }
+    else if(a_gameState == 0) {
+        _string = "<h3>THE GAME IS ABOUT TO START</h3><h5>Get ready to hatch!</h5>";
+    }
+    else if(a_gameState == 2) {
+        _string = "<h3>THE GAME HAS ENDED</h3><h5>Open your Reward Chest and withdraw your earnings!</h5>"
+    }
+    d_gameState.innerHTML = _string;
+}
+
 // Timers
 
 function updateLaunchTimer() {
@@ -508,7 +541,7 @@ function updateAccount() {
 		refreshData();
 	});
 }
-
+/*
 function getContractOwner() {
 	contract.owner().then((result) => 
 			{
@@ -517,7 +550,7 @@ function getContractOwner() {
 				document.getElementById("contractOwner").innerHTML = formatEthAdr(_owner);
 			});
 }
-
+*/
 // Tier prod (all 8)
 function updateTierProd() {
 	for(let i = 1; i < 9; i++) {
@@ -763,41 +796,6 @@ function updateNestValue(__player, __tier){
 }
 */
 
-var a_gameState = 0;
-
-
-// Check if game hasn't started (0), is ongoing (1), has ended (2)
-function checkGameState() {
-    _currentTimestamp = getCurrentTime();
-    if(a_end[0] < _currentTimestamp) {
-        if(a_end[0] !== 0) {
-            a_gameState = 2;
-        }
-        else {
-            a_gameState = 0;
-        }
-    }
-    else {
-        a_gameState = 1;
-    }
-}
-
-d_gameState = document.getElementById('gameState');
-
-function updateGameState() {
-    let _string = "";
-    if(a_gameState == 1) {
-        _string = "<h3>THE GAME IS ACTIVE</h3><h5>Collect RADs to win part of the reward chest</h5>"; 
-    }
-    else if(a_gameState== 0) {
-        _string = "<h3>THE GAME IS ABOUT TO START</h3><h5>Get ready to hatch!</h5>";
-    }
-    else if(a_gameState == 2) {
-        _string = "<h3>THE GAME HAS ENDED</h3><h5>Open your Reward Chest and withdraw your earnings!</h5>"
-    }
-    d_gameState.innerHTML = _string;
-}
-
 function selectTribe(__tribe) {
 	h_selectedTribe = __tribe;
 	document.getElementById('selectedTribe').innerHTML = switchTribeName(__tribe);
@@ -964,7 +962,7 @@ function updateDaiAuctionTimer(){
 
 // Current cost for DAI auction
 function updateDaiAuctionCostNow() {
-	let _currentTimestamp = parseInt((new Date()).getTime() / 1000); // from ms to s
+	let _currentTimestamp = getCurrentTime();
 	let _daiBaseCost = ethers.utils.parseEther(a_daiAuctionCost[0].toString());
 	contract.ComputeAuction(a_daiAuctionTimer[0], _daiBaseCost, _currentTimestamp).then((result) =>
 	{
@@ -1090,7 +1088,7 @@ function updateRadAuctionTimer(){
 
 // Current cost for rad auction
 function updateRadAuctionCostNow() {
-	let _currentTimestamp = parseInt((new Date()).getTime() / 1000); // from ms to s
+	let _currentTimestamp = getCurrentTime();
 	contract.ComputeAuction(a_radAuctionTimer.toString(), a_radAuctionCost.toString(), _currentTimestamp.toString()).then((result) =>
 	{
 		handleResult(result, a_radAuctionCostNow, 'radAuctionCost', "string");
