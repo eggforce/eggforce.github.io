@@ -427,11 +427,11 @@ function updateJoinOrChange() {
 
 	if(m_tier[0] > 0) {
 		d_joinOrChange.innerHTML = 'changing tribe';
-		d_joinOrChangeButton.innerHTML = '<button class="btn btn-danger" onclick="changeTribe()">Change Tribe</button>'
+		d_joinOrChangeButton.innerHTML = '<button class="btn btn-danger" onclick="checkTribeIsSelected(changeTribe)">Change Tribe</button>'
 	}
 	else {
 		d_joinOrChange.innerHTML = 'joining the game';
-		d_joinOrChangeButton.innerHTML = '<button class="btn btn-danger" onclick="joinGame()">Join Game</button>'
+		d_joinOrChangeButton.innerHTML = '<button class="btn btn-danger" onclick="checkTribeIsSelected(joinGame)">Join Game</button>'
 	}
 }
 
@@ -1541,7 +1541,15 @@ const attackLand = async() => {
 }
 
 // JOINGAME WORKS - SECOND ARGUMENT IS "OVERRIDE", FOR ETH VALUE AMONGST OTHER
-let m_tribeChoice = 1;
+
+function checkTribeIsSelected(__func) {
+	if(h_selectedTribe == 0) {
+		notificationCondition('You must select a Tribe first (click on 1 of the 4 images)');
+	}
+	else {
+		__func();
+	}
+}
 
 const joinGame = async() => {
 	try {
