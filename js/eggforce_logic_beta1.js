@@ -908,6 +908,7 @@ function handleResult(result_, a_, doc_, operation_){
 		let _html = a_[0];
 		if(operation_ == "dai") {
 			_html = parseFloat(a_[0]).toFixed(4);
+			_html = parseFloat(_html);
 		}
 		document.getElementById(doc_).innerHTML = _html;
 	}
@@ -1215,6 +1216,7 @@ function handleEvent(__string, __block) {
 function truncateEther(__eth) {
 	let e = ethers.utils.formatEther(__eth);
 	e = parseFloat(e).toFixed(6);
+	e = parseFloat(e);
 	return e;
 }
 
@@ -1266,7 +1268,7 @@ function beginEventLogging() {
 	});
 
 	contract.on("OpenedChest", (sender, eth, event) => {
-		let _string = formatEthAdr(sender) + " opens their reward chest! They win " + ethers.utils.formatEther(eth) + " POA.";
+		let _string = formatEthAdr(sender) + " opens their reward chest! They win " + truncateEther(eth) + " POA.";
 		handleEvent(_string, event.blockNumber);
 
 				//testing block numbers
