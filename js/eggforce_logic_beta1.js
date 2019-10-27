@@ -1338,7 +1338,7 @@ function beginEventLogging() {
 
 	contract.on("ClaimedTribeRad", (sender, rad, tribe, event) => { // add tribe on next contract
 		console.log(sender + " claimed " + rad.toString() + " rads from their Tribe chest.");
-		let _string = formatEthAdr(sender) + " of the " + switchTribeName(tribe.toString()) + " Tribe claimed " + rad.toString() + " rads from their Tribe chest.";
+		let _string = formatEthAdr(sender) + " of the " + switchTribeName(parseInt(tribe.toString())) + " Tribe claimed " + rad.toString() + " rads from their Tribe chest.";
 		checkEventPast(_string, event.blockNumber);
 
 				//testing block numbers
