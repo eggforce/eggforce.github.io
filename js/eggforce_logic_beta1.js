@@ -38,18 +38,18 @@ window.addEventListener('load', async () => {
 			});
 
 			
-			beginEventLogging();			
+			//beginEventLogging();			
         } catch (error) {
             // User denied account access...
 			useReadOnlyProvider();
-			beginEventLogging();
+			//beginEventLogging();
         }
     }
     // Non-dapp browsers...
     else {
         console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
 		useReadOnlyProvider();
-		beginEventLogging();
+		//beginEventLogging();
     }
 });
 
@@ -1226,7 +1226,7 @@ function checkEventPast(__string, __block) {
 }
 
 function logThePast() {	
-	if(loggingThePast === true) {
+	if(loggingThePast === true && eventArray.length > 0) {
 		console.log("hello i'm logging the past");
 		loggingThePast = false;
 		eventArray.sort(function(a,b) {return (a.block - b.block);} );
@@ -1466,6 +1466,9 @@ function beginEventLogging() {
 var events;
 
 
+// this sets the event logging from the start block, and triggers it instantly
+// need to set dates based on block time!
+var	loggingThePast = true;
 
 function getPastEvents() {
 
@@ -1475,9 +1478,6 @@ function getPastEvents() {
 		toBlock: "latest"
 	};
 
-	// this sets the event logging from the start block, and triggers it instantly
-	// need to set dates based on block time!
-	loggingThePast = true;
 	
 	//signer.resetEventsBlock(f_fromBlock);
 
@@ -1489,9 +1489,9 @@ function getPastEvents() {
 		provider.resetEventsBlock(f_fromBlock);
 		signer = provider.getSigner();
 		contract = new ethers.Contract(contractAddress, abi, signer);
-		beginEventLogging();
 	}
 	
+	beginEventLogging();
 	
 	console.log("starting to log past events...");
 
