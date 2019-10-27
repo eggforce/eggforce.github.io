@@ -1489,6 +1489,7 @@ function getPastEvents() {
 		provider.resetEventsBlock(f_fromBlock);
 		signer = provider.getSigner();
 		contract = new ethers.Contract(contractAddress, abi, signer);
+		beginEventLogging();
 	}
 	
 	
