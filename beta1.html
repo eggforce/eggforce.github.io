@@ -1,0 +1,431 @@
+<html>
+	<head>
+        <link href="https://fonts.googleapis.com/css?family=Cairo|Exo&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="css/simpleNotification.css">
+		<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+		<link rel="stylesheet" type="text/css" href="css/eggforce.css">
+	</head>
+	<body>
+		<br>
+		<div class="container" style="text-align:center;">
+			<div class="container">
+				<h1 class="display-1">EGGFORCE Beta 1</h1>
+				<br>		
+			</div>
+            <br>
+            <span id="gameState">?</span>
+            <hr>
+            <h6>Beta is consistently updated, and things might break. Is this page not working? Visit the backup: <a href="beta1_bkup.html">click me</a>
+            <hr>
+            <h3>REWARD CHEST: <span id="chest">?</span> [POA]</h3>
+            <h6>(Shared on round end)</h6>
+            <br>
+            <h6>Select your Tribe before <span id="joinOrChange">?</span></h6>
+            <br>
+            
+            <div class="row">
+                <div class="col-sm">
+                    <img src="img/goa_crimson.svg" class="tribe-img show-pointer" onclick="selectTribe(1)">
+                    <h6>Crimson</h6>
+                </div>
+                <div class="col-sm">
+                    <img src="img/goa_blu.svg" class="tribe-img show-pointer" onclick="selectTribe(2)">
+                    <h6>Blu</h6>
+                </div>
+                <div class="col-sm">
+                    <img src="img/goa_greg.svg" class="tribe-img show-pointer" onclick="selectTribe(3)">
+                    <h6>Greg</h6>
+                </div>
+                <div class="col-sm">
+                    <img src="img/goa_lumi.svg" class="tribe-img show-pointer" onclick="selectTribe(4)">
+                    <h6>Lumi</h6>
+                </div>
+            </div>
+            <h6>Selected Tribe: <span id="selectedTribe">?</span></h6>
+            <span id="joinOrChangeButton"><button class="btn btn-danger" onclick="checkTribeIsSelected(joinGame)">Join Game</button></span>
+            <h6>(Cost: <span id="joinCost">?</span> POA)</h6>
+            <hr>
+            <h4>EVENTS</h4>
+            <br>
+            <div class="row">
+                <div class="col-sm-2">
+
+                </div>
+                <div class="col-sm">
+                    <div class="scroll-box" id="scrollLog" style="text-align:left;">
+                        <p><span id="eventLog">[Waiting for events...]</span></p>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    
+                </div>
+            </div>
+            <br>
+            <hr>
+            <h4>MY STUFF</h3>
+            <h5>Account = <span id="account">?</span></h3>
+            <br>
+            <div class="row" style="text-align:left;">
+                <div class="col-sm">
+                    <h5>SHROOMS</h5>
+                    <br>
+                    <h6>You have <span id="shroom">?</span> Shrooms</h6>                        
+                    <h6>Tier of Eggoa to hatch: <input type="text" id="shroomTier" oninput="changeShroomTier(this.value)" value="1" size="1"></h6>
+                    <h6>Multiplier: <input type="text" id="shroomMult" oninput="changeShroomMult(this.value)" value="1" size="1">
+                    <h6>Cost = <span id="shroomCost">?</span> RAD</h6>
+                    <h6>You will get <span id="shroomEggoa">?</span> Eggoas</h6>
+                    <h6><button class="btn btn-success" onclick="checkShroomCostThenHatch()">Hatch Shrooms</button></h6>
+                    <br>
+                    <h6>Last Shroom hatch: <span id="lastShroom">?</span></h6>
+                </div>
+                <div class="col-sm">
+                        <h5>TRIBE</h5>
+                        <br>
+                        <h6>Tribe: <span id="tribe">?</span></h6>
+                        <h6>Number of Tribe Changes: <span id="tribeChange">?</span></h6>
+                        <h6>Balance: <span id="balance">?</span> POA</h6> <button class="btn btn-success" onclick="withdrawDai()">Withdraw Balance</button>
+                </div>
+                <div class="col-sm">
+                    <h5>RADS</h5>
+                    <br>
+                    <h6>You have <span id="rad">?</span> RADS</h6>
+                        <h6>Rads ready for Harvest: <span id="radToHarvest">?</span></h6>
+                        <button class="btn btn-success" onclick="harvestRads()">Harvest Rads</button>
+                        <br>
+                        <h6>Last Rad collection: <span id="lastRad">?</span></h6>
+                        <br>
+                        <h6>Rads available to claim: <span id="tribeRadToClaim">?</span></h6>
+                        <button class="btn btn-success" onclick="claimTribeRads()">Claim Tribe Rads</button>
+                        <br>
+                        <h6>You have previously claimed: <span id="collectedTribeRad">?</span> RADS</h6>
+                        <br>
+                        <h6>Earned Rads: <span id="earnedRad">?</span></h6>                    
+                </div>
+            </div>
+            
+            <br>
+            <hr>
+            <br>
+            <div class="row">
+                <div class="col-sm">
+                    <h4>Select Land (1 to 64) <input type="text" id="landSelector" onInput="updateTerritory(this.value)" value="1" size="1"></h4>
+                </div>
+                <div class="col-sm">
+                    <h5><span id="w3q_land">?</span></h5>
+                </div>
+            </div>     
+            <br>
+            <div class="row">
+                <div class="col-sm">
+                    <h5>Land Level:</h5>
+                    <span id="landLevel">?</span>
+                </div>
+                <div class="col-sm">
+                    <h5>Land Stats:</h5>
+                    <span id="landStat">?</span>
+                </div>
+
+                <div class="col-sm">
+                    <h5>Current Lord:</h5>
+                    <span id="landLord">?</span>
+                </div>
+                <div class="col-sm">
+                    <h5>Lord Power:</h5>
+                    <span id="landPower">?</span>
+                </div>
+                <div class="col-sm">
+                    <h5>Lord Tribe:</h5>
+                    <span id="landTribe">?</span>
+                </div>
+                <div class="col-sm">
+                    <h5>Last Shroom Harvest:</h5>
+                    <span id="landLast">?</span>
+                </div>
+                <div class="col-sm">
+                    <h5>Shrooms to Harvest:</h5>
+                    <span id="landShroom">?</span>
+                </div>
+            </div>
+            <br>
+            <h6>Attack Land with Eggoas of tier <input type="text" id="attackLandTierSelector" oninput="changeAttackLandTier(this.value)" value="1" size="1"></h6>
+            <div class="row">
+                <div class="col-sm">
+                    <h6>Power: <span id="attackPower">?</span></h6>
+                </div>
+                <div class="col-sm">
+                    <h6>Chance to win: <span id="winRate">?</span>%</h6>
+                </div>
+            </div>
+			<span id="landButton">?</span>
+			<br>
+            <hr>
+            <h3>FIND ANOMALY</h3>
+            <br>
+            <h6>Choose what to change: <button id="anomalyLand" class="btn btn-info btn-sm" onclick="updateTargetType('land')">Land</button> or <button id="anomalyProd" class="btn btn-info btn-sm" onclick="updateTargetType('prod')">Prod</button></h6>
+            <h6><span id="anomalyTargetType">?</span> to target: <input type="text" id="anomalyTargetId" onInput="updateTargetId(this.value)" value="0" size="1"></h6>
+            <h6>(between 1 and 8 for tier, 1 and 64 for land)</h6>
+            <h6>Weights: <input type="text" id="anomalyWeight0" onInput="updateWeight(0, this.value, 'anomalyWeight0')" value="0" size="1"><input type="text" id="anomalyWeight1" onInput="updateWeight(1, this.value, 'anomalyWeight1')" value="0" size="1"><input type="text" id="anomalyWeight2" onInput="updateWeight(2, this.value, 'anomalyWeight2')" value="0" size="1"><input type="text" id="anomalyWeight3" onInput="updateWeight(3, this.value, 'anomalyWeight3')" value="0" size="1"></h6>
+            <h6>(between 0 and 4 for each weight)</h6> 
+            <div class="row">
+                <div class="col-sm">
+                    <h5>POA Anomaly</h5>
+                    <h6>Auction started <span id="daiAuctionTimer">?</span></h6>
+                    <button class="btn btn-danger" onclick="findDaiAnomaly()">BUY POA ANOMALY</button>
+                    <h6>Auction cost: <span id="daiAuctionCost">?</span> POA</h6>
+                </div>
+                <div class="col-sm">
+                     <h5>RAD Anomaly</h5>
+                    <h6>Auction started <span id="radAuctionTimer">?</span></h6>
+                    <button class="btn btn-success" onclick="findRadAnomaly()">BUY RAD ANOMALY</button>
+                    <h6>Auction cost: <span id="radAuctionCost">?</span> RADS</h6>
+                </div>
+            </div>
+            
+            <br>
+            <br>
+            <hr>
+
+            <br>
+            <h5>My Nest: </h5>
+            <h6>Best Tier unlocked: <span id="tier">?</span></h5>
+            <h6><button class="btn btn-success" onclick="unlockNextTier()">Unlock Next Tier</button></h6>
+            <h6>(Cost: <span id="unlockTierRadCost">?</span> Rads)</h6>
+            <div class="row">
+                <div class="col-sm">
+                    <h6>TIER 1</h6>
+                    <span id="tier1">?</span>
+                    <br>
+                    <h6>Tier weight: <span id="tier1prod">?</span></h6>
+                    <hr>
+                </div>
+                <div class="col-sm">
+                    <h6>TIER 2</h6>
+                    <span id="tier2">?</span>
+                    <br>
+                    <h6>Tier weight: <span id="tier2prod">?</span></h6>
+                    <hr>
+                </div>
+                <div class="col-sm">
+                    <h6>TIER 3</h6>
+                    <span id="tier3">?</span>
+                    <br>
+                    <h6>Tier weight: <span id="tier3prod">?</span></h6>
+                    <hr>
+                </div>
+                <div class="col-sm">
+                    <h6>TIER 4</h6>
+                    <span id="tier4">?</span>
+                    <br>
+                    <h6>Tier weight: <span id="tier4prod">?</span></h6>
+                    <hr>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-sm">
+                    <h6>TIER 5</h6>
+                    <span id="tier5">?</span>
+                    <br>
+                    <h6>Tier weight: <span id="tier5prod">?</span></h6>
+                    <hr>
+                </div>
+                <div class="col-sm">
+                    <h6>TIER 6</h6>
+                    <span id="tier6">?</span>
+                    <br>
+                    <h6>Tier weight: <span id="tier6prod">?</span></h6>
+                    <hr>
+                </div>
+                <div class="col-sm">
+                    <h6>TIER 7</h6>
+                    <span id="tier7">?</span>
+                    <br>
+                    <h6>Tier weight: <span id="tier7prod">?</span></h6>
+                    <hr>
+                </div>
+                <div class="col-sm">
+                    <h6>TIER 8</h6>
+                    <span id="tier8">?</span>
+                    <br>
+                    <h6>Tier weight: <span id="tier8prod">?</span></h6>
+                    <hr>
+                </div>
+            </div>
+            <br>
+            <h5>UPGRADE EGGOA</h5>
+            <br>
+            <h6>Tier: <input type="text" id="tierToUpgrade" onInput="updateUpgradeTier(this.value)" value="0" size="1"></h6>
+            <h6>(between 1 and 8 for tier)</h6>
+            <h6>Weights: <input type="text" id="upgradeWeight0" onInput="updateUpgradeWeight(0, this.value, 'upgradeWeight0')" value="0" size="1"><input type="text" id="upgradeWeight1" onInput="updateUpgradeWeight(1, this.value, 'upgradeWeight1')" value="0" size="1"><input type="text" id="upgradeWeight2" onInput="updateUpgradeWeight(2, this.value, 'upgradeWeight2')" value="0" size="1"><input type="text" id="upgradeWeight3" onInput="updateUpgradeWeight(3, this.value, 'upgradeWeight3')" value="0" size="1"></h6>
+            <h6>(each weight will give +1 to the selected stat)</h6>
+            <h6>Upgrade cost: <span id="upgradeCost">?</span> RADS</h6>
+            <button class="btn btn-success" onclick="upgradeGoa()">Upgrade Eggoa</button>            
+            <hr>
+  
+            
+            <hr>
+            <h5>MY PLANTAMIDS</h5>
+            <br>
+            <div class="row">
+                <div class="col-sm">
+                    <h6>Eggoa Plantamid Floor: <span id="eggoaPlantamid">?</span></h6>
+                    <br>
+                    <h5>Sacrifice Eggoas to raise Floor</h5>
+                    <h6>Tier to sacrifice: <input type="text" id="tierSacrifice" oninput="getSacrificeAmount(this.value)" value="1" size="1"></h6>
+                    <h6>(You will sacrifice <span id="sacrificeAmount">?</span> Eggoas)</h6>
+                    <button class="btn btn-success" onclick="raiseGoamid()">Raise Goamid</button>
+                </div>
+                <div class="col-sm">
+                    <h6>Poa Plantamid Floor: <span id="daiPlantamid">?</span></h6>
+                    <br>
+                    <h5>Spend Poa to raise Floor by 1 or more levels</h5>
+                    <h6>Number of Floors: <input type="text" id="floorsAdded" oninput="getFloorDaiCost(this.value)" value="1" size="1"></h6>
+                    <h6>(You will spend <span id="floorDaiCost">?</span> POA)</h6>
+                    <button class="btn btn-danger" onclick="raiseDaimid()">Raise Poamid</button>
+                </div>
+            </div>                    
+            <br>
+            <hr>
+            <br>
+            <hr>
+            <h5>GAME STATS</h5>
+            <br>
+            <h6>Game start: <span id="launch">?</span></h6>
+            <h6>Game end: <span id="end">?</span></h6>
+            <br>
+            <h6>Total number of Rads earned by all players: <span id="globalRad">?</span></h6>
+            <br>
+            <hr>
+            <h5>POA CHEST</h5>
+            <br>
+            <h6><span id="playerChest">(do that later)</span></h6>
+            <br>           
+            <hr><hr>       
+        </div>
+        <!-- TUTORIAL -->
+        <div class="container">
+            <h3>HOW TO PLAY</h3>
+            <br>
+            <h6>In Eggforce, you control a nest of Eggoas who produce resources (RADs) and fight for land.</h6>
+            <br>
+            <h6>Your goal is to harvest as many RADs as possible. At the end of the round, you win a POA reward. This reward is proportional to your harvested RADs, compared to the harvested RADs of every player.</h6>
+            <br><hr>
+            <h4>JOINING THE GAME</h5>
+            <br>
+            <h6>Select one of the four Tribes first, then join the game.</h6>
+            <h6>Members of each Tribe cannot attack each other. Every time a member of your Tribe spends POA on the game, you receive some extra RADs through the Tribe Chest.</h6>
+            <br>
+            <h6>Joining the game comes with a small POA cost.</h6>
+            <h6>As you join the game, you get a few tier1 Eggoas to start.</h6>
+            <br>
+            <h6>After you've joined the game, you can change Tribe again for the same POA cost.</h6>
+            <br><hr>
+            <h4>SHROOMS</h4>
+            <br>
+            <h6>Your Shrooms grow passively at a constant rate.</h6>
+            <h6>Using RADs, you can hatch your Shrooms into Eggoas.</h6>
+            <br>
+            <h6>RADs act as a multiplier for the number of Eggoas you get per Shroom.</h6>
+            <h6>Select your desired tier of Eggoas and multiplier before hatching.</h6>
+            <h6>The higher the tier of Eggoas, the higher the RAD cost.</h6>
+            <br>
+            <h6>Shroom growth can't be improved directly, except with Plantamids.</h6>
+            <h6>Capturing lands is another way to get more shrooms.</h6>
+            <br><hr>
+            <h4>RADS</h4>
+            <br>
+            <h6>Produced consistently by all your Eggoas, RADs are the primary resource of the game.</h6>
+            <h6>With RADs, you can upgrade your Eggoas, hatch Shrooms and find Anomalies.</h6>
+            <br>
+            <h6>Any RAD from your Eggoas can be saved through Harvesting them.</h6>
+            <h6>Harvested RADs count towards your endgame POA reward.</h6>
+            <br>
+            <h6>The Tribe RAD chest is an extra source of RAD. As Tribe members use POA, this Tribe chest grows.</h6>
+            <h6>Claiming the Tribe Chest doesn't count towards your endgame POA reward.</h6>
+            <h6>Make sure you Claim the Chest before any Tribe change, or you will lose any remaining RAD you might be entitled to!</h6>
+            <br><hr>
+            <h4>EGGOAS</h4>
+            <br>
+            <h6>Your production units and field soldiers, all in one. Eggoas produce RADs and can attack lands.</h6>
+            <br>
+            <h6>There is 8 tiers of Eggoas. You must unlock these tiers 1 by 1, for a fixed cost in RADs.</h6>
+            <h6>Each tier is a multiplier for production and fighting power. For example, a tier3 eggoa produces 3x as many RADs as a tier1 Eggoa.</h6>
+            <br><hr>
+            <h4>STATS AND WEIGHTS</h4>
+            <br>
+            <h6>Each tier of Eggoa has their own 4 stats. Stats act as a production and power multiplier</h6>
+            <br>
+            <h6>Upgrades can raise particular stats for a RAD cost. This cost grows with each upgrade.</h6>
+            <br>
+            <h6>Each tier of Eggoa has a set of weights, shared globally. These weights range from 0 to 4, and modify the production bonus of each stat accordingly.</h6>
+            <h6>All tier weights are initially set at 4/4/4/4, but can change with anomalies.</h6>
+            <br>
+            <h6>Each land has its own set of weights, ranging from 0 to 4.</h6>
+            <h6>Land weights affect the power bonus of each stat accordingly.</h6>
+            <h6>When a land is discovered for the first time, a random set of land weights is attributed to this land.</h6>
+            <br><hr>
+            <h4>LAND</h4>
+            <br>
+            <h6>Lands grow Shrooms, and can be conquered by Eggoas.</h6>
+            <h6>There is a maximum of 64 Lands.</h6>
+            <br>
+            <h6>If a Land hasn't been discovered yet, all its numbers will show as 0. Any Eggoa can be used to capture this land.</h6>
+            <h6>The player becomes the Lord of this land.</h6>
+            <h6>Each tier of Eggoas can only own one Land, and can only attack a Land once a day.</h6>
+            <br>
+            <h6>If a Land is already owned, whoever wants to capture this land will have to fight the current Lord.</h6>
+            <h6>Fights are resolved as a dice roll, according to weighted Eggoa power.</h6>
+            <h6>Whoever loses the fight loses 20% of the Eggoas he sent to fight.</h6>
+            <br>
+            <h6>The Lord of a Land can collect Shrooms as often as he wants.</h6>
+            <h6>Shrooms on Land grow at a slightly exponential rate. The longer the wait, the greater the reward.</h6>
+            <br>
+            <h6>If a Lord is defeated by an attacker, this attacker gets 3/4 of the Shrooms, and the Lord gets 1/4.</h6>
+            <h6>A successful attack also raises the level of the Land. Shroom production is multiplied by the level of the Land.</h6>
+            <br><hr>
+            <h4>ANOMALIES</h4>
+            <br>
+            <h6>Finding an Anomaly lets the player change the weights of a land or a tier.</h6>
+            <h6>Each weight can be anywhere between 0 and 4, as long as at least one weight is above 0.</h6>
+            <br>
+            <h6>Anomalies work as auctions with decreasing costs.</h6>
+            <h6>There's always 2 auctions at once, one with POA, and one with RAD.</h6>
+            <h6>Once an Anomaly is found, the corresponding auction sees its timer reset, and its current cost multiplied.</h6>
+            <br>
+            <h4>PLANTAMIDS</h4>
+            <br>
+            <h6>Plantamids are overall multipliers to the prod and power of all your Eggoas, as well as your Shrooms (only your own, not any Land Shrooms you may have).</h6>
+            <br>
+            <h6>The Eggoa Plantamid demands a sacrifice in Eggoas. The higher the tier, the less Eggoa required.</h6>
+            <h6>The sacrifice required increases significantly with each floor.</h6>
+            <br>
+            <h6>The POA Plantamid requires POA to grow. You can raise several floors at once.</h6>
+            <h6>Each floor costs more POA than the previous one.</h6>
+            <br><hr>
+            <h3>PUTTING IT ALL TOGETHER</h3>
+            <br>
+            <h6>Your goal is to harvest RADs. To do that, you need to grow your nest of Eggoas as much as possible, so they produce more RADs.</h6>
+            <br>
+            <h6>You will also want to upgrade your Eggoas for more prod and power. As Lands have different weights, selecting specific stats to upgrade can help you conquer certain Lands.</h6>
+            <br>
+            <h6>More importantly, Anomalies let you reverse the tide of battle. If a Lord owns a territory weighted towards his stats, you can use an Anomaly to change the weights of this Land towards something that advantages you and disadvantages him, then attack him before he has a chance to react.</h6>
+            <br>
+            <h6>Likewise, you can distribute your upgrades towards a certain direction - for example, boosting the third stat above all. Then you can use an Anomaly to change the corresponding tier weights to 0/0/4/0, leaving every other player in the dust.</h6>
+            <br>
+            <h6>Of course, other players might do the same to you. So is it better to aim for a balanced approach? To go all-in in one direction? To have different specialists in each tier?</h6>
+            <br>
+            <h6>The choice is yours...</h6>
+            <br><hr>
+            <h4>MORE INFO</h4>
+            <br>
+            <h6>If anything is missing, unclear, or if you have other questions, <a href="https://discord.gg/JU8P4Ru">join our Discord Channel!</a></h6>
+        </div>
+        <!-- simpleNotification -->
+        <script src="js/simpleNotification.js"></script>
+		<!-- etherjs -->
+		<script src="js/ethers-v4.min.js"></script>
+		<!-- Eggforce -->
+		<script src="js/abi_beta1.js"></script>
+		<script src="js/eggforce_logic_beta1.js"></script>
+	</body>
+</html>
