@@ -402,6 +402,7 @@ function convertTime(__timestamp){
 // Calculate production per second for each tier
 
 function computeProduction() {
+	m_totalProd = 0;
 	for(let i = 1; i <= m_tier; i++) {
 		// add all 4 stats weighted
 		m_prod[i] = parseInt(m_nest[i].stat0) * parseInt(a_tierProd[i][0]) + parseInt(m_nest[i].stat1) * parseInt(a_tierProd[i][1]) + parseInt(m_nest[i].stat2) * parseInt(a_tierProd[i][2]) + parseInt(m_nest[i].stat3) * parseInt(a_tierProd[i][3]);
