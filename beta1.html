@@ -186,7 +186,9 @@
             <hr>
 
             <br>
-            <h5>My Nest: </h5>
+            <h3>MY NEST</h3>
+            <h4>Producing <span id="totalProd">?</span> RAD per hour</h4>
+            <br>
             <h6>Best Tier unlocked: <span id="tier">?</span></h5>
             <h6><button class="btn btn-success" onclick="unlockNextTier()">Unlock Next Tier</button></h6>
             <h6>(Cost: <span id="unlockTierRadCost">?</span> Rads)</h6>
@@ -195,28 +197,32 @@
                     <h6>TIER 1</h6>
                     <span id="tier1">?</span>
                     <br>
-                    <h6>Tier weight: <span id="tier1prod">?</span></h6>
+                    <h6>Tier weight: <span id="tier1weight">?</span></h6>
+                    <h5>PROD = <span id="tier1prod">?</span> RAD/hour</h5>
                     <hr>
                 </div>
                 <div class="col-sm">
                     <h6>TIER 2</h6>
                     <span id="tier2">?</span>
                     <br>
-                    <h6>Tier weight: <span id="tier2prod">?</span></h6>
+                    <h6>Tier weight: <span id="tier2weight">?</span></h6>
+                    <h5>PROD = <span id="tier2prod">?</span> RAD/hour</h5>
                     <hr>
                 </div>
                 <div class="col-sm">
                     <h6>TIER 3</h6>
                     <span id="tier3">?</span>
                     <br>
-                    <h6>Tier weight: <span id="tier3prod">?</span></h6>
+                    <h6>Tier weight: <span id="tier3weight">?</span></h6>
+                    <h5>PROD = <span id="tier3prod">?</span> RAD/hour</h5>
                     <hr>
                 </div>
                 <div class="col-sm">
                     <h6>TIER 4</h6>
                     <span id="tier4">?</span>
                     <br>
-                    <h6>Tier weight: <span id="tier4prod">?</span></h6>
+                    <h6>Tier weight: <span id="tier4weight">?</span></h6>
+                    <h5>PROD = <span id="tier4prod">?</span> RAD/hour</h5>
                     <hr>
                 </div>
             </div>
@@ -226,28 +232,32 @@
                     <h6>TIER 5</h6>
                     <span id="tier5">?</span>
                     <br>
-                    <h6>Tier weight: <span id="tier5prod">?</span></h6>
+                    <h6>Tier weight: <span id="tier5weight">?</span></h6>
+                    <h5>PROD = <span id="tier5prod">?</span> RAD/hour</h5>
                     <hr>
                 </div>
                 <div class="col-sm">
                     <h6>TIER 6</h6>
                     <span id="tier6">?</span>
                     <br>
-                    <h6>Tier weight: <span id="tier6prod">?</span></h6>
+                    <h6>Tier weight: <span id="tier6weight">?</span></h6>
+                    <h5>PROD = <span id="tier6prod">?</span> RAD/hour</h5>
                     <hr>
                 </div>
                 <div class="col-sm">
                     <h6>TIER 7</h6>
                     <span id="tier7">?</span>
                     <br>
-                    <h6>Tier weight: <span id="tier7prod">?</span></h6>
+                    <h6>Tier weight: <span id="tier7weight">?</span></h6>
+                    <h5>PROD = <span id="tier7prod">?</span> RAD/hour</h5>
                     <hr>
                 </div>
                 <div class="col-sm">
                     <h6>TIER 8</h6>
                     <span id="tier8">?</span>
                     <br>
-                    <h6>Tier weight: <span id="tier8prod">?</span></h6>
+                    <h6>Tier weight: <span id="tier8weight">?</span></h6>
+                    <h5>PROD = <span id="tier8prod">?</span> RAD/hour</h5>
                     <hr>
                 </div>
             </div>
@@ -259,7 +269,7 @@
             <h6>Weights: <input type="text" id="upgradeWeight0" onInput="updateUpgradeWeight(0, this.value, 'upgradeWeight0')" value="0" size="1"><input type="text" id="upgradeWeight1" onInput="updateUpgradeWeight(1, this.value, 'upgradeWeight1')" value="0" size="1"><input type="text" id="upgradeWeight2" onInput="updateUpgradeWeight(2, this.value, 'upgradeWeight2')" value="0" size="1"><input type="text" id="upgradeWeight3" onInput="updateUpgradeWeight(3, this.value, 'upgradeWeight3')" value="0" size="1"></h6>
             <h6>(each weight will give +1 to the selected stat)</h6>
             <h6>Upgrade cost: <span id="upgradeCost">?</span> RADS</h6>
-            <button class="btn btn-success" onclick="upgradeGoa()">Upgrade Eggoa</button>            
+            <button class="btn btn-success" onclick="checkUpgradeCostThenUpgrade()">Upgrade Eggoa</button>            
             <hr>
   
             
@@ -276,9 +286,15 @@
                     <button class="btn btn-success" onclick="raiseGoamid()">Raise Goamid</button>
                 </div>
                 <div class="col-sm">
+                    <br>
+                    <h3>BOOST</h3>
+                    <h3>x<span id="boost">?</span></h3>
+                    <h6>Multiplies all prod and power</h6>
+                </div>
+                <div class="col-sm">
                     <h6>Poa Plantamid Floor: <span id="daiPlantamid">?</span></h6>
                     <br>
-                    <h5>Spend Poa to raise Floor by 1 or more levels</h5>
+                    <h5>Spend Poa to raise Floor</h5>
                     <h6>Number of Floors: <input type="text" id="floorsAdded" oninput="getFloorDaiCost(this.value)" value="1" size="1"></h6>
                     <h6>(You will spend <span id="floorDaiCost">?</span> POA)</h6>
                     <button class="btn btn-danger" onclick="raiseDaimid()">Raise Poamid</button>

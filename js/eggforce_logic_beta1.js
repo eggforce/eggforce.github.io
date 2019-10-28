@@ -64,6 +64,7 @@ function useReadOnlyProvider() {
 const MULT_COST = 10;
 const PAST_BLOCKS = 12 * 60 * 24 * 2 * 10; // 12 blocks per minute, 60min per hour, 24h in a day
 const POA_BLOCK_TIME = 5.4;
+const TIME_FOR_1RAD = 60 * 60 * 4; // 4 hours in seconds
 
 var a_chest = [0];
 var a_daiAuctionCost = [0];
@@ -84,6 +85,7 @@ var a_tierProd = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 for(let k = 1; k < 9; k++){
 	a_tierProd[k] = [0, 0, 0, 0];
 }
+var a_tierSum = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 var h_anomalyLand = true; // whether land or prod is targeted on anomaly buy
 var h_anomalyTargetId = 0;
@@ -101,6 +103,7 @@ var h_upgradeTier = 1; // selected tier for Eggoa Upgrade
 var h_upgradeWeight = [0, 0, 0, 0];
 
 var m_balance = [0];
+var m_boost = 1;
 var m_collectedTribeRad = [0];
 var m_daiPlantamid = [0];
 var m_earnedRad = [0];
@@ -118,6 +121,9 @@ var m_tribeChange = [0];
 var m_unlockTierRadCost = [0];
 var m_upgradeCost = [0];
 var m_upgradeWeightSum = [0];
+
+var m_prod = []; // RAD per hourfor each tier
+var m_totalProd = 0; // total RAD per hour, all tiers included
 
 var n_sacrificeAmount = [0];
 var n_floorDaiCost = [0];
@@ -218,7 +224,7 @@ function controlLoop4() {
 	}
 	updateDaiAuctionCostNow();
 	updateRadAuctionCostNow();
-	updateTierProdHtml();
+	updateTierWeightHtml();
     updatePlayerChest();
     checkGameState();
 	updateGameState();
@@ -282,6 +288,9 @@ function refreshData(){
 	updateJoinOrChange();
 	updateTribeRadToClaim();
 	updateTierProd();
+	updateTerritory(h_selectedLand);
+	updateBoost();
+	computeProduction();
 }
 
 //** UTILITIES **//
@@ -389,6 +398,39 @@ function convertTime(__timestamp){
 }
 
 //** LOCAL FUNCTIONS **//
+
+// Calculate production per second for each tier
+
+function computeProduction() {
+	for(let i = 1; i <= m_tier; i++) {
+		// add all 4 stats weighted
+		m_prod[i] = parseInt(m_nest[i].stat0) * parseInt(a_tierProd[i][0]) + parseInt(m_nest[i].stat1) * parseInt(a_tierProd[i][1]) + parseInt(m_nest[i].stat2) * parseInt(a_tierProd[i][2]) + parseInt(m_nest[i].stat3) * parseInt(a_tierProd[i][3]);
+		// multiply by amount, tier, and boost
+		m_prod[i] = m_prod[i] * m_nest[i].amount * i * m_boost;
+		// divide by weight sum
+		m_prod[i] = m_prod[i] / a_tierSum[i];
+		// divide by TIME_FOR_1RAD for seconds, divide by 4 for prod per hour
+		m_prod[i] = parseFloat(m_prod[i]) / 4;
+		m_prod[i] = m_prod[i].toFixed(2);
+		console.log("Tier " + i + " = " + m_prod[i]);
+		
+		// add result to totalprod
+		m_totalProd = parseFloat(m_totalProd) + parseFloat(m_prod[i]);
+
+		// update HTML
+		d_tierProd[i].innerHTML = m_prod[i];
+	}
+	// update totalProd HTML
+	document.getElementById('totalProd').innerHTML = m_totalProd;
+}
+
+
+// Add eggoaPlantamid and daiPlantamid (+ the base of 1)
+
+function updateBoost() {
+	m_boost = parseInt(m_eggoaPlantamid) + parseInt(m_daiPlantamid) + parseInt(1);
+	document.getElementById('boost').innerHTML = m_boost;
+}
 
 // Check available tribe rads
 
@@ -556,7 +598,7 @@ function getContractOwner() {
 			});
 }
 */
-// Tier prod (all 8)
+// Tier prod (all 8) BAD NAME? SHOULD BE TIER WEIGHT
 function updateTierProd() {
 	for(let i = 1; i < 9; i++) {
 		contract.GetTierProd(i).then((result) =>
@@ -565,6 +607,7 @@ function updateTierProd() {
 			a_tierProd[i][1] = result[1].toString();
 			a_tierProd[i][2] = result[2].toString();
 			a_tierProd[i][3] = result[3].toString();
+			a_tierSum[i] = parseInt(a_tierProd[i][0]) + parseInt(a_tierProd[i][1]) + parseInt(a_tierProd[i][2]) + parseInt(a_tierProd[i][3]); 
 		});
 	}
 }
@@ -581,11 +624,23 @@ var d_tierProd = [
 	document.getElementById('tier8prod')
 ]
 
-function updateTierProdHtml() {
+function updateTierWeightHtml() {
 	for(let i = 1; i < 9; i++) {
-		d_tierProd[i].innerHTML = a_tierProd[i][0] + "/" + a_tierProd[i][1] + "/" + a_tierProd[i][2] + "/" + a_tierProd[i][3];
+		d_tierWeight[i].innerHTML = a_tierProd[i][0] + "/" + a_tierProd[i][1] + "/" + a_tierProd[i][2] + "/" + a_tierProd[i][3];
 	}	
 }
+
+var d_tierWeight = [
+	0,
+	document.getElementById('tier1weight'),
+	document.getElementById('tier2weight'),
+	document.getElementById('tier3weight'),
+	document.getElementById('tier4weight'),
+	document.getElementById('tier5weight'),
+	document.getElementById('tier6weight'),
+	document.getElementById('tier7weight'),
+	document.getElementById('tier8weight')
+]
 
 // Territory stats (all 64)
 /*
@@ -1109,6 +1164,7 @@ function updateShroom(__player) {
 		contract.ComputeShroom(__player).then((result) =>
 		{
 			handleResult(result, m_shroom, 'shroom', "string");
+			computeShroomEggoa();
 		});
 	}
 	// if player hasn't (i.e account change), reset value to 0
@@ -1784,6 +1840,15 @@ const withdrawDai = async() => {
 // UpgradeEggoa - TEST
 // (TODO) let player pick upgradeStat. total should be 4
 // WORKS
+
+function checkUpgradeCostThenUpgrade() {
+	if(m_upgradeCost > m_rad) {
+		notificationCondition("You don't have enough RADs for this amount of upgrade!");
+	}
+	else {
+		upgradeGoa();
+	}
+}
 
 const upgradeGoa = async() => {
 	try {
