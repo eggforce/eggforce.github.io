@@ -1752,7 +1752,7 @@ function getShroomCost() {
 }
 
 function checkShroomCostThenHatch() {
-	if(h_hatchShroomRad > m_rad) {
+	if(h_hatchShroomRad > parseInt(m_rad)) {
 		notificationCondition('Not enough RADs for selected tier/multiplier');
 	}
 	else {
@@ -1843,7 +1843,7 @@ const withdrawDai = async() => {
 // WORKS
 
 function checkUpgradeCostThenUpgrade() {
-	if(m_upgradeCost > m_rad) {
+	if(parseInt(m_upgradeCost) > parseInt(m_rad)) {
 		notificationCondition("You don't have enough RADs for this amount of upgrade!");
 	}
 	else {
