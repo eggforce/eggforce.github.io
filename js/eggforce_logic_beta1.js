@@ -755,7 +755,7 @@ function updateTerritory(__id) {
 	}
 
 	// display message while waiting for promise result 
-	document.getElementById('w3q_land').innerHTML = "Waiting for blockchain...";
+	//document.getElementById('w3q_land').innerHTML = "Waiting for blockchain...";
 
 	// begin the spam
 	contract.land(__id).then((result) =>
@@ -786,7 +786,7 @@ function updateTerritory(__id) {
 						updateLand(__id);
 
 						// update status message
-						document.getElementById('w3q_land').innerHTML = "Up to date.";
+						//document.getElementById('w3q_land').innerHTML = "Up to date.";
 
 						// update possible action
 						updateLandButton();
