@@ -288,7 +288,7 @@ function refreshData(){
 	updateJoinOrChange();
 	updateTribeRadToClaim();
 	updateTierProd();
-	updateTerritory(h_selectedLand);
+	//updateTerritory(h_selectedLand);
 	updateBoost();
 	computeProduction();
 }
@@ -411,8 +411,8 @@ function computeProduction() {
 		// divide by weight sum
 		m_prod[i] = m_prod[i] / a_tierSum[i];
 		// divide by TIME_FOR_1RAD for seconds, divide by 4 for prod per hour
-		m_prod[i] = parseFloat(m_prod[i]) / 4;
-		m_prod[i] = m_prod[i].toFixed(2);
+		m_prod[i] = parseInt(m_prod[i] / 4);
+		//m_prod[i] = m_prod[i].toFixed(2);
 		console.log("Tier " + i + " = " + m_prod[i]);
 		
 		// add result to totalprod
@@ -745,7 +745,9 @@ function updateWeight(__weight, __number, __html) {
 	h_anomalyWeight[__weight] = __number;
 }
 
-function updateTerritory(__id) {
+function updateTerritory() {
+
+	let __id = document.getElementById('landSelector').value;
 
 	__id = checkBoundaries(__id, 'landSelector', 1, 64);
 
@@ -821,7 +823,7 @@ function updateLand(__id){
 	document.getElementById('landStat').innerHTML = t_land[__id].stat0 + "/" + t_land[__id].stat1 + "/" + t_land[__id].stat2 + "/" + t_land[__id].stat3;
 
 	// call changeAttackLandTier for proper % to show
-	changeAttackLandTier(h_selectedTier);
+	changeAttackLandTier();
 }
 /*
 // Land stat array
@@ -1598,7 +1600,8 @@ const startGame = async() => {
 // Attack Land h_selectedLand using Eggoas of tier h_attackLandTier
 let h_attackLandTier = 1;
 
-function changeAttackLandTier(__tier) {
+function changeAttackLandTier() {
+	let __tier = document.getElementById('attackLandTierSelector').value;
 	checkBoundariesWithCb(__tier, 'attackLandTierSelector', 1, m_tier[0], changeAttackLandTierCallback);
 }
 
@@ -1643,7 +1646,7 @@ function checkAttackTimerThenAttack(__tier) {
 const attackLand = async() => {
 	try {
 		//console.log("about to send transaction");
-		notificationSend('About to attack Land ' + h_selectedLand + '...');
+		notificationSend('About to attack Land ' + h_selectedLand + ' with Tier ' + h_attackLandTier);
 		const attackThisLand = await contract.AttackTerritory(h_selectedLand, h_attackLandTier)
 		notificationSuccess('Attacking Land ' + h_selectedLand + '!');
 		//console.log("sent attackland tx successfully");
