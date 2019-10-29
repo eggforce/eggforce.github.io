@@ -1647,7 +1647,9 @@ const attackLand = async() => {
 	try {
 		//console.log("about to send transaction");
 		notificationSend('About to attack Land ' + h_selectedLand + ' with Tier ' + h_attackLandTier);
-		const attackThisLand = await contract.AttackTerritory(h_selectedLand, h_attackLandTier)
+		const attackThisLand = await contract.AttackTerritory(h_selectedLand, h_attackLandTier, {
+			gasLimit: 280000
+		})
 		notificationSuccess('Attacking Land ' + h_selectedLand + '!');
 		//console.log("sent attackland tx successfully");
 	} catch(error) {
@@ -1921,7 +1923,8 @@ const findRadAnomaly = async() => {
 		let _radToSend = (parseInt(a_radAuctionCostNow) + parseInt(1));
 		notificationSend('Searching for Rad Anomaly...');
 		const findMyRadAnomaly = await contract.FindAnomaly(_radToSend, h_anomalyLand, h_anomalyTargetId, h_anomalyWeight[0], h_anomalyWeight[1], h_anomalyWeight[2], h_anomalyWeight[3], {
-			value: 0
+			value: 0,
+			gasLimit: 200000
 		})
 		//console.log("found anomaly successfully");
 		notificationSuccess('Finding Rad Anomaly!');
