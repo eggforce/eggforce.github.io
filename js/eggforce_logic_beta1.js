@@ -198,7 +198,7 @@ function initializeBlockchainData() {
 	updateJoinCost();
 	updateLaunchTimestamp();
 	updateEndTimestamp();
-	updateTerritory(1);
+	updateTerritory();
 	getSacrificeAmount(1);
 	getFloorDaiCost(1);
 	getShroomCost();
@@ -212,7 +212,7 @@ function controlLoop1(){
 	updateGoamidTimer();
 	updateLastRadTimer();
 	updateLastShroomTimer();
-	updateSelectedLandTimer(h_selectedLand);
+	//updateSelectedLandTimer(h_selectedLand);
 	updateNestTextTimer();
 	setTimeout(controlLoop1, 1000);
 }
@@ -288,7 +288,7 @@ function refreshData(){
 	updateJoinOrChange();
 	updateTribeRadToClaim();
 	updateTierProd();
-	//updateTerritory(h_selectedLand);
+	updateTerritory();
 	updateBoost();
 	computeProduction();
 }
