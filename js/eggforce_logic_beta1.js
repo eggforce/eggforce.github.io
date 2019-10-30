@@ -102,6 +102,8 @@ var h_selectedTribe = 0; // selected tribe to join game - or to change tribe
 var h_upgradeTier = 1; // selected tier for Eggoa Upgrade
 var h_upgradeWeight = [0, 0, 0, 0];
 
+var l_array = []; // store leaders and earned rads here
+
 var m_balance = [0];
 var m_boost = 1;
 var m_collectedTribeRad = [0];
@@ -273,7 +275,7 @@ function refreshData(){
 	updateLastShroom(m_account);	
 	updateDaiPlantamid(m_account);
 	updateEggoaPlantamid(m_account);
-	updateEarnedRad(m_account);
+	updateEarnedRad(m_account, true);
 	updateBalance(m_account);
 	updateCollectedTribeRad(m_account);
 	updatePlayerChest();
@@ -291,6 +293,8 @@ function refreshData(){
 	updateTerritory();
 	updateBoost();
 	computeProduction();
+	updateLeaderRad();
+	sortUpdateLeaderboard();
 }
 
 //** UTILITIES **//
@@ -425,7 +429,41 @@ function computeProduction() {
 	document.getElementById('totalProd').innerHTML = m_totalProd;
 }
 
+// prod for leaders. might require significant rework...
+/*
+var stat = [0, 2, 3, 4];
+var tier = [stat, stat, stat, stat, stat, stat, stat, stat]
 
+var leaderArray = [{ address: "0", prod: "0", nest: nest}];
+
+function computeLeaderProd() {
+	
+	for(let j = 0; j < leaderArray.length; j++) {
+		let _totalProd = 0;
+		for(let i = 1; i <= 8; i++) {
+			// add all 4 stats weighted
+			leaderArray[j].prod[i] = parseInt(m_nest[i].stat0) * parseInt(a_tierProd[i][0]) + parseInt(m_nest[i].stat1) * parseInt(a_tierProd[i][1]) + parseInt(m_nest[i].stat2) * parseInt(a_tierProd[i][2]) + parseInt(m_nest[i].stat3) * parseInt(a_tierProd[i][3]);
+			// multiply by amount, tier, and boost
+			m_prod[i] = m_prod[i] * m_nest[i].amount * i * m_boost;
+			// divide by weight sum
+			m_prod[i] = m_prod[i] / a_tierSum[i];
+			// divide by TIME_FOR_1RAD for seconds, divide by 4 for prod per hour
+			m_prod[i] = parseInt(m_prod[i] / 4);
+			//m_prod[i] = m_prod[i].toFixed(2);
+			//console.log("Tier " + i + " = " + m_prod[i]);
+			
+			// add result to totalprod
+			m_totalProd = parseFloat(m_totalProd) + parseFloat(m_prod[i]);
+	
+			// update HTML
+			d_tierProd[i].innerHTML = m_prod[i];
+		}
+		// update totalProd HTML
+		document.getElementById('totalProd').innerHTML = m_totalProd;
+	}
+
+}
+*/
 // Add eggoaPlantamid and daiPlantamid (+ the base of 1)
 
 function updateBoost() {
@@ -934,8 +972,8 @@ function updateNestText(__tier) {
 		}
 
 		doc_m_nest[__tier].innerHTML = 
-		"<h6>Amount: " + m_nest[__tier].amount + "</h6>" +
-		"<h6>Level: " + m_nest[__tier].level + "</h6>" +
+		"<h6>" + m_nest[__tier].amount + " Eggoas</h6>" +
+		"<h6>Level " + m_nest[__tier].level + "</h6>" +
 		"<h6>Time until attack: " + _timeUntilAttack + "</h6>" +
 		"<h6>Lord of Land: " + m_nest[__tier].ownedLand + "</h6>" +
 		"<h6>Stats: " + m_nest[__tier].stat0 + "/" + m_nest[__tier].stat1 + "/" + m_nest[__tier].stat2 + "/" + m_nest[__tier].stat3;
@@ -1050,9 +1088,36 @@ function updateDaiPlantamid(__player){
 function updateEarnedRad(__player){
 	contract.earnedRad(__player).then((result) =>
 	{
-		handleResult(result, m_earnedRad, 'earnedRad', "string");
+			handleResult(result, m_earnedRad, 'earnedRad', "string");
 	});
 }
+
+// Historical rads for leaders
+function updateLeaderRad() {
+	for(let i = 0; i < l_array.length; i++) {
+		contract.earnedRad(l_array[i].address).then((result) =>
+		{
+			l_array[i].rad = parseInt(result.toString());
+		});
+	}
+}
+
+function sortUpdateLeaderboard() {
+	d_leaderboard = document.getElementById('leaderboard');
+	let _string = "";
+
+	// sort array
+	l_array.sort(function(a,b) {return (b.rad - a.rad);} );
+
+	// run through it and add to string
+	for(let i = 0; i < l_array.length; i++) {
+		_string += '<h5> ' + formatEthAdr(l_array[i].address) + ' = ' + l_array[i].rad + ' RAD</h5>';
+	}
+
+	// finally update d_leaderboard
+	d_leaderboard.innerHTML = _string;
+}
+
 
 // Eggoa Plantamid for player
 function updateEggoaPlantamid(__player){
@@ -1330,6 +1395,17 @@ eventArray.push(eventObjTest2);
 eventArray.sort(function(a,b) {return (a.block - b.block);} );
 */
 
+function checkLeaderExists(_sender) {
+	if (l_array.some(any => any.address === _sender)) {
+		// already a leader, don't add the new one
+	} 
+	else {
+		console.log("ok");
+		let _newLeader = {address: _sender, rad: 0};
+		l_array.push(_newLeader);
+	}
+}
+
 function beginEventLogging() {
 	
 	console.log("event logging begins");
@@ -1340,7 +1416,7 @@ function beginEventLogging() {
 	});
 	*/
 
-	let eventNumber = 0;
+	//let eventNumber = 0;
 
 	// event.blockNumber then converting it to timestamp through a local assumption of blocktime
 	// isn't as reliable as event.getBlock().timestamp, but not sure how to get the later working
@@ -1370,12 +1446,14 @@ function beginEventLogging() {
 		//console.log(sender + " harvested " + rad.toString() + " rads");
 		let _string = formatEthAdr(sender) + " harvested " + rad.toString() + " rads.";
 		checkEventPast(_string, event.blockNumber);
+		checkLeaderExists(sender);
 	});
 
 	contract.on("ClaimedTribeRad", (sender, rad, tribe, event) => { // add tribe on next contract
 		//console.log(sender + " claimed " + rad.toString() + " rads from their Tribe chest.");
 		let _string = formatEthAdr(sender) + " of the " + switchTribeName(parseInt(tribe.toString())) + " Tribe claimed " + rad.toString() + " rads from their Tribe chest.";
 		checkEventPast(_string, event.blockNumber);
+		checkLeaderExists(sender);
 	});
 
 	contract.on("ChangedTribe", (sender, tribe, event) => {
@@ -1426,7 +1504,7 @@ function beginEventLogging() {
 	});
 
 	contract.on("DiscoveredLand", (sender, land, event) => {
-		let _string = "All hail " + formatEthAdr(sender) + "! This famed explorer plants his flag on land " + land.toString() + ".";
+		let _string = "All hail " + formatEthAdr(sender) + "! This famed explorer plants their flag on land " + land.toString() + ".";
 		checkEventPast(_string, event.blockNumber);
 	});
 
@@ -1650,7 +1728,7 @@ const changeTribe = async() => {
 const raiseGoamid = async() => {
 	try {
 		//console.log("about to send transaction raiseeggoaplantamid");
-		notificationSend('About to raise the Goa Plantamid with a sacrifice of ' + n_sacrificeAmount[0] + ' Eggoas');
+		notificationSend('About to raise the Goa Plantamid with a sacrifice of ' + n_sacrificeAmount[0] + ' Tier ' + h_selectedTier + ' Eggoas');
 		const raiseMyGoamid = await contract.RaiseEggoaPlantamid(h_selectedTier)
 		notificationSuccess('Raising the Goa Plantamid!');
 		//console.log("raised the plantamid successfully");
@@ -1748,7 +1826,7 @@ const harvestRads = async() => {
 const collectShrooms = async() => {
 	try {
 		//console.log("about to collect shrooms");
-		notificationSend('About to collect shrooms...');
+		notificationSend('About to collect Shrooms from land ' + h_selectedLand);
 		const collectMyShrooms = await contract.CollectShroom(h_selectedLand)
 		//console.log("collected shrooms !");
 		notificationSuccess('Collecting Shrooms!');
