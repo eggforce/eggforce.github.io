@@ -30,7 +30,7 @@
             </div>
             <br>
             <div class="border-orange terminal">
-                <h6>Beta is consistently updated, and things might break. Is this page not working? Visit the backup: <a href="beta1_bkup.html">click me</a>
+                <h6>Beta is consistently updated, and things might break. Is this page not working? Visit the backup: <a href="beta2_bkup.html">click me</a>
             </div>
             <br>
             <div class="border-orange terminal">
@@ -58,7 +58,7 @@
                     </div>
                 </div>
                 <h6>Selected Tribe: <span id="selectedTribe">?</span></h6>
-                <span id="joinOrChangeButton"><button class="btn btn-danger" onclick="checkTribeIsSelected(joinGame)">Join Game</button></span>
+                <span id="joinOrChangeButton">Choose land name: <input type="text" id="landName" oninput="changeLandName(this.value)" value="1" size="16"><button class="btn btn-danger" onclick="checkTribeIsSelected(joinGame)">Join Game</button></span>
                 <h6>(Cost: <span id="joinCost">?</span> POA)</h6>
             </div>
             <br>

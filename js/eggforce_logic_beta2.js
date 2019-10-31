@@ -99,6 +99,8 @@ var h_selectedTier = 1; // base tier for Eggoa Plantamid
 var h_selectedFloor = 1; // base rise for Dai Plantamid
 
 var h_selectedTribe = 0; // selected tribe to join game - or to change tribe
+var h_selectedName = ""; // player chosen name for land
+var nameMaxChar = 20; // maximum characters for name
 
 var h_upgradeTier = 1; // selected tier for Eggoa Upgrade
 var h_upgradeWeight = [0, 0, 0, 0];
@@ -499,7 +501,7 @@ function updateJoinOrChange() {
 	}
 	else {
 		d_joinOrChange.innerHTML = 'joining the game';
-		d_joinOrChangeButton.innerHTML = '<button class="btn btn-danger" onclick="checkTribeIsSelected(joinGame)">Join Game</button>'
+		d_joinOrChangeButton.innerHTML = 'Choose land name: <input type="text" id="landName" oninput="changeLandName(this.value)" value="1" size="20"><button class="btn btn-danger" onclick="checkTribeIsSelected(joinGame)">Join Game</button>'
 	}
 }
 
@@ -1661,9 +1663,7 @@ const attackLand = async() => {
 	try {
 		//console.log("about to send transaction");
 		notificationSend('About to attack Land ' + h_selectedLand + ' with Tier ' + h_attackLandTier);
-		const attackThisLand = await contract.AttackTerritory(h_selectedLand, h_attackLandTier, {
-			gasLimit: 280000
-		})
+		const attackThisLand = await contract.AttackTerritory(h_selectedLand, h_attackLandTier)
 		notificationSuccess('Attacking Land ' + h_selectedLand + '!');
 		//console.log("sent attackland tx successfully");
 	} catch(error) {
@@ -1675,20 +1675,32 @@ const attackLand = async() => {
 // JOINGAME WORKS - SECOND ARGUMENT IS "OVERRIDE", FOR ETH VALUE AMONGST OTHER
 
 function checkTribeIsSelected(__func) {
+    if(m_tier[0] == 0) {
+        if(h_selectedName == "") {
+            notificationCondition('Pick a name to ensure the legacy of your land.');
+        } else if(h_selectedName.length > nameMaxChar) {
+            notificationCondition('Too many characters! Maximum: 20');
+        }
+    }
 	if(h_selectedTribe == 0) {
 		notificationCondition('You must select a Tribe first (click on 1 of the 4 images)');
 	}
 	else {
 		__func();
-	}
+    }
+}
+
+function changeLandName(__name) {
+    h_selectedName = __name;
 }
 
 const joinGame = async() => {
 	try {
 		//console.log("about to send transaction joingame");
 		notificationSend('About to join game...');
-		const joinTheGame = await contract.JoinGame(h_selectedTribe, {
-		  value: ethers.utils.parseEther(a_joinCost[0])
+		const joinTheGame = await contract.JoinGame(h_selectedTribe, h_selectedName, {
+            value: ethers.utils.parseEther(a_joinCost[0]),
+            gasLimit: 600000
 		})
 		notificationSuccess('Joining game!');
 		//console.log("joined the game successfully");
