@@ -758,7 +758,7 @@ function updateTargetType(__type) {
 function updateTargetId(__id) {
 
 	if(h_anomalyLand == true) {
-		__id = checkBoundaries(__id, 'anomalyTargetId', 1, parseInt(a_MaxTerritory));
+		__id = checkBoundaries(__id, 'anomalyTargetId', 1, parseInt(a_maxTerritory));
 	}
 	else if(h_anomalyLand == false) {
 		__id = checkBoundaries(__id, 'anomalyTargetId', 1, 8);
@@ -778,7 +778,7 @@ function updateTerritory() {
 
 	let __id = document.getElementById('landSelector').value;
 
-	__id = checkBoundaries(__id, 'landSelector', 1, parseInt(a_MaxTerritory));
+	__id = checkBoundaries(__id, 'landSelector', 1, parseInt(a_maxTerritory));
 
 	// initialize t_land if previously undefined
 	if(t_land[__id] == null){
