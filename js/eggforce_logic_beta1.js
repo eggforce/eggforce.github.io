@@ -1518,13 +1518,18 @@ function beginEventLogging() {
 		let _powerSender = powerSender.toString();
 		let _powerLord = powerLord.toString();
 		let _winChance = parseFloat(_powerSender) / (parseFloat(_powerSender) + parseFloat(_powerLord));
-		let _string = formatEthAdr(sender) + ", with a " + _winChance + " to win, takes land X from " + formatEthAdr(lord) + "! " + formatEthAdr(lord) + " loses " + eggoa.toString() + " Eggoas.";
+		_winChance = parseFloat(_winChance * 100).toFixed(2);
+		let _string = formatEthAdr(sender) + ", with a " + _winChance + "% chance to win, takes land X from " + formatEthAdr(lord) + "! " + formatEthAdr(lord) + " loses " + eggoa.toString() + " Eggoas.";
 		checkEventPast(_string, event.blockNumber);
 	});
 	
 	// add land as 3rd argument in contract v9
 	contract.on("LostLandFight", (sender, lord, powerSender, powerLord, result, eggoa, event) => {
-		let _string = formatEthAdr(lord) + " defends his land against " + formatEthAdr(sender) + ", who loses " + eggoa.toString() + "Eggoas.";
+		let _powerSender = powerSender.toString();
+		let _powerLord = powerLord.toString();
+		let _winChance = parseFloat(_powerSender) / (parseFloat(_powerSender) + parseFloat(_powerLord));
+		_winChance = parseFloat(_winChance * 100).toFixed(2);
+		let _string = "Successful defense from " + formatEthAdr(lord) + "! " + formatEthAdr(sender) + " had a " + _winChance + "% chance to win, but loses " + eggoa.toString() + "Eggoas.";
 		checkEventPast(_string, event.blockNumber);
 	});
 

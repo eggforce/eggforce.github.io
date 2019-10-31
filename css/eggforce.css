@@ -1,7 +1,70 @@
+.terminal {
+	background-color: black;
+	background-image: radial-gradient(
+	  rgba(0, 150, 0, 0.5), black 120%
+	);
+	margin: 0;
+	overflow: hidden;
+	padding: 1rem;
+	color: white;
+	font: 1rem Inconsolata, monospace;
+	text-shadow: 0 0 5px #C8C8C8;
+	/*border-image: url("../img/console2.jpg") 32 round;*/
+}
+
+.terminal:selection {
+	background: #0080FF;
+	text-shadow: none;
+}
+
+.border-orange {
+	border: 4px solid #FF851B;
+	border-radius: 8px;
+}
+
+.border-margin {
+	margin: 8px;
+	padding: 8px;
+}
+
+pre {
+	margin: 0;
+}
+
 
 body {
 	font-family: 'Cairo', serif;
+	background-color: #FF851B;
+
+	background: url("../img/desert_apoc.jpg");
+
+	background-repeat: no-repeat;
+	background-position: center;
+	background-attachment: fixed;
 }
+
+@media only screen and (max-width:900px), (max-device-width:900px){
+	body:before {
+	  content: "";
+	  display: block;
+	  position: fixed;
+	  left: 0;
+	  top: 0;
+	  width: 100%;
+	  height: 100%;
+	  z-index: -10;
+	  background: url("../img/desert_apoc.jpg") no-repeat center center;
+	  -webkit-background-size: cover;
+	  -moz-background-size: cover;
+	  -o-background-size: cover;
+	  background-size: cover;
+	}
+	}
+/*
+h6 {
+	font: 1.0rem Inconsolata, monospace;
+}
+*/
 
 h1 {
 	font-family: 'Exo', serif;
@@ -13,7 +76,7 @@ h1 {
 */
 
 .icon-link {
-	height: 96px;
+	height: 64px;
 	cursor: pointer;
 	filter: brightness(50%);
   -webkit-filter: brightness(50%);
@@ -65,4 +128,34 @@ h1 {
 
 .tribe-img {
 	height: 64px;
+}
+
+.plantamid-img {
+	background-image: url("../img/plantamid.svg");
+	background-size: 192px;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+/* use same color as background for container title */
+.title-container {
+	color: #FF851B;
+}
+
+/* white background and rounded corners */
+.white-container {
+	background-color: #ffffff;
+	border: 4px solid #FF851B;
+	border-radius: 8px;
+	margin: 4px;
+}
+
+/* white text with black outline */
+.black-shadow {
+	color: white;
+	text-shadow:
+	-1px -1px 0 #000,  
+	1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
 }
