@@ -1448,9 +1448,9 @@ function beginEventLogging() {
 		checkEventPast(_string, event.blockNumber);
 	});
 
-	contract.on("JoinedGame", (sender, tribe, event) => {
+	contract.on("JoinedGame", (sender, tribe, land, name, event) => {
 		//console.log("New player: " + sender + " has joined tribe " + tribe.toString());
-		let _string = "A new member for the " + switchTribeName(parseInt(tribe.toString())) + " Tribe: " + formatEthAdr(sender) + " joined the game.";
+		let _string = formatEthAdr(sender) + ", of the " + switchTribeName(parseInt(tribe.toString())) + " Tribe, joins the game and names his land " + name;
 		checkEventPast(_string, event.blockNumber);
 	});
 
@@ -1530,12 +1530,12 @@ function beginEventLogging() {
 	});
 	
 	// add land as 3rd argument in contract v9
-	contract.on("LostLandFight", (sender, lord, powerSender, powerLord, result, eggoa, event) => {
+	contract.on("LostLandFight", (sender, lord, land, powerSender, powerLord, result, eggoa, event) => {
 		let _powerSender = powerSender.toString();
 		let _powerLord = powerLord.toString();
 		let _winChance = parseFloat(_powerSender) / (parseFloat(_powerSender) + parseFloat(_powerLord));
 		_winChance = parseFloat(_winChance * 100).toFixed(2);
-		let _string = "Successful defense from " + formatEthAdr(lord) + "! " + formatEthAdr(sender) + " had a " + _winChance + "% chance to win, but loses " + eggoa.toString() + "Eggoas.";
+		let _string = formatEthAdr(lord) + " defends his land " + land.toString() + " against " + formatEthAdr(sender) + " had a " + _winChance + "% chance to win, but loses " + eggoa.toString() + "Eggoas.";
 		checkEventPast(_string, event.blockNumber);
 	});
 
