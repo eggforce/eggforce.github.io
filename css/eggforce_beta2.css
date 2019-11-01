@@ -159,3 +159,10 @@ h1 {
     -1px 1px 0 #000,
     1px 1px 0 #000;
 }
+
+/* resize title on small screens so it doesn't overflow */
+@media only screen and (max-width: 540px) {
+    .display-1 {
+        font-size: 48px;
+    }
+}
