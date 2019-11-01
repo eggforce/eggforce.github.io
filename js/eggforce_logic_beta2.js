@@ -501,7 +501,7 @@ function updateJoinOrChange() {
 	}
 	else {
 		d_joinOrChange.innerHTML = 'joining the game';
-		d_joinOrChangeButton.innerHTML = 'Choose land name: <input type="text" id="landName" oninput="changeLandName(this.value)" value="1" size="20"><button class="btn btn-danger" onclick="checkTribeIsSelected(joinGame)">Join Game</button>'
+		d_joinOrChangeButton.innerHTML = 'Choose land name: <input type="text" id="landName" value="" size="20"><button class="btn btn-danger" onclick="checkTribeIsSelected(joinGame)">Join Game</button>'
 	}
 }
 
