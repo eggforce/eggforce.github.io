@@ -506,7 +506,7 @@ function updateJoinOrChange() {
 	else {
         if(h_join == false) {
             d_joinOrChange.innerHTML = 'joining the game';
-            d_joinOrChangeButton.innerHTML = 'Choose land name: <input type="text" id="landName" value="" size="20"><button class="btn btn-danger" onclick="checkTribeIsSelected(joinGame)">Join Game</button>'
+            d_joinOrChangeButton.innerHTML = 'Choose land name: <input type="text" id="newLandName" value="" size="20"><button class="btn btn-danger" onclick="checkTribeIsSelected(joinGame)">Join Game</button>'
         }
 	}
 }
@@ -622,7 +622,7 @@ function updateAccount() {
 function updateMaxTerritory() {
     contract.maxTerritory().then((result) => 
 		{
-			handleResult(result, a_maxTerritory, 0, "string");
+			handleResult(result, a_maxTerritory, 'maxLand', "string");
 		});
 }
 
@@ -852,7 +852,8 @@ function updateLand(__id){
 	}
 	else {
 		document.getElementById('landLast').innerHTML = convertTime(getCurrentTime());
-	}
+    }
+    document.getElementById('currentLandName').innerHTML = t_land[__id].name;
 	document.getElementById('landLord').innerHTML = formatEthAdr(t_land[__id].lord);
 	document.getElementById('landPower').innerHTML = t_land[__id].power;
 	document.getElementById('landLevel').innerHTML = t_land[__id].level;
@@ -1694,7 +1695,7 @@ const attackLand = async() => {
 
 function checkTribeIsSelected(__func) {
     if(m_tier[0] == 0) {
-        h_selectedName = document.getElementById('landName').value;
+        h_selectedName = document.getElementById('newLandName').value;
         if(h_selectedName == "") {
             notificationCondition('Pick a name to ensure the legacy of your land.');
         } else if(h_selectedName.length > nameMaxChar) {
@@ -1709,9 +1710,11 @@ function checkTribeIsSelected(__func) {
     }
 }
 
+/*
 function changeLandName(__name) {
     h_selectedName = __name;
 }
+*/
 
 const joinGame = async() => {
 	try {

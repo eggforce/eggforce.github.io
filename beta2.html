@@ -58,7 +58,7 @@
                     </div>
                 </div>
                 <h6>Selected Tribe: <span id="selectedTribe">?</span></h6>
-                <span id="joinOrChangeButton">Choose land name: <input type="text" id="landName" value="" size="20"><button class="btn btn-danger" onclick="checkTribeIsSelected(joinGame)">Join Game</button></span>
+                <span id="joinOrChangeButton">Choose land name: <input type="text" id="newLandName" value="" size="20"><button class="btn btn-danger" onclick="checkTribeIsSelected(joinGame)">Join Game</button></span>
                 <h6>(Cost: <span id="joinCost">?</span> POA)</h6>
             </div>
             <br>
@@ -115,7 +115,14 @@
             <br>
             <div class="border-orange terminal">
                 <h3 class="title-container">LAND</h3>
-                    <h4>Select Land (1 to 64) <input type="text" id="landSelector" value="1" size="2"><button onclick="updateTerritory()">OK</button></h4>
+                <div class="row">
+                    <div class="col-sm">
+                        <h4><span id="currentLandName">?</span></h4>
+                    </div>
+                    <div class="col-sm">
+                        <h5>Select Land (1 to <span id="maxLand">?</span>) <input type="text" id="landSelector" value="1" size="2"><button onclick="updateTerritory()">OK</button></h5>
+                    </div>
+                </div>   
                 <br>
                 <div class="row">
                     <div class="col-sm">
