@@ -1096,12 +1096,24 @@ function updateLeaderRad() {
 	}
 }
 
+// Sort an array in decreasing order
+function compare(_a, _b) {
+    if(_a.rad < _b.rad) {
+        return 1;
+    }
+    if(_a.rad > _b.rad) {
+        return -1;
+    }
+    return 0;
+}
+
 function sortUpdateLeaderboard() {
 	d_leaderboard = document.getElementById('leaderboard');
 	let _string = "";
 
 	// sort array
-	l_array.sort(function(a,b) {return (b.rad - a.rad);} );
+	//l_array.sort(function(a,b) {return (b.rad - a.rad);} );
+    l_array.sort(compare);
 
 	// run through it and add to string
 	for(let i = 0; i < l_array.length; i++) {
@@ -1676,6 +1688,7 @@ const attackLand = async() => {
 
 function checkTribeIsSelected(__func) {
     if(m_tier[0] == 0) {
+        h_selectedName = document.getElementById('landName').value;
         if(h_selectedName == "") {
             notificationCondition('Pick a name to ensure the legacy of your land.');
         } else if(h_selectedName.length > nameMaxChar) {
