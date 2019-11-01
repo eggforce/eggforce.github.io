@@ -89,6 +89,7 @@ for(let k = 1; k < 9; k++){
 var a_tierSum = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 var h_anomalyLand = true; // whether land or prod is targeted on anomaly buy
+var h_anomalyString = ""; // contains Land or Prod, based on choice
 var h_anomalyTargetId = 0;
 var h_anomalyWeight = [0, 0, 0, 0];
 
@@ -622,7 +623,8 @@ function updateAccount() {
 function updateMaxTerritory() {
     contract.maxTerritory().then((result) => 
 		{
-			handleResult(result, a_maxTerritory, 'maxLand', "string");
+            handleResult(result, a_maxTerritory, 'maxLand', "string");
+            document.getElementById('maxLand2').innerHTML = result.toString();
 		});
 }
 
@@ -754,11 +756,13 @@ function getArraySum(__array) {
 
 function updateTargetType(__type) {
 	if(__type == 'land') {
-		h_anomalyLand = true;
+        h_anomalyLand = true;
+        h_anomalyString = 'Land';
 		document.getElementById('anomalyTargetType').innerHTML = 'Land';
 	}
 	else if(__type == 'prod') {
-		h_anomalyLand = false;
+        h_anomalyLand = false;
+        h_anomalyString = 'Prod';
 		document.getElementById('anomalyTargetType').innerHTML = 'Prod';
 	}
 }
@@ -1952,7 +1956,7 @@ const claimTribeRads = async () => {
 const findDaiAnomaly = async() => {
 	try {
 		//console.log("about to send transaction findDAIanomaly");
-		notificationSend('Searching for POA Anomaly...');
+		notificationSend('Searching for POA Anomaly to change ' + h_anomalyString + ' ' + h_anomalyTargetId + ' to weights: ' + h_anomalyWeight[0] + '/' + h_anomalyWeight[1] + '/' + h_anomalyWeight[2] + '/' h_anomalyWeight[3]');
 		const findMyDaiAnomaly = await contract.FindAnomaly(0, h_anomalyLand, h_anomalyTargetId, h_anomalyWeight[0], h_anomalyWeight[1], h_anomalyWeight[2], h_anomalyWeight[3], {
 			value: ethers.utils.parseEther(a_daiAuctionCostNow[0])
 		})
@@ -1969,13 +1973,13 @@ const findRadAnomaly = async() => {
 	try {
 		//console.log("about to send transaction findRADanomaly");
 		let _radToSend = (parseInt(a_radAuctionCostNow) + parseInt(1));
-		notificationSend('Searching for Rad Anomaly...');
+		notificationSend('Searching for RAD Anomaly to change ' + h_anomalyString + ' ' + h_anomalyTargetId + ' to weights: ' + h_anomalyWeight[0] + '/' + h_anomalyWeight[1] + '/' + h_anomalyWeight[2] + '/' h_anomalyWeight[3]);
 		const findMyRadAnomaly = await contract.FindAnomaly(_radToSend, h_anomalyLand, h_anomalyTargetId, h_anomalyWeight[0], h_anomalyWeight[1], h_anomalyWeight[2], h_anomalyWeight[3], {
 			value: 0,
 			gasLimit: 200000
 		})
 		//console.log("found anomaly successfully");
-		notificationSuccess('Finding Rad Anomaly!');
+		notificationSuccess('Finding RAD Anomaly!');
 	} catch (error) {
 		//console.log("Error: ", error);
 		notificationError();

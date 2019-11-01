@@ -95,20 +95,20 @@
                             <h6>Balance: <span id="balance">?</span> POA</h6> <button class="btn btn-success" onclick="withdrawDai()">Withdraw Balance</button>
                     </div>
                     <div class="col-sm border-orange border-margin">
-                        <h5>RADS</h5>
+                        <h5>RADs</h5>
                         <br>
                         <h6>You have <span id="rad">?</span> RADS</h6>
-                            <h6>Rads ready for Harvest: <span id="radToHarvest">?</span></h6>
-                            <button class="btn btn-success" onclick="harvestRads()">Harvest Rads</button>
+                            <h6>RADs ready for Harvest: <span id="radToHarvest">?</span></h6>
+                            <button class="btn btn-success" onclick="harvestRads()">Harvest RADs</button>
                             <br>
-                            <h6>Last Rad collection: <span id="lastRad">?</span></h6>
+                            <h6>Last RAD collection: <span id="lastRad">?</span></h6>
                             <br>
-                            <h6>Rads available to claim: <span id="tribeRadToClaim">?</span></h6>
-                            <button class="btn btn-success" onclick="claimTribeRads()">Claim Tribe Rads</button>
+                            <h6>RADs available to claim: <span id="tribeRadToClaim">?</span></h6>
+                            <button class="btn btn-success" onclick="claimTribeRads()">Claim Tribe RADs</button>
                             <br>
                             <h6>You have previously claimed: <span id="collectedTribeRad">?</span> RADS</h6>
                             <br>
-                            <h6>Earned Rads: <span id="earnedRad">?</span></h6>                    
+                            <h6>Earned RADs: <span id="earnedRad">?</span></h6>                    
                     </div>
                 </div> 
             </div>         
@@ -173,7 +173,7 @@
                 <br>
                 <h6>Choose what to change: <button id="anomalyLand" class="btn btn-info btn-sm" onclick="updateTargetType('land')">Land</button> or <button id="anomalyProd" class="btn btn-info btn-sm" onclick="updateTargetType('prod')">Prod</button></h6>
                 <h6><span id="anomalyTargetType">?</span> to target: <input type="text" id="anomalyTargetId" onInput="updateTargetId(this.value)" value="0" size="2"></h6>
-                <h6>(between 1 and 8 for tier, 1 and 64 for land)</h6>
+                <h6>(between 1 and 8 for tier, 1 and <span id="maxLand2">?</span> for land)</h6>
                 <h6>Weights: <input type="text" id="anomalyWeight0" onInput="updateWeight(0, this.value, 'anomalyWeight0')" value="0" size="2"> <input type="text" id="anomalyWeight1" onInput="updateWeight(1, this.value, 'anomalyWeight1')" value="0" size="2"> <input type="text" id="anomalyWeight2" onInput="updateWeight(2, this.value, 'anomalyWeight2')" value="0" size="2"> <input type="text" id="anomalyWeight3" onInput="updateWeight(3, this.value, 'anomalyWeight3')" value="0" size="2"></h6>
                 <h6>(between 0 and 4 for each weight)</h6> 
                 <div class="row">
@@ -277,7 +277,7 @@
                 <h6>(between 1 and 8 for tier)</h6>
                 <h6>Weights: <input type="text" id="upgradeWeight0" onInput="updateUpgradeWeight(0, this.value, 'upgradeWeight0')" value="0" size="2"> <input type="text" id="upgradeWeight1" onInput="updateUpgradeWeight(1, this.value, 'upgradeWeight1')" value="0" size="2"> <input type="text" id="upgradeWeight2" onInput="updateUpgradeWeight(2, this.value, 'upgradeWeight2')" value="0" size="2"> <input type="text" id="upgradeWeight3" onInput="updateUpgradeWeight(3, this.value, 'upgradeWeight3')" value="0" size="2"></h6>
                 <h6>(each weight will give +1 to the selected stat)</h6>
-                <h6>Upgrade cost: <span id="upgradeCost">?</span> RADS</h6>
+                <h6>Upgrade cost: <span id="upgradeCost">?</span> RADs</h6>
                 <button class="btn btn-success" onclick="checkUpgradeCostThenUpgrade()">Upgrade Eggoa</button>
             </div>
             <br>
@@ -316,7 +316,7 @@
                 <h6>Game start: <span id="launch">?</span></h6>
                 <h6>Game end: <span id="end">?</span></h6>
                 <br>
-                <h6>Total number of Rads earned by all players: <span id="globalRad">?</span></h6>
+                <h6>Total number of RADs earned by all players: <span id="globalRad">?</span></h6>
             </div>
             <br>
             <div class="border-orange terminal">
