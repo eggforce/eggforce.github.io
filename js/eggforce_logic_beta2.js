@@ -101,6 +101,7 @@ var h_selectedFloor = 1; // base rise for Dai Plantamid
 var h_selectedTribe = 0; // selected tribe to join game - or to change tribe
 var h_selectedName = ""; // player chosen name for land
 var nameMaxChar = 20; // maximum characters for name
+var h_join = true; // whether the join button or tribe button is shown
 
 var h_upgradeTier = 1; // selected tier for Eggoa Upgrade
 var h_upgradeWeight = [0, 0, 0, 0];
@@ -496,12 +497,17 @@ function updateJoinOrChange() {
 	d_joinOrChangeButton = document.getElementById('joinOrChangeButton');
 
 	if(m_tier[0] > 0) {
-		d_joinOrChange.innerHTML = 'changing tribe';
-		d_joinOrChangeButton.innerHTML = '<button class="btn btn-danger" onclick="checkTribeIsSelected(changeTribe)">Change Tribe</button>'
+        if(h_join == true) {
+            h_join = false;
+            d_joinOrChange.innerHTML = 'changing tribe';
+            d_joinOrChangeButton.innerHTML = '<button class="btn btn-danger" onclick="checkTribeIsSelected(changeTribe)">Change Tribe</button>'
+        }
 	}
 	else {
-		d_joinOrChange.innerHTML = 'joining the game';
-		d_joinOrChangeButton.innerHTML = 'Choose land name: <input type="text" id="landName" value="" size="20"><button class="btn btn-danger" onclick="checkTribeIsSelected(joinGame)">Join Game</button>'
+        if(h_join == false) {
+            d_joinOrChange.innerHTML = 'joining the game';
+            d_joinOrChangeButton.innerHTML = 'Choose land name: <input type="text" id="landName" value="" size="20"><button class="btn btn-danger" onclick="checkTribeIsSelected(joinGame)">Join Game</button>'
+        }
 	}
 }
 
