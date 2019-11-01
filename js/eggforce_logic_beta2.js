@@ -1956,7 +1956,7 @@ const claimTribeRads = async () => {
 const findDaiAnomaly = async() => {
 	try {
 		//console.log("about to send transaction findDAIanomaly");
-		notificationSend('Searching for POA Anomaly to change ' + h_anomalyString + ' ' + h_anomalyTargetId + ' to weights: ' + h_anomalyWeight[0] + '/' + h_anomalyWeight[1] + '/' + h_anomalyWeight[2] + '/' h_anomalyWeight[3]');
+		notificationSend('Searching for POA Anomaly to change ' + h_anomalyString + ' ' + h_anomalyTargetId + ' to weights: ' + h_anomalyWeight[0] + '/' + h_anomalyWeight[1] + '/' + h_anomalyWeight[2] + '/' + h_anomalyWeight[3]);
 		const findMyDaiAnomaly = await contract.FindAnomaly(0, h_anomalyLand, h_anomalyTargetId, h_anomalyWeight[0], h_anomalyWeight[1], h_anomalyWeight[2], h_anomalyWeight[3], {
 			value: ethers.utils.parseEther(a_daiAuctionCostNow[0])
 		})
@@ -1973,7 +1973,7 @@ const findRadAnomaly = async() => {
 	try {
 		//console.log("about to send transaction findRADanomaly");
 		let _radToSend = (parseInt(a_radAuctionCostNow) + parseInt(1));
-		notificationSend('Searching for RAD Anomaly to change ' + h_anomalyString + ' ' + h_anomalyTargetId + ' to weights: ' + h_anomalyWeight[0] + '/' + h_anomalyWeight[1] + '/' + h_anomalyWeight[2] + '/' h_anomalyWeight[3]);
+		notificationSend('Searching for RAD Anomaly to change ' + h_anomalyString + ' ' + h_anomalyTargetId + ' to weights: ' + h_anomalyWeight[0] + '/' + h_anomalyWeight[1] + '/' + h_anomalyWeight[2] + '/' + h_anomalyWeight[3]);
 		const findMyRadAnomaly = await contract.FindAnomaly(_radToSend, h_anomalyLand, h_anomalyTargetId, h_anomalyWeight[0], h_anomalyWeight[1], h_anomalyWeight[2], h_anomalyWeight[3], {
 			value: 0,
 			gasLimit: 200000
