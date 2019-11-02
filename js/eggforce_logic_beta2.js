@@ -1537,6 +1537,7 @@ function beginEventLogging() {
 	
 	// add land as 3rd argument in contract v9
 	contract.on("LostLandFight", (sender, lord, land, powerSender, powerLord, result, eggoa, event) => {
+        console.log("here's the lost land fight event");
 		let _powerSender = powerSender.toString();
 		let _powerLord = powerLord.toString();
 		let _winChance = parseFloat(_powerSender) / (parseFloat(_powerSender) + parseFloat(_powerLord));
@@ -1687,7 +1688,9 @@ const attackLand = async() => {
 	try {
 		//console.log("about to send transaction");
 		notificationSend('About to attack Land ' + h_selectedLand + ' with Tier ' + h_attackLandTier);
-		const attackThisLand = await contract.AttackTerritory(h_selectedLand, h_attackLandTier)
+		const attackThisLand = await contract.AttackTerritory(h_selectedLand, h_attackLandTier, {
+            gasLimit: 200000
+        })
 		notificationSuccess('Attacking Land ' + h_selectedLand + '!');
 		//console.log("sent attackland tx successfully");
 	} catch(error) {
