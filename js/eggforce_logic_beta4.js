@@ -808,27 +808,27 @@ function updateTerritory() {
 				{
 					contract.ComputeLandShroom(__id).then((result5) =>
 					{
-                        contract.GetNestStat(__id, result.lord).then((result5) =>
+                        contract.GetNestStat(result.lord, result.eggoa).then((result6) =>
                         {
-						t_land[__id].lord = result.lord;
-						t_land[__id].lastLand = result.lastLand.toString();
-						t_land[__id].level = result.level.toString();
-						t_land[__id].tribe = result3.toString();
-						t_land[__id].stat0 = result2[0].toString();
-						t_land[__id].stat1 = result2[1].toString();
-						t_land[__id].stat2 = result2[2].toString();
-						t_land[__id].stat3 = result2[3].toString();
-						t_land[__id].power = result4.toString();
-						t_land[__id].shroom = result5.toString();
-                        t_land[__id].lordStat = result5[0].toString() + "/" + result5[1].toString() + "/" + result5[2].toString() + "/" + result5[3].toString(); 
-						// update all the HTML bits
-						updateLand(__id);
+                            t_land[__id].lord = result.lord;
+                            t_land[__id].lastLand = result.lastLand.toString();
+                            t_land[__id].level = result.level.toString();
+                            t_land[__id].tribe = result3.toString();
+                            t_land[__id].stat0 = result2[0].toString();
+                            t_land[__id].stat1 = result2[1].toString();
+                            t_land[__id].stat2 = result2[2].toString();
+                            t_land[__id].stat3 = result2[3].toString();
+                            t_land[__id].power = result4.toString();
+                            t_land[__id].shroom = result5.toString();
+                            t_land[__id].lordStat = result6[0].toString() + "/" + result6[1].toString() + "/" + result6[2].toString() + "/" + result6[3].toString(); 
+                            // update all the HTML bits
+                            updateLand(__id);
 
-						// update status message
-						//document.getElementById('w3q_land').innerHTML = "Up to date.";
+                            // update status message
+                            //document.getElementById('w3q_land').innerHTML = "Up to date.";
 
-						// update possible action
-                        updateLandButton();
+                            // update possible action
+                            updateLandButton();
                         });
 					});
 				});
@@ -1192,7 +1192,7 @@ function updateLaunchTimestamp(){
 function updateOpenedChest(__player){
 	contract.openedChest(__player).then((result) =>
 	{
-        console.log(result);
+        //console.log(result);
 		handleResult(result, m_openedChest, 0, "none");
 	});
 }
@@ -1450,9 +1450,9 @@ function beginEventLogging() {
 		checkEventPast(_string, event.blockNumber);
 	});
 
-	contract.on("JoinedGame", (sender, tribe, land, name, event) => {
+	contract.on("JoinedGame", (sender, tribe, land, event) => {
 		//console.log("New player: " + sender + " has joined tribe " + tribe.toString());
-		let _string = formatEthAdr(sender) + ", of the " + switchTribeName(parseInt(tribe.toString())) + " Tribe, joins the game and names his land " + name;
+		let _string = formatEthAdr(sender) + ", of the " + switchTribeName(parseInt(tribe.toString())) + " Tribe, joins the game.";
 		checkEventPast(_string, event.blockNumber);
 	});
 
@@ -1511,34 +1511,34 @@ function beginEventLogging() {
 		checkEventPast(_string, event.blockNumber);
 	});
 
-	contract.on("CollectedShroom", (sender, name, shroom, event) => {
-		let _string = formatEthAdr(sender) + ", lord of land " + name + ", collected " + shroom.toString() + " shrooms.";
+	contract.on("CollectedShroom", (sender, land, shroom, event) => {
+		let _string = formatEthAdr(sender) + ", lord of land " + land.toString() + ", collected " + shroom.toString() + " shrooms.";
 		checkEventPast(_string, event.blockNumber);
 	});
 
-	contract.on("TookOverLand", (sender, name, event) => {
-		let _string = formatEthAdr(sender) + " snatches land " + name + " (previously abandoned).";
+	contract.on("TookOverLand", (sender, land, event) => {
+		let _string = formatEthAdr(sender) + " snatches land " + land.toString() + " (previously abandoned).";
 		checkEventPast(_string, event.blockNumber);
 	});
 
 	// add land as 3rd argument in contract v9
-	contract.on("WonLandFight", (sender, lord, name, powerSender, powerLord, result, shroom, eggoa, event) => {
+	contract.on("WonLandFight", (sender, lord, land, powerSender, powerLord, result, shroom, eggoa, event) => {
 		let _powerSender = powerSender.toString();
 		let _powerLord = powerLord.toString();
 		let _winChance = parseFloat(_powerSender) / (parseFloat(_powerSender) + parseFloat(_powerLord));
 		_winChance = parseFloat(_winChance * 100).toFixed(2);
-		let _string = formatEthAdr(sender) + ", with a " + _winChance + "% chance to win, takes land " + name + " from " + formatEthAdr(lord) + "! " + formatEthAdr(lord) + " loses " + eggoa.toString() + " Eggoas.";
+		let _string = formatEthAdr(sender) + ", with a " + _winChance + "% chance to win, takes land " + land.toString() + " from " + formatEthAdr(lord) + "! " + formatEthAdr(lord) + " loses " + eggoa.toString() + " Eggoas.";
 		checkEventPast(_string, event.blockNumber);
 	});
 	
 	// add land as 3rd argument in contract v9
-	contract.on("LostLandFight", (sender, lord, name, powerSender, powerLord, result, eggoa, event) => {
+	contract.on("LostLandFight", (sender, lord, land, powerSender, powerLord, result, eggoa, event) => {
         console.log("here's the lost land fight event");
 		let _powerSender = powerSender.toString();
 		let _powerLord = powerLord.toString();
 		let _winChance = parseFloat(_powerSender) / (parseFloat(_powerSender) + parseFloat(_powerLord));
 		_winChance = parseFloat(_winChance * 100).toFixed(2);
-		let _string = formatEthAdr(lord) + " defends his land " + name + " against " + formatEthAdr(sender) + " had a " + _winChance + "% chance to win, but loses " + eggoa.toString() + "Eggoas.";
+		let _string = formatEthAdr(lord) + " defends his land " + land.toString() + " against " + formatEthAdr(sender) + " had a " + _winChance + "% chance to win, but loses " + eggoa.toString() + "Eggoas.";
 		checkEventPast(_string, event.blockNumber);
 	});
 
