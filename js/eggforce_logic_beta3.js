@@ -1454,6 +1454,12 @@ function beginEventLogging() {
 		checkEventPast(_string, event.blockNumber);
 	});
 
+	contract.on("CollectedShroom", (sender, name, shroom, event) => {
+        console.log("collected shroom event has been logged");
+		//let _string = formatEthAdr(sender) + ", lord of land " + name + ", collected " + shroom.toString() + " shrooms.";
+		//checkEventPast(_string, event.blockNumber);
+	});
+
 	contract.on("JoinedGame", (sender, tribe, land, name, event) => {
 		//console.log("New player: " + sender + " has joined tribe " + tribe.toString());
 		let _string = formatEthAdr(sender) + ", of the " + switchTribeName(parseInt(tribe.toString())) + " Tribe, joins the game and names his land " + name;
@@ -1515,11 +1521,6 @@ function beginEventLogging() {
 		checkEventPast(_string, event.blockNumber);
 	});
 
-	contract.on("CollectedShroom", (sender, name, shroom, event) => {
-        console.log("collected shroom event has been logged");
-		//let _string = formatEthAdr(sender) + ", lord of land " + name + ", collected " + shroom.toString() + " shrooms.";
-		//checkEventPast(_string, event.blockNumber);
-	});
 
 	contract.on("TookOverLand", (sender, name, event) => {
 		let _string = formatEthAdr(sender) + " snatches land " + name + " (previously abandoned).";
