@@ -506,6 +506,7 @@ function updateJoinOrChange() {
 	}
 	else {
         if(h_join == false) {
+            h_join = true;
             d_joinOrChange.innerHTML = 'joining the game';
             d_joinOrChangeButton.innerHTML = 'Choose land name: <input type="text" id="newLandName" value="" size="20"><button class="btn btn-danger" onclick="checkTribeIsSelected(joinGame)">Join Game</button>'
         }
@@ -1952,7 +1953,28 @@ const claimTribeRads = async () => {
 }
 
 
-// FIND DAI ANOMALY - WORKSish. deploy v8 and test
+// FIND DAI ANOMALY
+
+// make sure all parameters are valid
+function checkAnomalyParams(_func) {
+
+    // get sum of weight array
+    let _weightSum = h_anomalyWeight.reduce((a, b) => a + b, 0);
+
+    // check each condition in turn
+    if(h_anomalyString == "") {
+        notificationCondition("First, choose whether your Anomaly will affect Land or Prod");
+    } else if(h_anomalyTargetId == 0) {
+        notificationCondition("Pick the ID of your targeted " + h_anomalyString);
+    } else if(_weightSum == 0) {
+        notificationCondition("Choose a non-zero number for at least one of your weights");
+    } 
+    // if nothing is wrong, call proper function
+    else {
+        _func();
+    }
+}
+
 const findDaiAnomaly = async() => {
 	try {
 		//console.log("about to send transaction findDAIanomaly");
