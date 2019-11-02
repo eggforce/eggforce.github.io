@@ -1516,12 +1516,12 @@ function beginEventLogging() {
 	});
 
 	contract.on("CollectedShroom", (sender, land, shroom, event) => {
-		let _string = formatEthAdr(sender) + ", lord of land " + land.toString() + ", collected " + shroom.toString() + " shrooms.";
+		let _string = formatEthAdr(sender) + ", lord of land " + land + ", collected " + shroom.toString() + " shrooms.";
 		checkEventPast(_string, event.blockNumber);
 	});
 
 	contract.on("TookOverLand", (sender, land, event) => {
-		let _string = formatEthAdr(sender) + " snatches land " + land.toString() + " (previously abandoned).";
+		let _string = formatEthAdr(sender) + " snatches land " + land + " (previously abandoned).";
 		checkEventPast(_string, event.blockNumber);
 	});
 
@@ -1531,7 +1531,7 @@ function beginEventLogging() {
 		let _powerLord = powerLord.toString();
 		let _winChance = parseFloat(_powerSender) / (parseFloat(_powerSender) + parseFloat(_powerLord));
 		_winChance = parseFloat(_winChance * 100).toFixed(2);
-		let _string = formatEthAdr(sender) + ", with a " + _winChance + "% chance to win, takes land " + land.toString() + " from " + formatEthAdr(lord) + "! " + formatEthAdr(lord) + " loses " + eggoa.toString() + " Eggoas.";
+		let _string = formatEthAdr(sender) + ", with a " + _winChance + "% chance to win, takes land " + land + " from " + formatEthAdr(lord) + "! " + formatEthAdr(lord) + " loses " + eggoa.toString() + " Eggoas.";
 		checkEventPast(_string, event.blockNumber);
 	});
 	
@@ -1542,7 +1542,7 @@ function beginEventLogging() {
 		let _powerLord = powerLord.toString();
 		let _winChance = parseFloat(_powerSender) / (parseFloat(_powerSender) + parseFloat(_powerLord));
 		_winChance = parseFloat(_winChance * 100).toFixed(2);
-		let _string = formatEthAdr(lord) + " defends his land " + land.toString() + " against " + formatEthAdr(sender) + " had a " + _winChance + "% chance to win, but loses " + eggoa.toString() + "Eggoas.";
+		let _string = formatEthAdr(lord) + " defends his land " + land + " against " + formatEthAdr(sender) + " had a " + _winChance + "% chance to win, but loses " + eggoa.toString() + "Eggoas.";
 		checkEventPast(_string, event.blockNumber);
 	});
 
