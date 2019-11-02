@@ -1723,8 +1723,9 @@ function changeLandName(__name) {
 
 const joinGame = async() => {
 	try {
-		//console.log("about to send transaction joingame");
-		notificationSend('About to join game...');
+        //console.log("about to send transaction joingame");
+        let _newTribe = switchTribeName(parseInt(h_selectedTribe));
+		notificationSend('About to join game as a member of Tribe ' + _newTribe + ', naming your Land ' + h_selectedName);
 		const joinTheGame = await contract.JoinGame(h_selectedTribe, h_selectedName, {
             value: ethers.utils.parseEther(a_joinCost[0]),
             gasLimit: 600000
