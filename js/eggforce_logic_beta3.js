@@ -1454,10 +1454,11 @@ function beginEventLogging() {
 		checkEventPast(_string, event.blockNumber);
 	});
 
-	contract.on("CollectedShroom", (sender, name, shroom, event) => {
+	contract.on("CollectedShroom", (sender, land, shroom, event) => {
         console.log("collected shroom event has been logged");
-		//let _string = formatEthAdr(sender) + ", lord of land " + name + ", collected " + shroom.toString() + " shrooms.";
-		//checkEventPast(_string, event.blockNumber);
+        //let _string = formatEthAdr(sender) + ", lord of land " + name + ", collected " + shroom.toString() + " shrooms.";
+        let _string = "ok";
+		checkEventPast(_string, event.blockNumber);
 	});
 
 	contract.on("JoinedGame", (sender, tribe, land, name, event) => {
