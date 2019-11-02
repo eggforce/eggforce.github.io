@@ -1516,8 +1516,9 @@ function beginEventLogging() {
 	});
 
 	contract.on("CollectedShroom", (sender, name, shroom, event) => {
-		let _string = formatEthAdr(sender) + ", lord of land " + name + ", collected " + shroom.toString() + " shrooms.";
-		checkEventPast(_string, event.blockNumber);
+        console.log("collected shroom event has been logged");
+		//let _string = formatEthAdr(sender) + ", lord of land " + name + ", collected " + shroom.toString() + " shrooms.";
+		//checkEventPast(_string, event.blockNumber);
 	});
 
 	contract.on("TookOverLand", (sender, name, event) => {
@@ -1542,7 +1543,7 @@ function beginEventLogging() {
 		let _powerLord = powerLord.toString();
 		let _winChance = parseFloat(_powerSender) / (parseFloat(_powerSender) + parseFloat(_powerLord));
 		_winChance = parseFloat(_winChance * 100).toFixed(2);
-		let _string = formatEthAdr(lord) + " defends his land " + name + " against " + formatEthAdr(sender) + " had a " + _winChance + "% chance to win, but loses " + eggoa.toString() + "Eggoas.";
+		let _string = formatEthAdr(lord) + " defends his land " + name + " against " + formatEthAdr(sender) + " had a " + _winChance + "% chance to win, but loses " + eggoa.toString() + " Eggoas. also " + result.toString();
 		checkEventPast(_string, event.blockNumber);
 	});
 
