@@ -169,7 +169,7 @@ function startLoop(){
 	initializeBlockchainData();
 	controlLoop1();
 	controlLoop4();
-    controlLoop60();
+    //controlLoop60();
 }
 
 //One-time init
@@ -210,15 +210,16 @@ function controlLoop4() {
     checkGameState();
 	updateGameState();
 	logThePast();
+	refreshData();
     setTimeout(controlLoop4, 4000);
 }
-
+/*
 //Large update loop every minute
 function controlLoop60(){
 	refreshData();
     setTimeout(controlLoop60, 60000);
 }
-
+*/
 // Get past block, current block, current time to get past events and compute their timestamps
 function initializeFilter() {
 	provider.getBlockNumber().then((current) => { 
@@ -273,7 +274,7 @@ function refreshData(){
 	updateBoost();
 	computeProduction();
 	updateLeaderRad();
-    sortUpdateLeaderboard();
+    //sortUpdateLeaderboard();
     updateMaxTerritory();
 }
 
@@ -607,10 +608,12 @@ function updateAccount() {
 	contract = new ethers.Contract(contractAddress, abi, signer);
 
 	let addressPromise = signer.getAddress().then(function(result){
-		m_account = result;
-		document.getElementById('account').innerHTML = formatEthAdr(m_account);
-		//console.log(m_account);
-		refreshData();
+		if(m_account != result) {
+			m_account = result;
+			document.getElementById('account').innerHTML = formatEthAdr(m_account);
+			resetNest();
+			refreshData();
+		}
 	});
 }
 
@@ -946,19 +949,24 @@ function updateNest(__player ) {
 
 	// if player isn't active (account change)
 	if(m_tier[0] == 0) {
-		for(let j = 1; j < 9; j++) {
-			m_nest[j].amount = 0;
-			m_nest[j].level = 0;
-			m_nest[j].attackNext = 0;
-			m_nest[j].ownedLand = 0;
+		resetNest();		
+	}
+}
 
-			m_nest[j].stat0 = 0;
-			m_nest[j].stat1 = 0;
-			m_nest[j].stat2 = 0;
-			m_nest[j].stat3 = 0;
+// Set all nest text to 0
+function resetNest() {
+	for(let j = 1; j < 9; j++) {
+		m_nest[j].amount = 0;
+		m_nest[j].level = 0;
+		m_nest[j].attackNext = 0;
+		m_nest[j].ownedLand = 0;
 
-			updateNestText(j);
-		}
+		m_nest[j].stat0 = 0;
+		m_nest[j].stat1 = 0;
+		m_nest[j].stat2 = 0;
+		m_nest[j].stat3 = 0;
+
+		updateNestText(j);
 	}
 }
 
@@ -1099,6 +1107,9 @@ function updateLeaderRad() {
 		contract.earnedRad(l_array[i].address).then((result) =>
 		{
 			l_array[i].rad = parseInt(result.toString());
+			if(i+parseInt(1) == l_array.length) {
+				sortUpdateLeaderboard();
+			}
 		});
 	}
 }
@@ -1114,6 +1125,7 @@ function compare(_a, _b) {
     return 0;
 }
 
+// Called in updateLeaderRad, else sort() goes crazy while waiting for web3 on rad
 function sortUpdateLeaderboard() {
 	d_leaderboard = document.getElementById('leaderboard');
 	let _string = "";
@@ -1126,7 +1138,7 @@ function sortUpdateLeaderboard() {
 	for(let i = 0; i < l_array.length; i++) {
 		_string += '<h5> ' + formatEthAdr(l_array[i].address) + ' = ' + l_array[i].rad + ' RAD</h5>';
 	}
-
+	
 	// finally update d_leaderboard
 	d_leaderboard.innerHTML = _string;
 }
@@ -1439,7 +1451,7 @@ function beginEventLogging() {
 		let _string = "The game has started! It will end " + convertTime(end) + ". May the best egg win.";	
 		checkEventPast(_string, event.blockNumber);
 	});
-
+	
 	contract.on("WithdrewBalance", (sender, eth, event) => {
 		let _string = formatEthAdr(sender) + " has withdrawn " + truncateEther(eth) + " POA to his wallet." ;
 		checkEventPast(_string, event.blockNumber);
@@ -1449,35 +1461,36 @@ function beginEventLogging() {
 		let _string = formatEthAdr(sender) + " opens their reward chest! They win " + truncateEther(eth) + " POA.";
 		checkEventPast(_string, event.blockNumber);
 	});
-
+	
 	contract.on("JoinedGame", (sender, tribe, land, event) => {
 		//console.log("New player: " + sender + " has joined tribe " + tribe.toString());
 		let _string = formatEthAdr(sender) + ", of the " + switchTribeName(parseInt(tribe.toString())) + " Tribe, joins the game.";
 		checkEventPast(_string, event.blockNumber);
 	});
-
+	
 	contract.on("HarvestedRad", (sender, rad, event) => {
 		//console.log(sender + " harvested " + rad.toString() + " rads");
 		let _string = formatEthAdr(sender) + " harvested " + rad.toString() + " rads.";
 		checkEventPast(_string, event.blockNumber);
 		checkLeaderExists(sender);
 	});
-
+	
 	contract.on("ClaimedTribeRad", (sender, rad, tribe, event) => { // add tribe on next contract
 		//console.log(sender + " claimed " + rad.toString() + " rads from their Tribe chest.");
 		let _string = formatEthAdr(sender) + " of the " + switchTribeName(parseInt(tribe.toString())) + " Tribe claimed " + rad.toString() + " rads from their Tribe chest.";
 		checkEventPast(_string, event.blockNumber);
 		checkLeaderExists(sender);
 	});
-
+	
 	contract.on("ChangedTribe", (sender, tribe, event) => {
 		//console.log(sender + " renounces their old ways and joins the " + switchTribeName(tribe.toString()));
 		let _string = formatEthAdr(sender) + " renounces their old ways and joins the " + switchTribeName(parseInt(tribe.toString())) + ".";
 		checkEventPast(_string, event.blockNumber);
 	});
-
-	// change "eth" to "cost" for contract v9
-	contract.on("FoundAnomaly", (sender, eth, rad, land, stat0, stat1, stat2, stat3, event) => {
+	
+	// change "eth" to "cost" for contract v13
+	// "rad" is unneeded!!
+	contract.on("FoundAnomaly", (sender, eth, rad, land, target, stat0, stat1, stat2, stat3, event) => {
 		let _string = formatEthAdr(sender) + " finds an Anomaly using ";
 
 		// check if anomaly is rad or poa
@@ -1497,10 +1510,10 @@ function beginEventLogging() {
 		}
 		
 		// add stats then send string
-		_string += "addIdLater weight is changed to " + stat0.toString() + "/" + stat1.toString() + "/" + stat2.toString() + "/" + stat3.toString() + ".";
+		_string += "Land " + target.toString() + " weight is changed to " + stat0.toString() + "/" + stat1.toString() + "/" + stat2.toString() + "/" + stat3.toString() + ".";
 		checkEventPast(_string, event.blockNumber);
 	});
-
+	
 	contract.on("UnlockedTier", (sender, tier, event) => {
 		let _string = formatEthAdr(sender) + " unlocks tier " + tier.toString() + ".";
 		checkEventPast(_string, event.blockNumber);
@@ -1556,7 +1569,7 @@ function beginEventLogging() {
 		let _string = formatEthAdr(sender) + " spends " + truncateEther(eth) + " POA to raise his Plantamid by " + upgrade.toString() + " floor(s), reaching floor " + plantamid.toString() + ".";
 		checkEventPast(_string, event.blockNumber);
 	});
-
+	
 }
 
 //var events;
