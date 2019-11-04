@@ -1246,7 +1246,10 @@ function updateRadAuctionCostNow() {
 	let _currentTimestamp = getCurrentTime();
 	contract.ComputeAuction(a_radAuctionTimer.toString(), a_radAuctionCost.toString(), _currentTimestamp.toString()).then((result) =>
 	{
-		handleResult(result, a_radAuctionCostNow, 'radAuctionCost', "string");
+		// never returns the right value!
+		// difference isn't used anyway, so multiply requirement like in dai
+		result = parseInt(result * 1.1).toString();
+		handleResult(result, a_radAuctionCostNow, 'radAuctionCost', "none");
 	});
 }
 
@@ -1879,7 +1882,15 @@ const collectShrooms = async() => {
 } 
 
 // UnlockTier - WORKS
-// (TODO) run ComputeUnlockCost and disable/enable action based on m_rad evaluation
+function checkUnlockTier() {
+	if(m_unlockTierRadCost > parseInt(m_rad)) {
+		notificationCondition('Unlocking this Tier requires more RAD');
+	}
+	else {
+		unlockNextTier();
+	}
+}
+
 const unlockNextTier = async() => {
 	try {
 		let _tier = parseInt(m_tier[0]) + parseInt(1);
