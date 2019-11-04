@@ -1138,7 +1138,7 @@ function sortUpdateLeaderboard() {
 	for(let i = 0; i < l_array.length; i++) {
 		_string += '<h5> ' + formatEthAdr(l_array[i].address) + ' = ' + l_array[i].rad + ' RAD</h5>';
 	}
-	
+
 	// finally update d_leaderboard
 	d_leaderboard.innerHTML = _string;
 }
@@ -1475,11 +1475,10 @@ function beginEventLogging() {
 		checkLeaderExists(sender);
 	});
 	
-	contract.on("ClaimedTribeRad", (sender, rad, tribe, event) => { // add tribe on next contract
+	contract.on("ClaimedTribeRad", (sender, rad, tribe, event) => {
 		//console.log(sender + " claimed " + rad.toString() + " rads from their Tribe chest.");
 		let _string = formatEthAdr(sender) + " of the " + switchTribeName(parseInt(tribe.toString())) + " Tribe claimed " + rad.toString() + " rads from their Tribe chest.";
 		checkEventPast(_string, event.blockNumber);
-		checkLeaderExists(sender);
 	});
 	
 	contract.on("ChangedTribe", (sender, tribe, event) => {
@@ -1551,7 +1550,7 @@ function beginEventLogging() {
 		let _powerLord = powerLord.toString();
 		let _winChance = parseFloat(_powerSender) / (parseFloat(_powerSender) + parseFloat(_powerLord));
 		_winChance = parseFloat(_winChance * 100).toFixed(2);
-		let _string = formatEthAdr(lord) + " defends his land " + land.toString() + " against " + formatEthAdr(sender) + " had a " + _winChance + "% chance to win, but loses " + eggoa.toString() + "Eggoas.";
+		let _string = formatEthAdr(lord) + " defends his land " + land.toString() + " against " + formatEthAdr(sender) + " had a " + _winChance + "% chance to win, but loses " + eggoa.toString() + " Eggoas.";
 		checkEventPast(_string, event.blockNumber);
 	});
 
@@ -1662,7 +1661,7 @@ function changeAttackLandTierCallback(__tier) {
 	+ m_nest[h_attackLandTier].stat1 * t_land[h_selectedLand].stat1 
 	+ m_nest[h_attackLandTier].stat2 * t_land[h_selectedLand].stat2 
 	+ m_nest[h_attackLandTier].stat3 * t_land[h_selectedLand].stat3;
-	_power = _power * m_nest[h_attackLandTier].amount * (parseInt(m_daiPlantamid) + parseInt(m_eggoaPlantamid) + parseInt(1));
+	_power = h_attackLandTier * _power * m_nest[h_attackLandTier].amount * (parseInt(m_daiPlantamid) + parseInt(m_eggoaPlantamid) + parseInt(1));
 	_power = parseInt(_power / h_landWeight);
 	document.getElementById('attackPower').innerHTML = _power;
 
