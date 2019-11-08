@@ -1,3 +1,7 @@
+/*
+// Terminal Look
+*/
+
 .terminal {
 	background-color: black;
 	background-image: radial-gradient(
@@ -15,6 +19,19 @@
 .terminal:selection {
 	background: #0080FF;
 	text-shadow: none;
+}
+
+/*
+// Old paper background
+*/
+
+.paper {
+	max-width: 960px;
+	background: url("../img/paper.jpg");
+
+	background-repeat: no-repeat;
+	background-position: center;
+	background-attachment: fixed;
 }
 
 .border-orange {
