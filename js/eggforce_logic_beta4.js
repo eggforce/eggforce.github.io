@@ -910,7 +910,19 @@ function updateNestValue(__player, __tier){
 
 function selectTribe(__tribe) {
 	h_selectedTribe = __tribe;
-	document.getElementById('selectedTribe').innerHTML = switchTribeName(__tribe);
+	let _tribeName = switchTribeName(__tribe);
+	document.getElementById('selectedTribe').innerHTML = _tribeName;
+	document.getElementById(_tribeName).style.backgroundColor = "rgb(170, 90, 16)";
+
+	//reset all other tribes
+	let _resetTribe;
+	for(let i = 1; i < 5; i++) {
+		if(i != h_selectedTribe) {
+			_resetTribe = switchTribeName(i);
+			document.getElementById(_resetTribe).style.backgroundColor = "";
+		}
+	}
+
 }
 
 function switchTribeName(__number) {
@@ -1027,7 +1039,7 @@ function handleResult(result_, a_, doc_, operation_){
 			_html = parseFloat(_html);
 		}
 		if(operation_ == "number") {
-			_html = numberWithStrings(a_[0]);
+			_html = numberWithSpaces(a_[0]);
 		}
 		document.getElementById(doc_).innerHTML = _html;
 	}
