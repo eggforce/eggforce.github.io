@@ -22,6 +22,7 @@ Some guidance:
 3) ethers-v4.min.js is the excellent ethers.js library used to interact with everything Ethereum: https://docs.ethers.io/ethers.js/html/
 4) simpleNotification.js is a lightweight notification library: https://github.com/Glagan/SimpleNotification
 5) eggforce_logic_* has all the javascript for the eggforce website, in one glorious ~2000 lines file ignoring every best practice known to man
+
 --
 
 Have fun!
