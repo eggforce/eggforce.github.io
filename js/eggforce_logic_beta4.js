@@ -382,6 +382,11 @@ function convertTime(__timestamp){
 	return _returnString;
 }
 
+// Adds spaces between integers, every 3 integers
+function numberWithSpaces(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
+
 //** LOCAL FUNCTIONS **//
 
 // Calculate production per second for each tier
@@ -407,7 +412,7 @@ function computeProduction() {
 		d_tierProd[i].innerHTML = m_prod[i];
 	}
 	// update totalProd HTML
-	document.getElementById('totalProd').innerHTML = m_totalProd;
+	document.getElementById('totalProd').innerHTML = numberWithSpaces(m_totalProd);
 }
 
 // prod for leaders. might require significant rework...
@@ -596,6 +601,8 @@ function updateLandButton() {
 		d_landButton.innerHTML = '<button class="btn btn-success" onClick="attackLand()">Attack Land</button>';
 	}
 }
+
+
 
 // READ ONLY ETHERS
 
@@ -857,7 +864,7 @@ function updateLand(__id){
 		document.getElementById('landLast').innerHTML = convertTime(getCurrentTime());
     }
 	document.getElementById('landLord').innerHTML = formatEthAdr(t_land[__id].lord);
-	document.getElementById('landPower').innerHTML = t_land[__id].power;
+	document.getElementById('landPower').innerHTML = numberWithSpaces(t_land[__id].power);
 	document.getElementById('landLevel').innerHTML = t_land[__id].level;
 	document.getElementById('landTribe').innerHTML = switchTribeName(parseInt(t_land[__id].tribe));
 	document.getElementById('landShroom').innerHTML = t_land[__id].shroom;
@@ -1006,7 +1013,7 @@ function handleResult(result_, a_, doc_, operation_){
 	if(operation_ == "none"){
 		a_[0] = result_;
 	} 
-	else if(operation_ == "string"){
+	else if(operation_ == "string" || operation_ == "number"){
 		a_[0] = result_.toString();
 	}
 	else if(operation_ == "dai"){
@@ -1018,6 +1025,9 @@ function handleResult(result_, a_, doc_, operation_){
 		if(operation_ == "dai") {
 			_html = parseFloat(a_[0]).toFixed(4);
 			_html = parseFloat(_html);
+		}
+		if(operation_ == "number") {
+			_html = numberWithStrings(a_[0]);
 		}
 		document.getElementById(doc_).innerHTML = _html;
 	}
@@ -1136,7 +1146,7 @@ function sortUpdateLeaderboard() {
 
 	// run through it and add to string
 	for(let i = 0; i < l_array.length; i++) {
-		_string += '<h5> ' + formatEthAdr(l_array[i].address) + ' = ' + l_array[i].rad + ' RAD</h5>';
+		_string += '<h5> ' + formatEthAdr(l_array[i].address) + ' = ' + numberWithSpaces(l_array[i].rad) + ' RAD</h5>';
 	}
 
 	// finally update d_leaderboard
@@ -1164,7 +1174,7 @@ function updateEndTimestamp(){
 function updateGlobalRad(){
 	contract.globalRad().then((result) =>
 	{
-		handleResult(result, a_globalRad, 'globalRad', "string");
+		handleResult(result, a_globalRad, 'globalRad', "number");
 	});
 }
 
@@ -1221,7 +1231,7 @@ function updatePlantamidDaiCost(){
 function updateRad(__player){
 	contract.rad(__player).then((result) =>
 	{
-		handleResult(result, m_rad, 'rad', "string");
+		handleResult(result, m_rad, 'rad', "number");
 	});
 }
 
@@ -1332,7 +1342,7 @@ function getFloorDaiCost(__floor){
 function updateUnlockCost() {
 	contract.ComputeUnlockCost(m_tier).then((result) =>
 	{
-		handleResult(result, m_unlockTierRadCost, 'unlockTierRadCost', "string");
+		handleResult(result, m_unlockTierRadCost, 'unlockTierRadCost', "number");
 	});
 }
 
@@ -1343,6 +1353,13 @@ function updateUpgradeCost() {
 		handleResult(result, m_upgradeCost, 'upgradeCost', "string");
 	});
 }
+
+// local function for upgrade cost
+function computeUpgradeCost() {
+
+}
+
+// Get maximum number of upgrades current rads allow
 
 // Get Rads player can harvest
 function updateRadToHarvest() {
@@ -1406,24 +1423,6 @@ function truncateEther(__eth) {
 // Are we logging past events?
 var loggingThePast = false;
 
-/*
-var testValue = 1100000 + 20000;
-var testValueSmaller = 1100000 + 100;
-var eventObjTest3 = { string: "hello", block: testValue};
-var eventObjTest4 = { string: "good morning", block: testValueSmaller};
-eventArray.push(eventObjTest3);
-eventArray.push(eventObjTest4);
-eventArray.sort(function(a,b) {return (a.block - b.block);} );
-console.log(eventArray[0].string);
-// Testing array sorting
-/*
-var eventObjTest = { text: "This is a string", block: 123};
-var eventObjTest2 = { text: "Also a string", block: 44};
-eventArray.push(eventObjTest);
-eventArray.push(eventObjTest2);
-eventArray.sort(function(a,b) {return (a.block - b.block);} );
-*/
-
 function checkLeaderExists(_sender) {
 	if (l_array.some(any => any.address === _sender)) {
 		// already a leader, don't add the new one
@@ -1438,14 +1437,6 @@ function checkLeaderExists(_sender) {
 function beginEventLogging() {
 	
 	console.log("event logging begins");
-	/*
-	contract.on(" ", (sender, eth, event) => {
-		let _string = formatEthAdr(sender) + ethers.utils.formatEther(eth);
-		handleEvent(_string);
-	});
-	*/
-
-	//let eventNumber = 0;
 
 	// event.blockNumber then converting it to timestamp through a local assumption of blocktime
 	// isn't as reliable as event.getBlock().timestamp, but not sure how to get the later working
