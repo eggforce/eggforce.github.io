@@ -3,9 +3,11 @@
 Website for upcoming decentralized game "Eggforce" on POA Network and xDai chain.
 
 See more at: https://eggforce.github.io/
+
 Better yet, come chat on Discord: https://discord.gg/JU8P4Ru
 
 --
+
 This repo is the work of a man in despair. Why "despair", you ask? Because very few seasoned programmers explore DApp games to their full extent.
 
 Ergo, despite not knowing how to write a Hello World program without googling the solution, here I am. 
@@ -13,6 +15,7 @@ Ergo, despite not knowing how to write a Hello World program without googling th
 Enjoy looking through this mess of basic HTML/CSS/JS. No Typescript, jQuery or node.js - too rich for my blood.
 
 --
+
 Some guidance:
 1) "test_xxx" files refer to older test versions. "betaX" are the most recent files (beta4 as of the time of this writing)
 2) abi_* holds the smart contract ABI, generated with Remix IDE: https://remix.ethereum.org/
