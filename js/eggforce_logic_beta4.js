@@ -110,7 +110,7 @@ var m_earnedRad = [0];
 var m_eggoaPlantamid = [0];
 var m_lastRad = [0];
 var m_lastShroom = [0];
-var m_openedChest = false;
+var m_openedChest = [false];
 var m_power = [0];
 var m_rad = [0];
 var m_radToHarvest = [0];
@@ -477,11 +477,11 @@ function updatePlayerChest() {
 	let _time = a_end - _currentTimestamp;
 
 	// has player opened his chest already?
-	if(m_openedChest == true) {
+	if(m_openedChest[0] == true) {
 		d_playerChest.innerHTML = "You've opened your POA chest before, and won " + m_playerChest + " POA. Good job!";
 	}
 	// is the game over?
-	else if(_time < 0 && m_openedChest == false) {
+	else if(_time < 0 && m_openedChest[0] == false) {
 		d_playerChest.innerHTML = "You have won " + m_playerChest + " POA!<br><button class='btn btn-success'  onclick='openRewardChest()'>Open Chest</button>";
 	}
 	// if the game is still ongoing, give estimation
@@ -1225,7 +1225,7 @@ function updateLaunchTimestamp(){
 function updateOpenedChest(__player){
 	contract.openedChest(__player).then((result) =>
 	{
-        //console.log(result);
+        console.log(result);
 		handleResult(result, m_openedChest, 0, "none");
 	});
 }
