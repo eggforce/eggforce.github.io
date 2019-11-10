@@ -473,18 +473,17 @@ function updatePlayerChest() {
 	let _playerShare = parseFloat(a_chest * m_earnedRad / a_globalRad).toFixed(6);
 	m_playerChest = _playerShare;
 
+	let _currentTimestamp = parseInt((new Date()).getTime() / 1000); // from ms to s
+	let _time = a_end - _currentTimestamp;
+
 	// has player opened his chest already?
 	if(m_openedChest == true) {
 		d_playerChest.innerHTML = "You've opened your POA chest before, and won " + m_playerChest + " POA. Good job!";
 	}
-
 	// is the game over?
-	let _currentTimestamp = parseInt((new Date()).getTime() / 1000); // from ms to s
-	let _time = a_end - _currentTimestamp;
-	if(_time < 0 && m_openedChest == false) {
+	else if(_time < 0 && m_openedChest == false) {
 		d_playerChest.innerHTML = "You have won " + m_playerChest + " POA!<br><button class='btn btn-success'  onclick='openRewardChest()'>Open Chest</button>";
 	}
-
 	// if the game is still ongoing, give estimation
 	else if(_time >= 0) {
 		d_playerChest.innerHTML = "Your estimated earnings: " + m_playerChest + " POA.";
