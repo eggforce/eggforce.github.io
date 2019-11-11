@@ -1418,7 +1418,7 @@ function logThePast() {
 }
 
 function handleEvent(__string, __block) {
-	d_eventLog.innerHTML += "<br>[" + getTimeFromBlock(__block) + "] " + __string;
+	d_eventLog.innerHTML += "<h6>[" + getTimeFromBlock(__block) + "] " + __string + "</h6>";
 	d_scrollLog.scrollTop = d_scrollLog.scrollHeight;
 }
 
@@ -2015,7 +2015,16 @@ const findDaiAnomaly = async() => {
 	}
 }
 
-// FIND RAD ANOMALY - WORKS
+// FIND RAD ANOMALY
+function checkRadForAnomaly() {
+    if(parseInt(m_rad[0]) > parseInt(a_radAuctionCostNow)) {
+        findRadAnomaly();
+    }
+    else {
+        notificationCondition('Not enough RAD for Anomaly!');
+    }
+}
+
 const findRadAnomaly = async() => {
 	try {
 		//console.log("about to send transaction findRADanomaly");
