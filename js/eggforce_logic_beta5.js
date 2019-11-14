@@ -57,7 +57,7 @@ function useReadOnlyProvider() {
 const MULT_COST = 10;
 const PAST_BLOCKS = 12 * 60 * 24 * 2 * 10; // 12 blocks per minute, 60min per hour, 24h in a day
 const POA_BLOCK_TIME = 5.4;
-const TIME_FOR_1RAD = 60 * 60 * 4; // 4 hours in seconds
+const TIME_FOR_1RAD = 60 * 60 * 8; // 8 hours in seconds
 
 var a_chest = [0];
 var a_daiAuctionCost = [0];
@@ -382,15 +382,26 @@ function convertTime(__timestamp){
 	return _returnString;
 }
 
-// Adds spaces between integers, every 3 integers
+// Add spaces between integers, every 3 integers
 function numberWithSpaces(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
+
+// Set text to red if condition is true, reset to base if condition is false
+function setRedLimit(_id, _bool) {
+    if(_bool == true) {
+        document.getElementById(_id).style.color = "rgb(255, 0, 0)";
+        document.getElementById(_id).style.textShadow = "1px 1px 1px #ff0000";
+    }
+    else {
+        document.getElementById('shroomCost').style.color = "";
+        document.getElementById('shroomCost').style.textShadow = "";
+    }
 }
 
 //** LOCAL FUNCTIONS **//
 
 // Calculate production per second for each tier
-
 function computeProduction() {
 	m_totalProd = 0;
 	for(let i = 1; i <= m_tier; i++) {
@@ -1020,6 +1031,11 @@ function updateCurrentBlock(){
 // Set variable a_ according to operation_
 // Get element of ID doc, change innerHTML to a_
 // Log to console and return a_
+// Choices: 
+// none -> plain
+// string -> number (needs to be converted to a string from its BigNumber type)
+// dai -> ether/dai value
+// number -> same operation as string, but put spaces between digits in html
 function handleResult(result_, a_, doc_, operation_){
 	if(operation_ == "none"){
 		a_[0] = result_;
@@ -1118,7 +1134,7 @@ function updateDaiPlantamid(__player){
 function updateEarnedRad(__player){
 	contract.earnedRad(__player).then((result) =>
 	{
-			handleResult(result, m_earnedRad, 'earnedRad', "string");
+			handleResult(result, m_earnedRad, 'earnedRad', "number");
 	});
 }
 
@@ -1376,7 +1392,7 @@ function computeUpgradeCost() {
 function updateRadToHarvest() {
 	contract.ComputeFullRad(m_account).then((result) =>
 	{
-		handleResult(result, m_radToHarvest, 'radToHarvest', "string");
+		handleResult(result, m_radToHarvest, 'radToHarvest', "number");
 	});
 }
 
@@ -1555,7 +1571,7 @@ function beginEventLogging() {
 		let _powerLord = powerLord.toString();
 		let _winChance = parseFloat(_powerSender) / (parseFloat(_powerSender) + parseFloat(_powerLord));
 		_winChance = parseFloat(_winChance * 100).toFixed(2);
-		let _string = formatEthAdr(lord) + " defends his land " + land.toString() + " against " + formatEthAdr(sender) + " had a " + _winChance + "% chance to win, but loses " + eggoa.toString() + " Eggoas.";
+		let _string = formatEthAdr(lord) + " defends his land " + land.toString() + " against " + formatEthAdr(sender) + ", who had a " + _winChance + "% chance to win but loses " + eggoa.toString() + " Eggoas.";
 		checkEventPast(_string, event.blockNumber);
 	});
 
@@ -1801,7 +1817,6 @@ const raiseDaimid = async() => {
 	}
 }
 
-
 // Hatch Shrooms using h_hatchShroomMult into Eggoas of h_hatchShroomTier
 // METAMASK FAILS IF h_hatchShroomRad > m_rad
 let h_hatchShroomRad = 0;
@@ -1815,6 +1830,7 @@ function changeShroomMult(__mult) {
 }
 
 function changeShroomTier(__tier) {
+    _tier = checkBoundaries(__tier, 'shroomTier', 1, m_tier[0]);
 	h_hatchShroomTier = __tier;
 	h_hatchShroomRad = getShroomCost();
 	computeShroomEggoa();
@@ -1822,7 +1838,13 @@ function changeShroomTier(__tier) {
 
 function getShroomCost() {
 	let _cost = MULT_COST ** (parseInt(h_hatchShroomMult) + parseInt(h_hatchShroomTier));
-	document.getElementById('shroomCost').innerHTML = _cost;
+    document.getElementById('shroomCost').innerHTML = numberWithSpaces(_cost);
+    if(_cost > parseInt(m_rad)) {
+        setRedLimit('shroomCost', true);
+    }
+    else {
+        setRedLimit('shroomCost', false);
+    }
 	return _cost;
 }
 
