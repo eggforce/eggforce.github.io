@@ -276,6 +276,8 @@ function refreshData(){
 	updateLeaderRad();
     //sortUpdateLeaderboard();
     updateMaxTerritory();
+    getFloorDaiCost();
+    getSacrificeAmount();
 }
 
 //** UTILITIES **//
@@ -1054,7 +1056,7 @@ function handleResult(result_, a_, doc_, operation_){
 			_html = parseFloat(a_[0]).toFixed(4);
 			_html = parseFloat(_html);
 		}
-		if(operation_ == "number") {
+		if(operation_ == "number" || operation_ == "red") {
 			_html = numberWithSpaces(a_[0]);
         }
         if(operation_ == "red") {
@@ -1356,20 +1358,22 @@ function updateTribeRad(__tribe){
 }
 
 // Get amount of Eggoas of given tier to sacrifice for player's next plantamid floor
-function getSacrificeAmount(__tier){
-	contract.ComputeEggoaPlantamidCost(m_eggoaPlantamid, __tier).then((result) =>
+function getSacrificeAmount(){
+    let _tier = document.getElementById('tierSacrifice').value;
+	contract.ComputeEggoaPlantamidCost(m_eggoaPlantamid, _tier).then((result) =>
 	{
 		handleResult(result, n_sacrificeAmount, 'sacrificeAmount', "string");
-		h_selectedTier = __tier;
+		h_selectedTier = _tier;
 	});
 }
 
 // Get Dai cost to raise the Plantamid by __floor floors
-function getFloorDaiCost(__floor){
-	contract.ComputeDaiPlantamidCost(m_daiPlantamid, __floor).then((result) =>
+function getFloorDaiCost(){
+    let _floor = document.getElementById('floorsAdded').value;
+	contract.ComputeDaiPlantamidCost(m_daiPlantamid, _floor).then((result) =>
 	{
 		handleResult(result, n_floorDaiCost, 'floorDaiCost', "dai");
-		h_selectedFloor = __floor;
+		h_selectedFloor = _floor;
 	});
 }
 
