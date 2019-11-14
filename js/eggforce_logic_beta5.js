@@ -394,8 +394,8 @@ function setRedLimit(_id, _bool) {
         document.getElementById(_id).style.textShadow = "1px 1px 1px #ff0000";
     }
     else {
-        document.getElementById('shroomCost').style.color = "";
-        document.getElementById('shroomCost').style.textShadow = "";
+        document.getElementById(_id).style.color = "";
+        document.getElementById(_id).style.textShadow = "";
     }
 }
 
@@ -1036,11 +1036,12 @@ function updateCurrentBlock(){
 // string -> number (needs to be converted to a string from its BigNumber type)
 // dai -> ether/dai value
 // number -> same operation as string, but put spaces between digits in html
+// red -> same operation as string, but check against m_rad and color in red if need be 
 function handleResult(result_, a_, doc_, operation_){
 	if(operation_ == "none"){
 		a_[0] = result_;
 	} 
-	else if(operation_ == "string" || operation_ == "number"){
+	else if(operation_ == "string" || operation_ == "number" || operation_ == "red"){
 		a_[0] = result_.toString();
 	}
 	else if(operation_ == "dai"){
@@ -1055,7 +1056,15 @@ function handleResult(result_, a_, doc_, operation_){
 		}
 		if(operation_ == "number") {
 			_html = numberWithSpaces(a_[0]);
-		}
+        }
+        if(operation_ == "red") {
+            if(parseInt(a_[0]) > parseInt(m_rad)) {
+                setRedLimit(doc_, true);
+            }
+            else {
+                setRedLimit(doc_, false);
+            }
+        }
 		document.getElementById(doc_).innerHTML = _html;
 	}
 
@@ -1286,7 +1295,7 @@ function updateRadAuctionCostNow() {
 		// never returns the right value!
 		// difference isn't used anyway, so multiply requirement like in dai
 		result = parseInt(result * 1.1).toString();
-		handleResult(result, a_radAuctionCostNow, 'radAuctionCost', "none");
+		handleResult(result, a_radAuctionCostNow, 'radAuctionCost', "red");
 	});
 }
 
@@ -1369,7 +1378,7 @@ function getFloorDaiCost(__floor){
 function updateUnlockCost() {
 	contract.ComputeUnlockCost(m_tier).then((result) =>
 	{
-		handleResult(result, m_unlockTierRadCost, 'unlockTierRadCost', "number");
+		handleResult(result, m_unlockTierRadCost, 'unlockTierRadCost', "red");
 	});
 }
 
@@ -1377,7 +1386,7 @@ function updateUnlockCost() {
 function updateUpgradeCost() {
 	contract.ComputeUpgradeCost(m_nest[h_upgradeTier].level, m_upgradeWeightSum).then((result) =>
 	{
-		handleResult(result, m_upgradeCost, 'upgradeCost', "string");
+		handleResult(result, m_upgradeCost, 'upgradeCost', "red");
 	});
 }
 
@@ -1831,7 +1840,7 @@ function changeShroomMult(__mult) {
 
 function changeShroomTier(__tier) {
     _tier = checkBoundaries(__tier, 'shroomTier', 1, m_tier[0]);
-	h_hatchShroomTier = __tier;
+	h_hatchShroomTier = _tier;
 	h_hatchShroomRad = getShroomCost();
 	computeShroomEggoa();
 }
