@@ -278,6 +278,7 @@ function refreshData(){
     updateMaxTerritory();
     getFloorDaiCost();
     getSacrificeAmount();
+    getShroomCost();
 }
 
 //** UTILITIES **//
