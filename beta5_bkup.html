@@ -1,5 +1,6 @@
 <html>
 	<head>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
         <link href="https://fonts.googleapis.com/css?family=Cairo|Exo&display=swap" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="css/simpleNotification.css">
 		<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
@@ -7,7 +8,7 @@
 	</head>
 	<body>
 		<br>
-        <div class="container" style="text-align:center;">
+        <div class="container-fluid" style="text-align:center;">
             <div class="border-orange terminal">
                 <h1 class="display-1">EGGFORCE Beta 5</h1>
                 <div class="row">
@@ -31,7 +32,7 @@
             <!-- LINK TO BACKUP -->
             <br>
             <div class="border-orange terminal">
-                <h6>You're on the backup page for Beta 5. Want to go back to the newest version? <a href="beta5.html">click me</a>
+                <h6>Beta is consistently updated, and things might break. Is this page not working? Visit the backup: <a href="beta5_bkup.html">click me</a>
             </div>
             <!-- -->
             <br>
@@ -70,7 +71,7 @@
                 <h3 class="title-container">EVENTS</h4>
                 <br>
                 <div class="scroll-box" id="scrollLog" style="text-align:left;">
-                    <p><span id="eventLog">[Waiting for events...]</span></p>
+                    <span id="eventLog">[Waiting for events...]</span>
                 </div>
             </div>
             <br>
@@ -125,35 +126,35 @@
                 <br>
                 <div class="row">
                     <div class="col-sm">
-                        <h5>Land Level:</h5>
+                        <h6>Land Level:</h5>
                         <span id="landLevel">?</span>
                     </div>
                     <div class="col-sm">
-                        <h5>Land Stats:</h5>
+                        <h6>Land Stats:</h5>
                         <span id="landStat">?</span>
                     </div>
                     <div class="col-sm">
-                        <h5>Current Lord:</h5>
+                        <h6>Current Lord:</h5>
                         <span id="landLord">?</span>
                     </div>
                     <div class="col-sm">
-                        <h5>Lord Power:</h5>
+                        <h6>Lord Power:</h5>
                         <span id="landPower">?</span>
                     </div>
                     <div class="col-sm">
-                        <h5>Lord Tribe:</h5>
+                        <h6>Lord Tribe:</h5>
                         <span id="landTribe">?</span>
                     </div>
                     <div class="col-sm">
-                        <h5>Lord Stats:</h5>
+                        <h6>Lord Stats:</h5>
                         <span id="landLordStat">?</span>
                     </div>
                     <div class="col-sm">
-                        <h5>Last Shroom Harvest:</h5>
+                        <h6>Last Shroom Harvest:</h5>
                         <span id="landLast">?</span>
                     </div>
                     <div class="col-sm">
-                        <h5>Shrooms to Harvest:</h5>
+                        <h6>Shrooms to Harvest:</h5>
                         <span id="landShroom">?</span>
                     </div>
                 </div>
@@ -161,10 +162,10 @@
                 <h6>Attack Land with Eggoas of tier <input type="text" id="attackLandTierSelector" value="1" size="2"><button onclick="changeAttackLandTier()">OK</button></h6>
                 <div class="row">
                     <div class="col-sm">
-                        <h6>Power: <span id="attackPower">?</span></h6>
+                        <h5>Power: <span id="attackPower">?</span></h6>
                     </div>
                     <div class="col-sm">
-                        <h6>Chance to win: <span id="winRate">?</span>%</h6>
+                        <h5>Chance to win: <span id="winRate">?</span>%</h6>
                     </div>
                 </div>
                 <span id="landButton">?</span>
@@ -189,7 +190,7 @@
                     <div class="col-sm border-orange border-margin">
                         <h5>RAD Anomaly</h5>
                         <h6>Auction started <span id="radAuctionTimer">?</span></h6>
-                        <button class="btn btn-success" onclick="checkAnomalyParams(findRadAnomaly)">BUY RAD ANOMALY</button>
+                        <button class="btn btn-success" onclick="checkAnomalyParams(checkRadForAnomaly)">BUY RAD ANOMALY</button>
                         <h6>Auction cost: <span id="radAuctionCost">?</span> RADS</h6>
                     </div>
                 </div>
@@ -204,7 +205,7 @@
                 <h6><button class="btn btn-success" onclick="checkUnlockTier()">Unlock Next Tier</button></h6>
                 <h6>(Cost: <span id="unlockTierRadCost">?</span> Rads)</h6>
                 <div class="row">
-                    <div class="col-sm border-orange border-margin">
+                    <div class="col-sm-5 col-md border-orange border-margin">
                         <h6>TIER 1</h6>
                         <span id="tier1">?</span>
                         <br>
@@ -212,7 +213,7 @@
                         <h5>PROD = <span id="tier1prod">?</span> RAD/hour</h5>
                         <hr>
                     </div>
-                    <div class="col-sm border-orange border-margin">
+                    <div class="col-sm-5 col-md border-orange border-margin">
                         <h6>TIER 2</h6>
                         <span id="tier2">?</span>
                         <br>
@@ -220,7 +221,7 @@
                         <h5>PROD = <span id="tier2prod">?</span> RAD/hour</h5>
                         <hr>
                     </div>
-                    <div class="col-sm border-orange border-margin">
+                    <div class="col-sm-5 col-md border-orange border-margin">
                         <h6>TIER 3</h6>
                         <span id="tier3">?</span>
                         <br>
@@ -228,7 +229,7 @@
                         <h5>PROD = <span id="tier3prod">?</span> RAD/hour</h5>
                         <hr>
                     </div>
-                    <div class="col-sm border-orange border-margin">
+                    <div class="col-sm-5 col-md border-orange border-margin">
                         <h6>TIER 4</h6>
                         <span id="tier4">?</span>
                         <br>
@@ -236,10 +237,8 @@
                         <h5>PROD = <span id="tier4prod">?</span> RAD/hour</h5>
                         <hr>
                     </div>
-                </div>
-                <br>
-                <div class="row">
-                    <div class="col-sm border-orange border-margin">
+                    <div class="w-100"></div>
+                    <div class="col-sm-5 col-md border-orange border-margin">
                         <h6>TIER 5</h6>
                         <span id="tier5">?</span>
                         <br>
@@ -247,7 +246,7 @@
                         <h5>PROD = <span id="tier5prod">?</span> RAD/hour</h5>
                         <hr>
                     </div>
-                    <div class="col-sm border-orange border-margin">
+                    <div class="col-sm-5 col-md border-orange border-margin">
                         <h6>TIER 6</h6>
                         <span id="tier6">?</span>
                         <br>
@@ -255,7 +254,7 @@
                         <h5>PROD = <span id="tier6prod">?</span> RAD/hour</h5>
                         <hr>
                     </div>
-                    <div class="col-sm border-orange border-margin">
+                    <div class="col-sm-5 col-md border-orange border-margin">
                         <h6>TIER 7</h6>
                         <span id="tier7">?</span>
                         <br>
@@ -263,7 +262,7 @@
                         <h5>PROD = <span id="tier7prod">?</span> RAD/hour</h5>
                         <hr>
                     </div>
-                    <div class="col-sm border-orange border-margin">
+                    <div class="col-sm-5 col-md border-orange border-margin">
                         <h6>TIER 8</h6>
                         <span id="tier8">?</span>
                         <br>
@@ -295,7 +294,7 @@
                         <h6>Eggoa Plantamid Floor: <span id="eggoaPlantamid">?</span></h6>
                         <br>
                         <h5>Sacrifice Eggoas for Floors</h5>
-                        <h6>Tier to sacrifice: <input type="text" id="tierSacrifice" oninput="getSacrificeAmount(this.value)" value="1" size="2"></h6>
+                        <h6>Tier to sacrifice: <input type="text" id="tierSacrifice" oninput="getSacrificeAmount()" value="1" size="2"></h6>
                         <h6>(You will sacrifice <span id="sacrificeAmount">?</span> Eggoas)</h6>
                         <button class="btn btn-success" onclick="raiseGoamid()">Raise Goamid</button>
                     </div>
@@ -309,7 +308,7 @@
                         <h6>Poa Plantamid Floor: <span id="daiPlantamid">?</span></h6>
                         <br>
                         <h5>Spend Poa to raise Floor</h5>
-                        <h6>Number of Floors: <input type="text" id="floorsAdded" oninput="getFloorDaiCost(this.value)" value="1" size="2"></h6>
+                        <h6>Number of Floors: <input type="text" id="floorsAdded" oninput="getFloorDaiCost()" value="1" size="2"></h6>
                         <h6>(You will spend <span id="floorDaiCost">?</span> POA)</h6>
                         <button class="btn btn-danger" onclick="raiseDaimid()">Raise Poamid</button>
                     </div>
@@ -469,6 +468,6 @@
 		<script src="js/ethers-v4.min.js"></script>
 		<!-- Eggforce -->
 		<script src="js/abi_beta4.js"></script>
-		<script src="js/eggforce_logic_beta5.js"></script>
+		<script src="js/eggforce_logic_beta5_bkup.js"></script>
 	</body>
 </html>
