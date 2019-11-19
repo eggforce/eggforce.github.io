@@ -60,8 +60,10 @@ var a_pullCost = 0;
 
 var m_balance = 0;
 var m_eggoa = 0;
+var m_glory = 0;
 var m_openedChest = false;
 var m_sacrifice = 0;
+var m_share = 0;
 var m_shroom = 0;
 
 var	loggingThePast = true;
