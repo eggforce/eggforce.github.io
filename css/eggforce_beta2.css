@@ -39,9 +39,17 @@
 	border-radius: 8px;
 }
 
+.border-round {
+	border-radius: 64px;
+}
+
+hr {
+	border: 1px solid #FF851B;
+}
+
 .border-margin {
-	margin: 8px;
-	padding: 8px;
+	margin: 8px 8px;
+	padding: 8px 8px;
 }
 
 pre {
@@ -93,7 +101,6 @@ h1 {
 */
 
 .icon-link {
-	height: 64px;
 	cursor: pointer;
 	filter: brightness(50%);
   -webkit-filter: brightness(50%);
@@ -110,6 +117,13 @@ h1 {
   -ms-filter: brightness(80%);
 }
 
+.icon-big {
+	height: 64px;
+}
+
+.icon-small {
+	height: 32px;
+}
 /* 
 // gn-lifespan from simpleNotification
 // Hide the progress bar!
@@ -179,7 +193,136 @@ h1 {
 
 /* resize title on small screens so it doesn't overflow */
 @media only screen and (max-width: 540px) {
+		
+	* {
+		font-size: 120%;
+	}
+
     .display-1 {
         font-size: 48px;
-    }
+	}
+
 }
+
+/*** MODALS ***/
+
+
+/* Modal (from W3Schools) */
+.egg-modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 200px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+	margin: 0 auto;
+    width: 100%;
+	max-width: 800px;
+	position: center;
+}
+
+/* The Close Button */
+.close {
+    font-size: 16px;
+    font-weight: bold;
+	color: white;
+	vertical-align: text-top;
+    float: right;
+}
+
+.close:hover,
+.close:focus {
+    color: gray;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/*** TABS ***/
+
+/** {box-sizing: border-box}*/
+
+/* Style the tab */
+.tab {
+  float: left;
+  margin: 4px 4px;
+  /*border: 1px solid #ccc;*/
+  /*background-color: #f1f1f1;*/
+  /*width: 30%;*/
+  height: 100%;
+}
+
+.tablinks {
+	margin: 4px 0px;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+  display: block;
+  /*background-color: #FF851B;*/
+  /*color: black;*/
+  /*padding: 4px 4px;*/
+  width: 100%;
+  /*border: none;
+  outline: none;
+  text-align: left;*/
+  cursor: pointer;
+  transition: 0.3s;
+  background-color: black;
+	background-image: radial-gradient(
+	  rgba(0, 150, 0, 0.5), black 120%
+	);
+	color: white;
+	font: Inconsolata, monospace;
+	text-shadow: 0 0 5px #C8C8C8;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: rgb(170, 90, 16);
+}
+
+/* Create an active/current "tab button" class */
+.tab button.active {
+  background-color: rgb(255, 205, 131);
+  background-image: "";
+}
+
+/* Style the tab content */
+.tabcontent {
+  float: left;
+  padding: 16px 16px;
+  margin: 4px 4px;
+  height: 100%;
+  /*border: 1px solid #ccc;*/
+  /*width: 70%;
+  border-left: none;
+  height: 300px;*/
+}
+
+/* Lower font size */
+@media screen and (max-width: 1023px) {
+	.tab button {
+		font: 1rem Inconsolata, monospace;
+	}
+}
+
+/* On screens that are less than 800px wide, make the sidebar into a topbar */
+@media screen and (max-width: 800px) {
+	.tab {
+	  width: 100%;
+	  position: relative;
+	}
+	.tab button {
+		width: auto;
+	}
+	.tabcontent {width: 100%;}
+  }

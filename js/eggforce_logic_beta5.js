@@ -29,20 +29,16 @@ window.addEventListener('load', async () => {
 				console.log(m_account);
 				startLoop();
 			});
-
 			
-			//beginEventLogging();			
         } catch (error) {
             // User denied account access...
 			useReadOnlyProvider();
-			//beginEventLogging();
         }
     }
     // Non-dapp browsers...
     else {
         console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
 		useReadOnlyProvider();
-		//beginEventLogging();
     }
 });
 
@@ -122,7 +118,7 @@ var m_unlockTierRadCost = [0];
 var m_upgradeCost = [0];
 var m_upgradeWeightSum = [0];
 
-var m_prod = []; // RAD per hourfor each tier
+var m_prod = []; // RAD per hour for each tier
 var m_totalProd = 0; // total RAD per hour, all tiers included
 
 var n_sacrificeAmount = [0];
@@ -213,34 +209,6 @@ function controlLoop4() {
 	refreshData();
     setTimeout(controlLoop4, 4000);
 }
-/*
-//Large update loop every minute
-function controlLoop60(){
-	refreshData();
-    setTimeout(controlLoop60, 60000);
-}
-*/
-// Get past block, current block, current time to get past events and compute their timestamps
-function initializeFilter() {
-	provider.getBlockNumber().then((current) => { 
-		f_fromBlock = current - PAST_BLOCKS;
-		getPastEvents();
-	});
-	provider.getBlockNumber().then((current2) => {
-		f_currentBlock = current2;
-	});
-	f_currentTime = getCurrentTime();
-}
-
-// Current block, then block details
-function updateCurrentBlock(){
-	provider.getBlockNumber().then((blockNumber) => {
-		console.log("Current block number: " + blockNumber);
-		provider.getBlock().then((result) => {
-			console.log(result.timestamp);
-		})
-	});
-}
 
 function refreshData(){
 	updateTribeChange(m_account);
@@ -279,6 +247,28 @@ function refreshData(){
     getFloorDaiCost();
     getSacrificeAmount();
     getShroomCost();
+}
+
+// Get past block, current block, current time to get past events and compute their timestamps
+function initializeFilter() {
+	provider.getBlockNumber().then((current) => { 
+		f_fromBlock = current - PAST_BLOCKS;
+		getPastEvents();
+	});
+	provider.getBlockNumber().then((current2) => {
+		f_currentBlock = current2;
+	});
+	f_currentTime = getCurrentTime();
+}
+
+// Current block, then block details
+function updateCurrentBlock(){
+	provider.getBlockNumber().then((blockNumber) => {
+		console.log("Current block number: " + blockNumber);
+		provider.getBlock().then((result) => {
+			console.log(result.timestamp);
+		})
+	});
 }
 
 //** UTILITIES **//
@@ -403,6 +393,28 @@ function setRedLimit(_id, _bool) {
 }
 
 //** LOCAL FUNCTIONS **//
+
+// Tabs (from w3schools)
+function selectTab(event, tabName) {
+	// Declare all variables
+	let i, tabcontent, tablinks;
+  
+	// Get all elements with class="tabcontent" and hide them
+	tabcontent = document.getElementsByClassName("tabcontent");
+	for (i = 0; i < tabcontent.length; i++) {
+	  tabcontent[i].style.display = "none";
+	}
+  
+	// Get all elements with class="tablinks" and remove the class "active"
+	tablinks = document.getElementsByClassName("tablinks");
+	for (i = 0; i < tablinks.length; i++) {
+	  tablinks[i].className = tablinks[i].className.replace(" active", "");
+	}
+  
+	// Show the current tab, and add an "active" class to the link that opened the tab
+	document.getElementById(tabName).style.display = "block";
+	event.currentTarget.className += " active";
+} 
 
 // Calculate production per second for each tier
 function computeProduction() {
