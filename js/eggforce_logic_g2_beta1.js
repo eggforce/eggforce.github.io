@@ -532,7 +532,9 @@ function updateGlory() {
 function updateShare() {
 	contract.totalGlory().then((result) =>
 	{
-		m_sharePercent = parseInt(m_glory) / parseInt(m_share);
+		_totalGlory = parseInt(result.toString());
+		if(_totalGlory == 0) { _totalGlory = 1}; // avoid division by 0
+		m_sharePercent = parseInt(m_glory) / _totalGlory
 		m_share = m_sharePercent * a_chest;
 		m_sharePercent = m_sharePercent * 100;
 		document.getElementById('sharePercent').innerHTML = parseFloat(m_sharePercent).toFixed(2);
