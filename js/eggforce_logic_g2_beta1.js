@@ -496,7 +496,7 @@ function updateReign() {
 function updatePushCost() {
     contract.ComputePush().then((result) =>
     {
-		let _cost = ethers.utils.formatEther(result) + parseInt(0.001);
+		let _cost = ethers.utils.formatEther(result) + parseFloat(0.001);
         a_pushCost = _cost;
         document.getElementById('pushCost').innerHTML = parseFloat(a_pushCost).toFixed(4);
     });
@@ -563,7 +563,6 @@ const pushKing = async() => {
 	try {
 		console.log("step 2");
 		//let _pushCost = parseFloat(a_pushCost) + 0.001;
-		console.log(_pushCost);
 		notificationSend('About to push the King for ' + a_pushCost + ' POA');
 		console.log("step 4");
 		const pushTheKing = await contract.Push({
