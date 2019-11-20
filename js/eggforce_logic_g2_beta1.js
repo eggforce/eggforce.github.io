@@ -496,7 +496,8 @@ function updateReign() {
 function updatePushCost() {
     contract.ComputePush().then((result) =>
     {
-        a_pushCost = ethers.utils.formatEther(result);
+		let _cost = ethers.utils.formatEther(result) + parseInt(0.001);
+        a_pushCost = _cost;
         document.getElementById('pushCost').innerHTML = parseFloat(a_pushCost).toFixed(4);
     });
 }
@@ -558,16 +559,20 @@ function updateShare() {
 // Push - spend DAI to become King
 
 const pushKing = async() => {
+	console.log("step 1");
 	try {
-		let _pushCost = parseFloat(a_pushCost) + 0.001;
-		notificationSend('About to push the King for ' + parseFloat(_pushCost).toFixed(3) + ' POA');
+		console.log("step 2");
+		//let _pushCost = parseFloat(a_pushCost) + 0.001;
+		console.log(_pushCost);
+		notificationSend('About to push the King for ' + a_pushCost + ' POA');
+		console.log("step 4");
 		const pushTheKing = await contract.Push({
-            value: ethers.utils.parseEther(_pushCost)
+            value: ethers.utils.parseEther(a_pushCost)
 		})
+		console.log("step 5");
 		notificationSuccess('Pushing the King!');
-		//console.log("joined the game successfully");
 	  } catch (error) {
-		//console.log("Error: ", error); //fires as the contract reverted the payment
+
 		notificationError();
 	  }
 }
