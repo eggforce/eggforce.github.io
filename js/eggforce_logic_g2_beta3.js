@@ -376,7 +376,7 @@ function localProdUpdate() {
 // Local Shroom calculation
 function localShroomUpdate() {
 	m_localShroom = parseFloat(m_localShroom) + parseFloat(m_prod);
-	document.getElementById('shroom').innerHTML = parseFloat(_shroom).toFixed(4); 
+	document.getElementById('shroom').innerHTML = parseFloat(m_localShroom).toFixed(4); 
 }
 
 /*
