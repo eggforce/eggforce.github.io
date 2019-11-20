@@ -336,7 +336,7 @@ function checkEggoaSacrifice() {
 		showModal('pull-modal');
 	}
 	else {
-		showModal('cant-pull-modal');
+		notificationCondition("You need more Eggoas for a sacrifice.");
 	}
 }
 
@@ -347,6 +347,15 @@ function changeEggoaSacrifice() {
 	m_sacrifice = _sacrifice;
 }
 
+// Check if player has shrooms to hatch
+function checkHatch() {
+	if(parseInt(m_shroom) > 0){
+		hatchShroom();
+	}
+	else {
+		notificationCondition("No Shrooms to hatch.");
+	}
+}
 
 /*
 // Calculate DAI earnings for player, based on his proportion of earned rads
