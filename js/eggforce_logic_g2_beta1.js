@@ -505,7 +505,7 @@ function updateReign() {
 function updatePushCost() {
     contract.ComputePush().then((result) =>
     {
-		let _cost = ethers.utils.formatEther(result) + parseFloat(0.001);
+		let _cost = parseFloat(ethers.utils.formatEther(result)) + parseFloat(0.001);
         a_pushCost = _cost;
         document.getElementById('pushCost').innerHTML = parseFloat(a_pushCost).toFixed(4);
     });
@@ -518,7 +518,6 @@ function updatePullCost() {
         a_pullCost = result.toString();
 		document.getElementById('pullCost').innerHTML = a_pullCost;
 		document.getElementById('pullCost2').innerHTML = a_pullCost;
-		document.getElementById('pullCost3').innerHTML = a_pullCost;
     });
 }
 
