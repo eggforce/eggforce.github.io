@@ -376,7 +376,7 @@ function localProdUpdate() {
 // Local Shroom calculation
 function localShroomUpdate() {
 	m_localShroom = parseFloat(m_shroom) + parseFloat(m_prod);
-	document.getElementById('shroom').innerHTML = parseFloat(m_localShroom).toFixed(3); 
+	document.getElementById('shroom').innerHTML = parseFloat(m_localShroom).toFixed(4); 
 }
 
 /*
@@ -557,7 +557,7 @@ function updateShroom() {
 	contract.ComputeShroom(m_account).then((result) =>
     {
         m_shroom = result.toString();
-        document.getElementById('shroom').innerHTML = m_shroom;
+        //document.getElementById('shroom').innerHTML = m_shroom;
     });
 }
 
