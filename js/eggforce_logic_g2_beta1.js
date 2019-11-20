@@ -330,6 +330,16 @@ function checkBoundaries(__number, __html, __min, __max) {
 	return __number;
 }
 
+// Check if player has enough eggoas to sacrifice
+function checkEggoaSacrifice() {
+	if(parseInt(m_eggoa) > parseInt(a_pullCost)) {
+		showModal('pull-modal');
+	}
+	else {
+		showModal('cant-pull-modal');
+	}
+}
+
 // Change Eggoa sacrifice
 function changeEggoaSacrifice() {
 	let _sacrifice = document.getElementById('eggoaSacrifice').value;
@@ -498,6 +508,7 @@ function updatePullCost() {
         a_pullCost = result.toString();
 		document.getElementById('pullCost').innerHTML = a_pullCost;
 		document.getElementById('pullCost2').innerHTML = a_pullCost;
+		document.getElementById('pullCost3').innerHTML = a_pullCost;
     });
 }
 
@@ -549,7 +560,7 @@ function updateShare() {
 const pushKing = async() => {
 	try {
 		let _pushCost = parseFloat(a_pushCost) + 0.001;
-		notificationSend('About to push the King for ' + parseFloat(_pushCost).toFixed(3 + ' POA'));
+		notificationSend('About to push the King for ' + parseFloat(_pushCost).toFixed(3) + ' POA');
 		const pushTheKing = await contract.Push({
             value: ethers.utils.parseEther(_pushCost)
 		})
@@ -635,7 +646,7 @@ function notificationError() {
 var d_eventLog = document.getElementById('eventLog');
 //var d_scrollLog = document.getElementById('scrollLog');
 
-//var eventArray = [];
+var eventArray = [];
 
 function checkEventPast(__string, __block) {
 	if(loggingThePast == false) {

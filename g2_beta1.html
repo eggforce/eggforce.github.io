@@ -50,10 +50,10 @@
                         <h6><span id="pushCost">?</span> POA</h6>
                     </div>
                     <div class="col">
-                        <button class="btn-lg btn-success">HATCH</button>
+                        <button class="btn-lg btn-success" onclick="hatchShroom()">HATCH</button>
                     </div>
                     <div class="col">
-                        <button class="btn-lg btn-info" onclick="showModal('pull-modal')">PULL</button>
+                        <button class="btn-lg btn-info" onclick="checkEggoaSacrifice()">PULL</button>
                         <h6><span id="pullCost">?</span> Eggoas</h6>
                     </div>
                 </div>
@@ -100,6 +100,13 @@
                         <button class="btn-lg btn-info" onclick="pullKing()">PULL</button>
                     </div>
                 </div>
+            </div>
+            <!-- CAN'T PULL WINDOW -->
+            <div class="egg-modal" id="cant-pull-modal">
+                    <div class="border-orange border-round terminal modal-content">
+                            <h3 class="title-container">YOU DON'T HAVE ENOUGH EGGOAS TO SACRIFICE</h3>
+                            <h5>Minimum: <span id="pullCost3">?</span>
+                    </div>
             </div>
 
 
