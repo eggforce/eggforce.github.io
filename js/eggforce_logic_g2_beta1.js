@@ -571,10 +571,10 @@ const pushKing = async() => {
 	try {
 		console.log("step 2");
 		//let _pushCost = parseFloat(a_pushCost) + 0.001;
-		notificationSend('About to push the King for ' + a_pushCost + ' POA');
+		//notificationSend('About to push the King for ' + a_pushCost + ' POA');
 		console.log("step 4");
 		const pushTheKing = await contract.Push({
-            value: ethers.utils.parseEther(a_pushCost)
+            value: ethers.utils.parseEther(a_pushCost.toString())
 		})
 		console.log("step 5");
 		notificationSuccess('Pushing the King!');
