@@ -557,7 +557,12 @@ function updateShroom() {
 	contract.ComputeShroom(m_account).then((result) =>
     {
 		m_shroom = result.toString();
-		m_localShroom = parseFloat(m_shroom);
+		// check if m_shroom differs significantly from m_localShroom
+		// update the latter if so
+		let _diff = (parseInt(m_shroom) - m_localShroom) * 10;
+		if(_diff > parseInt(m_shroom)) {
+			m_localShroom = parseInt(m_shroom);
+		}
         //document.getElementById('shroom').innerHTML = m_shroom;
     });
 }
