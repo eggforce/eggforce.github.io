@@ -1,0 +1,160 @@
+<html>
+	<head>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <link href="https://fonts.googleapis.com/css?family=Cairo|Exo&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="css/simpleNotification.css">
+		<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+		<link rel="stylesheet" type="text/css" href="css/eggforce_beta2.css">
+	</head>
+	<body>
+        <div class="container" style="text-align:center;">
+                        <!-- TITLE -->
+                        <div class="border-orange terminal">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <h5>EGGFORCE G2 Beta1</h5>
+                                    </div>
+                                    <div class="col">
+                                        <a href="https://blockscout.com/poa/core/address/0x20f7ffaF5f38C799df9973aE45A0110AeD9712d2/transactions" target="_blank"><img class="icon-link icon-small" src="img/icon_contract.png"></a>
+
+                                        
+                
+                                        <a href="https://discord.gg/JU8P4Ru" target="_blank"><img class="icon-link icon-small" src="img/icon_discord.png"></a>
+     
+                                        
+                                        <a href="https://twitter.com/eskaroy" target="_blank"><img class="icon-link icon-small" src="img/icon_twitto.png"></a>
+
+                                        <a href="https://medium.com/@thesnailking" target="_blank"><img class="icon-link icon-small" src="img/icon_medium.png"></a>
+                                    </div>
+                                </div>               
+                        </div>
+                    <p></p>
+            <div class="row">
+                <div class="col">
+                    <h1 class="title-container">CHEST = <span id="chest">?</span> POA</h1>
+                </div>     
+                <div class="col">
+                    <h1 class="title-container">END = <span id="end">?</span></h3>
+                </div>
+            </div>    
+            <!-- CURRENT KING, TIME SINCE REIGN, PUSH/PULL -->
+            <div class="border-orange border-round terminal">
+                <h3 class="title-container"><span id="king">?</span> SITS ON THE THRONE</h3>
+                <h5>Claimed the Throne <span id="reignDuration">?</span>
+                <br>
+                <hr>
+                <br>
+                <div class="row">
+                    <div class="col">
+                        <button class="btn-lg btn-danger" onclick="pushKing()">PUSH</button>
+                        <h6><span id="pushCost">?</span> POA</h6>
+                    </div>
+                    <div class="col">
+                        <button class="btn-lg btn-success" onclick="checkHatch()">HATCH</button>
+                    </div>
+                    <div class="col">
+                        <button class="btn-lg btn-info" onclick="checkEggoaSacrifice()">PULL</button>
+                        <h6><span id="pullCost">?</span> Eggoas</h6>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col">
+                        <h4 class="title-container">YOU HAVE</h4>
+                    </div>
+                    <div class="col">
+                        <h4><span id="shroom">?</span> Shrooms</h4>
+                    </div>
+                    <div class="col">
+                        <h4><span id="eggoa">?</span> Eggoas</h4>
+                    </div>
+                </div>
+            </div>
+            <p></p>
+            <!-- EVENT LOGGING -->
+            <h5 class="title-container"><span id="eventLog">[Waiting for events...]</span></h6>
+            <p></p>
+            <!-- LEADERBOARD -->
+            <div class="border-orange border-round terminal">
+                <h3 class="title-container">YOUR ACCOUNT = <span id="account">?</span></h3>
+                <div class="row">
+                    <div class="col">
+                        <h4>Your Glory: <span id="glory">?</span></h4>
+                    </div>
+                    <div class="col">
+                        <h4>Your Share: <span id="share">?</span> POA (<span id="sharePercent">?</span>%)
+                    </div>
+                </div>               
+            </div>
+            <p></p>
+            <!-- PULL WINDOW -->
+            <div class="egg-modal" id="pull-modal">
+                <div class="border-orange border-round terminal modal-content">
+                    <h3 class="title-container">HOW MANY EGGOAS TO SACRIFICE?</h3>
+                    <h5>Minimum: <span id="pullCost2">?</span>
+                    <br><br>
+                    <h3><input type="text" id="eggoaSacrifice" value="1" size="8"></h3>
+                    <br>
+                    <div class="container">
+                        <br>
+                        <button class="btn-lg btn-info" onclick="pullKing()">PULL</button>
+                    </div>
+                </div>
+            </div>
+        <!-- TUTORIAL -->
+        <div class="container">
+            <div class="border-orange terminal">
+                <h3 class="title-container">HOW TO PLAY</h3>
+                <br>
+                <h6>G2 is a King of the Hill game. Sit on the Throne for as long as possible.</h6>
+                <br>
+                <h6>The longer you sit, the more Glory you get. Glory can be traded for POA at the end of the game.</h6>
+                <br><hr>
+                <h4 class="title-container">PUSH THE KING</h5>
+                <br>
+                <h6>To join the game, you must first Push the King.</h6>
+                <br>
+                <h6>A Push costs POA. The previous King gains Glory for the amount of time he sat on the Throne, and loses his Throne. You become the new King.</h6>
+                <br>
+                <h6>Because everyone likes a good Push, 200 Eggoas immediately join your nest.</h6>
+                <br>
+                <h6>You can Push again even after you've joined the game.</h6>
+                <br><hr>
+                <h4 class="title-container">HATCH SHROOMS</h4>
+                <br>
+                <h6>While you aren't King, your Eggoas produce Shrooms passively.</h6>
+                <br>
+                <h6>Hatch your Shrooms at any point into more Eggoas. The more Eggoas, the more Shroom production.</h6>
+                <br>
+                <h6>Eggoas don't produce Shrooms while you sit on the Throne. They're too busy guarding your Kingdom.</h6>
+                <br><hr>
+                <h4 class="title-container">PULL THE KING</h4>
+                <br>
+                <h6>Instead of Pushing, you can sacrifice Eggoas to Pull the King off the throne.</h6>
+                <br>
+                <h6>Just like Push, Pull gives the previous King his Glory, then you become the King.</h6>
+                <br>
+                <h6>To Pull, you need to sacrifice more Eggoas than the current Throne Army. The Throne Army is either the amount of Eggoas the previous King used to Pull, or 200 if he used Push.</h6>
+                <br><hr>
+                <h4 class="title-container">MISCELLANEOUS</h4>
+                <br>
+                <h6>- Glory accumulates faster at the beginning of the game, then follows a decreasing curve.</h6>
+                <br>
+                <h6>- Push cost starts high, then decreases proportionally to the number of previous Pushes.</h6>
+                <br>
+                <h6>- Shroom production receives a slight multiplier the longer you don't hatch.</h6>
+                <br><hr>
+                <h4 class="title-container">EXTRA INFO</h4>
+                <br>
+                <h6>If anything is missing, unclear, or if you have other questions, <a href="https://discord.gg/JU8P4Ru">join our Discord Channel!</a></h6>
+            </div>
+        </div>
+        <!-- simpleNotification -->
+        <script src="js/simpleNotification.js"></script>
+		<!-- etherjs -->
+		<script src="js/ethers-v4.min.js"></script>
+		<!-- Eggforce -->
+		<script src="js/abi_g2_beta3.js"></script>
+		<script src="js/eggforce_logic_g2_beta3.js"></script>
+	</body>
+</html>
