@@ -375,8 +375,7 @@ function localProdUpdate() {
 
 // Local Shroom calculation
 function localShroomUpdate() {
-	m_localShroom = parseFloat(m_shroom) + parseFloat(m_prod);
-	let _shroom = m_localShroom;
+	m_localShroom = parseFloat(m_localShroom) + parseFloat(m_prod);
 	document.getElementById('shroom').innerHTML = parseFloat(_shroom).toFixed(4); 
 }
 
@@ -557,7 +556,8 @@ function updateEggoa() {
 function updateShroom() {
 	contract.ComputeShroom(m_account).then((result) =>
     {
-        m_shroom = result.toString();
+		m_shroom = result.toString();
+		m_localShroom = parseFloat(m_shroom);
         //document.getElementById('shroom').innerHTML = m_shroom;
     });
 }
