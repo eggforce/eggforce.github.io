@@ -61,6 +61,7 @@ var a_pullCost = 0;
 var m_balance = 0;
 var m_eggoa = 0;
 var m_glory = 0;
+var m_lastHatch = 0;
 var m_localShroom = 0;
 var m_openedChest = false;
 var m_prod = 0;
@@ -136,6 +137,7 @@ function refreshData(){
 		updateShroom();
 		updateGlory();
 		updateShare();
+		updateLastHatch();
 		localProdUpdate();
 	}
 }
