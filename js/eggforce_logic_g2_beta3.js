@@ -61,7 +61,9 @@ var a_pullCost = 0;
 var m_balance = 0;
 var m_eggoa = 0;
 var m_glory = 0;
+var m_localShroom = 0;
 var m_openedChest = false;
+var m_prod = 0;
 var m_sacrifice = 0;
 var m_share = 0;
 var m_shroom = 0;
@@ -95,6 +97,9 @@ function initializeBlockchainData() {
 //Fast loop every 100ms 
 function controlLoopFast() {
 	changeEggoaSacrifice();
+	if(m_account !== "") {
+		localShroomUpdate();
+	}
 	/*updateLaunchTimer();
 	
 	updateDaimidTimer();
@@ -131,6 +136,7 @@ function refreshData(){
 		updateShroom();
 		updateGlory();
 		updateShare();
+		localProdUpdate();
 	}
 }
 
@@ -357,6 +363,20 @@ function checkHatch() {
 	}
 }
 
+// Local prod calculation
+function localProdUpdate() {
+	let _elapsed = parseInt(getCurrentTime()) - parseInt(m_lastHatch);
+	let _mult = parseInt(_elapsed / 3600) + parseInt(24);
+	let _prod = _elapsed * parseInt(m_eggoa) * _mult / 24; // per day
+	m_prod = parseFloat(_prod) / (10 * 60 * 60 * 24) // daily prod converted to 100ms interval 
+}
+
+// Local Shroom calculation
+function localShroomUpdate() {
+	m_localShroom = parseFloat(m_shroom) + parseFloat(m_prod);
+	document.getElementById('shroom').innerHTML = parseFloat(m_localShroom).toFixed(3); 
+}
+
 /*
 // Calculate DAI earnings for player, based on his proportion of earned rads
 // Check if game is over and if player has opened chest too
@@ -537,6 +557,14 @@ function updateShroom() {
         m_shroom = result.toString();
         document.getElementById('shroom').innerHTML = m_shroom;
     });
+}
+
+// Player Last Hatch
+function updateLastHatch() {
+	contract.lastHatch(m_account).then((result) =>
+	{
+		m_lastHatch = result.toString();
+	});
 }
 
 // Player Glory
