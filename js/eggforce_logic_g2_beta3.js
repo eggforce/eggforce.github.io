@@ -369,7 +369,7 @@ function checkHatch() {
 function localProdUpdate() {
 	let _elapsed = parseInt(getCurrentTime()) - parseInt(m_lastHatch);
 	let _mult = parseInt(_elapsed / 3600) + parseInt(24);
-	let _prod = _elapsed * parseInt(m_eggoa) * _mult / 24; // per day
+	let _prod = parseInt(m_eggoa) * _mult / 24; // per day
 	m_prod = parseFloat(_prod) / (10 * 60 * 60 * 24) // daily prod converted to 100ms interval 
 }
 
