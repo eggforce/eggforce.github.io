@@ -99,7 +99,7 @@ function initializeBlockchainData() {
 //Fast loop every 100ms 
 function controlLoopFast() {
 	changeEggoaSacrifice();
-	if(m_account !== "") {
+	if(m_account !== "" && m_shroom !== 0) {
 		localShroomUpdate();
 	}
 	/*updateLaunchTimer();
@@ -572,7 +572,7 @@ function updateShroom() {
 		m_shroom = result.toString();
 		// check if m_shroom differs significantly from m_localShroom
 		// update the latter if so
-		let _diff = (parseInt(m_shroom) - m_localShroom) * 10; //10 is arbitrary, to check diff
+		let _diff = Math.abs(parseInt(m_shroom) - m_localShroom);
 		if(_diff > parseInt(m_shroom)) {
 			m_localShroom = parseInt(m_shroom);
 		}
