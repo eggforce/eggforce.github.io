@@ -1,0 +1,937 @@
+pragma solidity >=0.5.0 <0.6.0;
+
+// ----------------------------------------------------------------------------
+// SafeMath library
+// ----------------------------------------------------------------------------
+
+library SafeMath {
+
+    function add(uint a, uint b) internal pure returns (uint c) {
+        c = a + b;
+        require(c >= a, "couldn't add with safemath");
+    }
+
+    function sub(uint a, uint b) internal pure returns (uint c) {
+        require(b <= a, "couldn't sub with safemath");
+        c = a - b;
+    }
+
+    function mul(uint a, uint b) internal pure returns (uint c) {
+        c = a * b;
+        require(a == 0 || c / a == b, "couldn't mul with safemath");
+    }
+
+    function div(uint a, uint b) internal pure returns (uint c) {
+        require(b > 0, "couldn't div with safemath");
+        c = a / b;
+    }
+    
+    function mod(uint a, uint b) internal pure returns (uint c) {
+        require(b != 0, "couldn't modulo by 0");
+        c = a % b;
+    }
+}
+
+// ----------------------------------------------------------------------------
+// Owned contract
+// ----------------------------------------------------------------------------
+
+contract Owned {
+
+    address payable public owner;
+    address payable public newOwner;
+
+    event OwnershipTransferred(address indexed _from, address indexed _to);
+
+    constructor() public {
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner {
+        require(msg.sender == owner, "must be owner");
+        _;
+    }
+
+    function transferOwnership(address payable _newOwner) public onlyOwner {
+        newOwner = _newOwner;
+    }
+
+    function acceptOwnership() public {
+        require(msg.sender == newOwner, "must be new owner");
+        
+        owner = newOwner;
+        newOwner = address(0);
+
+        emit OwnershipTransferred(owner, newOwner);
+    }
+}
+
+// ----------------------------------------------------------------------------
+// Game contract
+// ----------------------------------------------------------------------------
+
+contract EggforceGameRound1 is Owned {
+    
+    using SafeMath for uint256;
+    
+    /* Structs */
+
+    struct Eggoa {
+        uint256 amount;     // eggoas owned
+        uint256 level;      // total number of upgrades
+        uint256 attackNext; // timestamp for next attack
+        uint256 ownedLand;  // id of land owned
+        uint256[4] stat;
+    }
+
+    struct Production {
+        uint256[4] stat;
+    }
+    
+    struct Territory {
+        address lord;       // current owner of the territory
+        uint256 eggoa;      // tier of the lord's eggoas
+        uint256 lastLand;   // last time shrooms were hatched
+        uint256 level;      // number of captures, shroom multiplier
+        uint256[4] stat;
+    }
+    
+    /* Constants */
+    
+    uint256 constant BASE_STAT          = 4;        // default value for all stats
+    uint256 constant SHROOM_MULT        = 24;       // multiplier for land shrooms
+    uint256 constant MULT_COST          = 10;       // base cost for multiplier
+    uint256 constant TIME_FOR_1_SHROOM  = 12 minutes;// interval for a shroom to grow
+    uint256 constant TIME_FOR_1_RAD     = 8 hours;  // interval for 1 eggoa with stat 1 to produce 1 rad
+    uint256 constant MAX_TIER           = 8;        // no more than 8 tiers (1 to 8)
+    uint256 constant AUCTION_MULT       = 8;        // multiplier when auctions reset
+    uint256 constant AUCTION_BASE       = 1 hours;  // price factor for auctions
+    uint256 constant GAME_DURATION      = 1 weeks;  // time between contract deployment and round end
+    uint256 constant UNIT_LOST_MUL      = 20;       // combined with UNIT_LOST_DIV, % of units lost
+    uint256 constant UNIT_LOST_DIV      = 100;      // after a lost fight
+    uint256 constant TRIBE_RAD_MULT     = 4000;     // multiplier for RAD from DAI spends
+    uint256 constant PLANTAMID_GOA_COST = 200;      // multiplier for base Eggoa plantamid cost
+    uint256 constant UNLOCK_COST        = 400;      // base cost for unlocking tier
+    uint256 constant RAD_AUCTION_BASE   = 40000;    // rad base cost for auctions
+    uint256 constant ATTACK_INTERVAL    = 1 days;   // duration between attacks
+    uint256 constant UPGRADE_COST       = 40;      // multiplier for upgrade cost in rad
+    
+    // DAI costs are expressed as a divider of the main pot, set at game start
+    uint256 constant PLANTAMID_DAI_COST = 100;      // base DAI plantamid cost
+    uint256 constant JOIN_COST          = 100;      // cost to join the game or change tribe
+    uint256 constant DAI_AUCTION_BASE   = 10;       // base cost for auctions
+    
+    /* Variables */
+    
+    uint256 public chest;               // DAI chest, to be split according to rads at round end
+    uint256 public launch;              // timestamp for round start
+    uint256 public end;                 // timestamp for round end
+    uint256 public globalRad;           // all harvested rads, used for chest distribution
+    
+    uint256 public daiAuctionTimer;   // start time of DAI auction
+    uint256 public daiAuctionCost;    // cost for DAI auction
+    uint256 public radAuctionTimer;   // start time of RAD auction
+    uint256 public radAuctionCost;    // cost for RAD auction
+    
+    uint256 public joinCost;            // cost to join the game or change tribe
+    uint256 public plantamidDaiCost;    // base cost for DAI plantamid
+    
+    uint256 public maxTerritory;        // current number of lands
+    
+    /* Mappings */
+    
+    mapping(address => uint256) public balance;                     // DAI balance for player
+    mapping(address => bool) public openedChest;                    // whether player has claimed his DAI reward
+    mapping(address => uint256) public lastShroom;                  // last shroom hatch for player
+    mapping(address => uint256) public lastRad;                     // last rad collection for player
+    mapping(address => uint256) public rad;                         // current rads for player
+    mapping(address => uint256) public earnedRad;                   // historical rads player earned
+    mapping(address => uint256) public shroom;                      // saved shrooms for player
+    mapping(address => uint256) public tribe;                       // player tribe
+    mapping(uint256 => uint256) public tribeRad;                    // claimable rads from tribe
+    mapping(address => uint256) public tribeChange;                 // number of times player changed tribes
+    mapping(address => uint256) public collectedTribeRad;           // claimed tribe rads for player
+    mapping(address => uint256) public tier;                        // current unlocked tier for player
+    mapping(address => mapping(uint256 => Eggoa)) public eggoaNest; // player Eggoa for given tier
+    mapping(uint256 => Production) private tierProd;                // production for given tier
+    mapping(uint256 => Territory) public land;                     // individual territory
+    mapping(address => uint256) public eggoaPlantamid;              // Eggoa plantamid 
+    mapping(address => uint256) public daiPlantamid;                // DAI plantamid 
+
+    /* Events */
+    
+    event StartedGame (uint256 launch, uint256 end);
+    event WithdrewBalance (address sender, uint256 eth);
+    event OpenedChest (address sender, uint256 eth);
+    event JoinedGame (address sender, uint256 tribe, uint256 land);
+    event HarvestedRad (address sender, uint256 rad);
+    event ClaimedTribeRad (address sender, uint256 rad, uint256 tribe);
+    event ChangedTribe (address sender, uint256 tribe);
+    event FoundAnomaly (address sender, uint cost, uint rad, bool territory, uint target, uint stat0, uint stat1, uint stat2, uint stat3);
+    event UnlockedTier (address sender, uint256 tier);
+    event HatchedShroom (address sender, uint256 rad, uint256 tier, uint256 shroom, uint256 eggoa);
+    event CollectedShroom (address sender, uint256 land, uint256 shroom);
+    event TookOverLand (address sender, uint256 land);
+    event WonLandFight (address sender, address lord, uint land, uint powerSender, uint powerLord, uint result, uint shroom, uint eggoa);
+    event LostLandFight (address sender, address lord, uint land, uint powerSender, uint powerLord, uint result, uint eggoa);
+    event UpgradedEggoa (address sender, uint rad, uint tier, uint stat0, uint stat1, uint stat2, uint stat3);
+    event RaisedEggoaPlantamid (address sender, uint tier, uint eggoa, uint plantamid);
+    event RaisedDaiPlantamid (address sender, uint eth, uint upgrade, uint plantamid);
+
+    /* Functions */
+    
+    //-- constructor
+    constructor() public {
+
+    }
+    
+    //-- StartGame [owner only]
+    // Sets appropriate values, starts game
+    function StartGame() payable public onlyOwner {
+		require(msg.value > 0, "seed the game, dummy");
+        
+        // initialize all production at 4/4/4/4 for convenience
+		for(uint256 i = 1; i <= MAX_TIER; i++){
+		    for(uint256 j = 0; j < BASE_STAT; j++){
+		        tierProd[i].stat[j] = BASE_STAT;
+		    }
+		}
+		
+		// set round start and end
+		launch = now;
+		end = now.add(GAME_DURATION);
+		
+		// owner's seed becomes the chest
+		chest = msg.value;
+		
+		// set auction base costs and timers
+		daiAuctionCost = chest.div(DAI_AUCTION_BASE);
+		radAuctionCost = RAD_AUCTION_BASE;
+		daiAuctionTimer = now;
+		radAuctionTimer = now;
+		
+		// set join and dai plantamid costs 
+		joinCost = chest.div(JOIN_COST);
+		plantamidDaiCost = chest.div(PLANTAMID_DAI_COST);
+		
+		emit StartedGame(launch, end);
+    }    
+    
+    // MODIFIERS
+    
+    modifier gameStarted {
+        require(end > 0, "game hasn't started yet");
+        _;
+    }
+    
+    modifier hasJoined {
+        require(tier[msg.sender] > 0, "player hasn't joined the game yet");
+        _;
+    }
+    
+    modifier gameOngoing {
+        require(now < end, "game is over");
+        _;
+    }
+    
+    // MISC ACTIONS
+    
+    //-- WithdrawBalance
+    // Sends player balance to his wallet
+    
+    function WithdrawBalance() public {
+        require(balance[msg.sender] > 0, "balance is empty");
+        
+        uint _amount = balance[msg.sender];
+        balance[msg.sender] = 0;
+        msg.sender.transfer(_amount);
+        
+        emit WithdrewBalance(msg.sender, _amount);
+    }
+    
+    //-- PotSplit [private]
+    // Splits __value between chest and owner (50/50)
+    // Increases tribeRad[__tribe] by __value * TRIBE_RAD_MULT / joinCost
+    
+    function PotSplit(uint256 __value, uint256 __tribe) private {
+        
+        // split value
+        chest = chest.add(__value.div(2));
+        balance[owner] = balance[owner].add(__value.div(2));
+        
+        // feed tribeRad
+        tribeRad[__tribe] = tribeRad[__tribe].add(__value.mul(TRIBE_RAD_MULT).div(joinCost));
+    }
+    
+    //-- OpenChest
+    // Gets share of DAI chest once game has ended 
+    // Personal share = earnedRad / globalRad
+    // Call withdraw()
+    
+    function OpenChest() gameStarted public {
+        require(now > end, "game hasn't ended yet");
+        require(openedChest[msg.sender] == false, "already opened chest");
+        
+        uint256 _reward = chest.mul(earnedRad[msg.sender]).div(globalRad);
+        openedChest[msg.sender] = true;
+        balance[msg.sender] = balance[msg.sender].add(_reward);
+        
+        emit OpenedChest(msg.sender, _reward);
+        
+        WithdrawBalance();
+    }
+    
+    // GAME ACTIONS
+    
+    //-- JoinGame
+    // Assigns new player to selected tribe
+    // Gives new player 1+ day worth of shrooms (timer is set from launch)
+    // Gives new player rads to hatch these shrooms, and hatch them immediately
+    // Generates new land, assigns this new land to player
+    
+    function JoinGame(uint256 __tribe) gameStarted gameOngoing payable public {
+        require(tx.origin == msg.sender, "player must be a fleshbag");
+        require(tier[msg.sender] == 0, "player is already active");
+        require(__tribe <= BASE_STAT, "pick a tribe between 1 and 4");
+        require(__tribe > 0, "pick a tribe between 1 and 4");
+        require(msg.value == joinCost, "wrong DAI value to join game");
+        
+        // divide to chest 
+        PotSplit(msg.value, __tribe);
+        
+        // assign player to tribe
+        tribe[msg.sender] = __tribe;
+        tribeChange[msg.sender]++;
+        
+        // set timers. 1 day worth of shrooms for instant start
+        lastShroom[msg.sender] = launch.sub(1 days);
+        lastRad[msg.sender] = now;
+        
+        // tier also serves as indicator the player is active by being > 0
+        tier[msg.sender] = 1;
+        
+        // set tier1 to level 1
+        eggoaNest[msg.sender][1].level = 1;
+        
+        // set tier1 stats to base levels
+        for(uint i = 0; i < BASE_STAT; i++){
+            eggoaNest[msg.sender][1].stat[i] = BASE_STAT;
+        }
+        
+        // give appropriate rads then call hatchshroom so sender has some eggoas
+        rad[msg.sender] = ComputeMultiplierCost(1, 1);
+        HatchShroom(1, 1);
+        
+        // add new land
+        maxTerritory++;
+            
+        // initialize land stats
+        uint256 _weightSum;
+            
+        for(uint256 i = 0; i < BASE_STAT; i++){
+            land[maxTerritory].stat[i] = ComputeRandom(i, 5); //returns between 0 and 4
+            _weightSum = _weightSum.add(land[maxTerritory].stat[i]);
+                
+            // make sure at least one stat is above 0
+            if(_weightSum == 0){
+                uint256 _nonZeroStat = ComputeRandom(0, 4);
+                land[maxTerritory].stat[_nonZeroStat] = 1;
+            }
+        }
+            
+        // set level to 1
+        land[maxTerritory].level = 1;
+            
+        // set last shroom collection to now (round start discouraged fights on low pop) 
+        land[maxTerritory].lastLand = now;
+            
+        // give ownership to our brave explorer
+        land[maxTerritory].lord = msg.sender;
+        land[maxTerritory].eggoa = 1;
+        eggoaNest[msg.sender][1].ownedLand = maxTerritory;
+        
+        emit JoinedGame(msg.sender, __tribe, maxTerritory);
+    }
+    
+    //-- HarvestRad
+    // Lets a player collect his accumulated rads
+    
+    function HarvestRad() hasJoined gameOngoing public {
+        
+        // tally up the rads
+        uint256 _rad = ComputeFullRad(msg.sender);
+        
+        // reset the timer
+        lastRad[msg.sender] = now;
+        
+        // give the goods
+        rad[msg.sender] = rad[msg.sender].add(_rad);
+        
+        // increase earnedRad and globalRad
+        earnedRad[msg.sender] = earnedRad[msg.sender].add(_rad);
+        globalRad = globalRad.add(_rad);
+        
+        emit HarvestedRad(msg.sender, _rad);
+    }
+    
+    //-- ClaimTribeRad 
+    // Lets a player collect new tribeRads
+    
+    function ClaimTribeRad() hasJoined gameOngoing public {
+        
+        // compute rads to claim
+        uint256 _rad = ComputeTribeRad(msg.sender);
+        
+        // set collected rad to triberad 
+        collectedTribeRad[msg.sender] = tribeRad[tribe[msg.sender]];
+        
+        // give rads to sender
+        rad[msg.sender] = rad[msg.sender].add(_rad);
+        
+        emit ClaimedTribeRad(msg.sender, _rad, tribe[msg.sender]);
+    }
+    
+    //-- ChangeTribe
+    // Lets a player change his tribe
+    
+    function ChangeTribe(uint256 __newTribe) hasJoined gameOngoing payable public {
+        require(__newTribe <= BASE_STAT, "tribe must be between 1 and 4");
+        require(__newTribe > 0, "tribe must be between 1 and 4");
+        
+        // compute cost to change tribe
+        uint256 _cost = ComputeTribeChange(tribeChange[msg.sender]);
+        require(msg.value == _cost, "wrong DAI value to change tribe");
+        
+        // split to chest 
+        PotSplit(msg.value, __newTribe);
+        
+        // welcome player to his new tribe
+        tribe[msg.sender] = __newTribe;
+        collectedTribeRad[msg.sender] = tribeRad[__newTribe];
+        tribeChange[msg.sender]++;
+        
+        emit ChangedTribe(msg.sender, __newTribe);
+    }
+    
+    //-- FindAnomaly
+    // Trades either DAI or RAD for an anomaly
+    // Then uses it on either territory or tierProd (__territory bool)
+    // #__target stats are changed to _stat0, _stat1, _stat2, _stat3
+    // _statX must be between 0 and 4
+    
+    function FindAnomaly(
+        uint256 __rad, 
+        bool __territory,
+        uint256 __target,
+        uint256 __stat0, 
+        uint256 __stat1, 
+        uint256 __stat2, 
+        uint256 __stat3) 
+        hasJoined gameOngoing payable public {
+            
+            // save stat changes in an array
+            uint256[4] memory _statChange = [__stat0, __stat1, __stat2, __stat3];
+            
+            // add stats to make sure at least one is nonzero
+            uint256 _total = __stat0.add(__stat1).add(__stat2).add(__stat3);
+            require(_total != 0, "at least one stat must be above 0");
+            
+            // make sure each stat is within the acceptable range
+            for(uint256 i = 0; i < BASE_STAT; i++){
+                require(_statChange[i] <= BASE_STAT, "stats must be between 0 and 4");
+            }
+            
+            uint256 _cost;
+            
+            // if sender sent DAI, use DAI. else use rad 
+            if(msg.value > 0){
+                
+                // check DAI cost, then revert if sender didn't send enough
+                _cost = ComputeAuction(daiAuctionTimer, daiAuctionCost, now);
+                require(msg.value >= _cost, "not enough DAI for anomaly auction");
+                
+                //reimburse sender for extra value sent
+                if(msg.value > _cost){
+                    uint256 _refund = msg.value.sub(_cost);
+                    balance[msg.sender] = balance[msg.sender].add(_refund);
+                }
+                
+                PotSplit(_cost, tribe[msg.sender]);
+                
+                //reset anomaly timer, multiply anomaly cost
+                daiAuctionTimer = now;
+                daiAuctionCost = _cost.mul(AUCTION_MULT);
+            } else {
+                
+                // check RAD cost, then revert if sender didn't send enough
+                // (note we want the sender to specify how many he sends,
+                // as if the auction resets, he could spend much more than he wanted)
+                _cost = ComputeAuction(radAuctionTimer, radAuctionCost, now);
+                require(__rad >= _cost, "not enough RAD");
+                
+                rad[msg.sender] = rad[msg.sender].sub(_cost);
+                
+                //reset anomaly timer, multiply anomaly cost 
+                radAuctionTimer = now;
+                radAuctionCost = _cost.mul(AUCTION_MULT);
+            }
+
+            
+            // check if __target is within bounds, then change stats accordingly
+            if(__territory){
+                require(__target <= maxTerritory, "over max target for territories");
+                require(__target != 0, "we don't go to land 0");
+                
+                for(uint256 i = 0; i < BASE_STAT; i++){
+                    land[__target].stat[i] = _statChange[i];
+                }
+            } else {
+                require(__target <= MAX_TIER, "over max target for tiers");
+                require(__target != 0, "the mysteries of tier0 are not known to you");
+                
+                for(uint256 i = 0; i < BASE_STAT; i++){
+                    tierProd[__target].stat[i] = _statChange[i];
+                }
+            }
+            
+            emit FoundAnomaly(msg.sender, _cost, __rad, __territory, __target, __stat0, __stat1, __stat2, __stat3);
+    }
+    
+    //-- UnlockTier
+    // Allows a player to unlock the next tier of Eggoas for RAD,
+    // Gives 1 Eggoa of that tier
+    
+    function UnlockTier() hasJoined gameOngoing public {
+        require(tier[msg.sender] < MAX_TIER, "already at max tier");
+        
+        // check cost, subtract rads
+        uint256 _cost = ComputeUnlockCost(tier[msg.sender]);
+        rad[msg.sender] = rad[msg.sender].sub(_cost);
+        
+        // initiate new tier
+        tier[msg.sender] = tier[msg.sender].add(1);
+        for(uint i = 0; i < BASE_STAT; i++){
+            eggoaNest[msg.sender][tier[msg.sender]].stat[i] = BASE_STAT;
+        }
+        
+        // give 1 eggoa of new tier, and set new tier to level 1
+        eggoaNest[msg.sender][tier[msg.sender]].amount = 1;
+        eggoaNest[msg.sender][tier[msg.sender]].level = 1;
+        
+        emit UnlockedTier(msg.sender, tier[msg.sender]);
+    }
+    
+    //-- HatchShroom
+    // Multiplies shrooms by __mult into eggoas of __tier
+    
+    function HatchShroom(uint256 __tier, uint256 __mult) hasJoined gameOngoing public {
+        require(__tier <= tier[msg.sender], "this tier hasn't been unlocked yet");
+        require(__tier > 0, "tier 0 is a lie");
+        
+        uint256 _rad = ComputeMultiplierCost(__tier, __mult);
+        require(rad[msg.sender] >= _rad, "not enough rads to hatch this tier of eggoas");
+        
+        // check how many shrooms we have, then set last hatch
+        uint256 _shroom = ComputeShroom(msg.sender);
+        lastShroom[msg.sender] = now;
+        shroom[msg.sender] = 0;
+        
+        // sub rads and give new eggoas to player
+        rad[msg.sender] = rad[msg.sender].sub(_rad);
+        uint256 _eggoaGained = _shroom.mul(__mult);
+        eggoaNest[msg.sender][__tier].amount = eggoaNest[msg.sender][__tier].amount.add(_eggoaGained);
+        
+        emit HatchedShroom(msg.sender, _rad, __tier, _shroom, _eggoaGained);
+    }
+    
+    //-- CollectShroom
+    // Lets a player collect shrooms from __land
+    // Player must be the lord of said __land
+    
+    function CollectShroom(uint256 __land) hasJoined gameOngoing public {
+        require(land[__land].lord == msg.sender, "you don't own this land");
+        
+        // calculate shrooms
+        uint256 _shroom = ComputeLandShroom(__land);
+        
+        // reset timer 
+        land[__land].lastLand = now;
+        
+        // give the reward
+        shroom[msg.sender] = shroom[msg.sender].add(_shroom);
+        
+        emit CollectedShroom(msg.sender, __land, _shroom);
+    }
+    
+    //-- AttackTerritory
+    // Take over __land if abandoned
+    // Else, fight the current lord of __land using __tier Eggoas
+    
+    function AttackTerritory(uint256 __land, uint256 __tier) hasJoined gameOngoing public {
+        require(__tier <= tier[msg.sender], "this tier hasn't been unlocked yet");
+        require(__tier > 0, "the legend of tier 0 remains out of reach");
+        require(__land <= maxTerritory, "over max target for land");
+        require(__land > 0, "this is not the land ID you're looking for");
+        require(now > eggoaNest[msg.sender][__tier].attackNext, "eggoas on cooldown from attacking");
+
+        // remove eggoa from previously owned land 
+        if(eggoaNest[msg.sender][__tier].ownedLand != 0){
+            land[eggoaNest[msg.sender][__tier].ownedLand].lord = address(0);
+        }
+        
+        // set attackNext to 1 day from now, no matter the result 
+        eggoaNest[msg.sender][__tier].attackNext = now.add(ATTACK_INTERVAL);
+
+        
+        // if the land is abandoned, msg.sender gets it     
+        if(land[__land].lord == address(0)) {
+           
+            land[__land].lord = msg.sender;
+            land[__land].eggoa = __tier;
+            eggoaNest[msg.sender][__tier].ownedLand = __land;
+            
+            emit TookOverLand(msg.sender, __land);
+            
+        // if the land is occupied, a fight starts
+        } else {
+            require(tribe[msg.sender] != tribe[land[__land].lord], "cannot attack member of same tribe");
+            
+            // calculate land weight
+            uint256 _landWeight;
+            
+            for(uint256 i = 0; i < BASE_STAT; i++){
+                _landWeight = _landWeight.add(land[__land].stat[i]);
+            }
+            
+            // pit msg.sender against lord
+            uint256 _powerSender = ComputeForce(__land, _landWeight, msg.sender, __tier);
+            uint256 _powerLord = ComputeForce(__land, _landWeight, land[__land].lord, land[__land].eggoa);
+
+            // add totals together and use that value as the max for the dice roll
+            uint256 _result = ComputeRandom(1, _powerSender.add(_powerLord));
+            
+            // if result is below _powerSender, msg.sender wins. else lord wins 
+            if(_result < _powerSender){
+                
+                // previous lord loses units
+                uint256 _unitLost = eggoaNest[land[__land].lord][land[__land].eggoa].amount.mul(UNIT_LOST_MUL).div(UNIT_LOST_DIV);
+                eggoaNest[land[__land].lord][land[__land].eggoa].amount = 
+                eggoaNest[land[__land].lord][land[__land].eggoa].amount.sub(_unitLost);
+                
+                // previous lord loses land 
+                eggoaNest[land[__land].lord][land[__land].eggoa].ownedLand = 0;
+                
+                // victorious msg.sender gets 3/4 of shrooms, previous lord gets 1/4
+                uint256 _shroom = ComputeLandShroom(__land);
+                shroom[land[__land].lord] = shroom[land[__land].lord].add(_shroom.div(4));
+                shroom[msg.sender] = shroom[msg.sender].add(_shroom.mul(3).div(4));
+                
+                // fire event here, to get proper lord
+                emit WonLandFight(msg.sender, land[__land].lord, __land, _powerSender, _powerLord, _result, _shroom, _unitLost);
+                
+                // msg.sender becomes lord
+                land[__land].lord = msg.sender;
+                land[__land].eggoa = __tier;
+                eggoaNest[msg.sender][__tier].ownedLand = __land;
+                
+                // set land harvest to now and increase land level
+                land[__land].lastLand = now;
+                land[__land].level++;
+                
+            } else {
+                
+                //msg.sender loses units
+                uint256 _unitLost = eggoaNest[msg.sender][__tier].amount.mul(UNIT_LOST_MUL).div(UNIT_LOST_DIV); 
+                eggoaNest[msg.sender][__tier].amount = eggoaNest[msg.sender][__tier].amount.sub(_unitLost);
+                
+                //if msg.sender owned a land before, he owns no land now
+                if(eggoaNest[msg.sender][__tier].ownedLand != 0){
+                    eggoaNest[msg.sender][__tier].ownedLand = 0;
+                }
+                
+                emit LostLandFight(msg.sender, land[__land].lord, __land, _powerSender, _powerLord, _result, _unitLost);
+            }
+            
+        }
+    }
+    
+    //-- UpgradeEggoa
+    // Trades RAD for any number of upgrades
+    // Each upgrade boosts the selected stat by 4 points
+    
+    function UpgradeEggoa(
+        uint256 __tier,
+        uint256 __stat0, 
+        uint256 __stat1, 
+        uint256 __stat2, 
+        uint256 __stat3)
+        hasJoined gameOngoing public {
+            require(__tier <= tier[msg.sender], "this tier hasn't been unlocked yet");
+            require(__tier > 0, "tier 0 has been banished from this world");
+            
+            uint256 _upgrade = __stat0.add(__stat1).add(__stat2).add(__stat3);
+            
+            uint256 _cost = ComputeUpgradeCost(eggoaNest[msg.sender][__tier].level, _upgrade, __tier);
+            require(rad[msg.sender] >= _cost, "not enough rads to upgrade");
+            
+            // remove player rads
+            rad[msg.sender] = rad[msg.sender].sub(_cost);
+            
+            // raise eggoa level
+            eggoaNest[msg.sender][__tier].level = eggoaNest[msg.sender][__tier].level.add(_upgrade);
+            
+            // save stat changes in an array
+            uint256[4] memory _statChange = [__stat0, __stat1, __stat2, __stat3];
+            
+            // allocate stats
+            for(uint256 i = 0; i < BASE_STAT; i++){
+                eggoaNest[msg.sender][__tier].stat[i] = eggoaNest[msg.sender][__tier].stat[i].add(_statChange[i]);
+            }
+            
+            emit UpgradedEggoa(msg.sender, _cost, __tier, __stat0, __stat1, __stat2, __stat3);
+        }
+    
+    //-- RaiseEggoaPlantamid
+    // Sacrifices Eggoas of __tier to upgrade Eggoa Plantamid once
+    
+    function RaiseEggoaPlantamid(uint256 __tier) hasJoined gameOngoing public {
+        uint256 _cost = ComputeEggoaPlantamidCost(eggoaPlantamid[msg.sender], __tier);
+        require(eggoaNest[msg.sender][__tier].amount >= _cost);
+        
+        // remove eggoas
+        eggoaNest[msg.sender][__tier].amount = eggoaNest[msg.sender][__tier].amount.sub(_cost);
+        
+        // raise Plantamid one floor
+        eggoaPlantamid[msg.sender]++;
+        
+        emit RaisedEggoaPlantamid(msg.sender, __tier, _cost, eggoaPlantamid[msg.sender]);
+    }
+    
+    //-- RaiseDaiPlantamid
+    // Trades DAI to upgrade  Dai Plantamid __upgrade times
+    
+    function RaiseDaiPlantamid(uint256 __upgrade) hasJoined gameOngoing payable public {
+        
+        uint256 _cost = ComputeDaiPlantamidCost(daiPlantamid[msg.sender], __upgrade);
+        require(msg.value >= _cost, "not enough DAI");
+        
+        //reimburse sender for extra value sent
+        if(msg.value > _cost){
+            uint256 _refund = msg.value.sub(_cost);
+            balance[msg.sender] = balance[msg.sender].add(_refund);
+        }
+
+        PotSplit(_cost, tribe[msg.sender]);
+            
+        daiPlantamid[msg.sender] = daiPlantamid[msg.sender].add(__upgrade);
+            
+        emit RaisedDaiPlantamid(msg.sender, _cost, __upgrade, daiPlantamid[msg.sender]);    
+    } 
+    
+    // COMPUTATIONS
+    
+    //-- ComputeForce
+    // Returns power for a given fighter in a given battle
+    // Power = sum of weighted stats * eggoa amount * plantamids / land weight
+    
+    function ComputeForce(
+        uint256 __land, 
+        uint256 __landWeight, 
+        address __fighter, 
+        uint256 __fighterTier) 
+        public view returns(uint256 _power) {
+        
+            // multiply each stat by tier and land weight 
+            for(uint256 i = 0; i < BASE_STAT; i++){
+                _power = _power.add(eggoaNest[__fighter][__fighterTier].stat[i].mul(__fighterTier).mul(land[__land].stat[i]));
+            }
+            
+            // mutiply by amount of eggoa, then plantamid
+            _power = _power.mul(eggoaNest[__fighter][__fighterTier].amount);
+            _power = _power.mul(daiPlantamid[__fighter].add(eggoaPlantamid[__fighter]).add(1));
+            
+            // divide by land weight
+            _power = _power.div(__landWeight);
+    }
+    
+    //-- ComputeSum
+    // Returns (n * n+1) / 2 sum starting at __start and ending at __end
+    
+    function ComputeSum(uint256 __start, uint256 __end) public pure returns(uint256) {
+        uint256 _sumStart = __start.mul(__start.add(1)).div(2);
+        uint256 _sumEnd = __end.mul(__end.add(1)).div(2);
+        return _sumEnd.sub(_sumStart);
+    }
+    
+    //-- ComputeRandom
+    // Generate a random number between 0 and __max -1
+    // __var adds variance for chained random calls in the same block (land stat generation)
+    // (This is exploitable! However, incentive for any individual attack should be low enough in Eggforce)
+    
+    function ComputeRandom(uint256 __var, uint256 __max) public view returns (uint256) {
+         return uint(keccak256(abi.encodePacked(__var, blockhash(block.number), block.number.sub(1)))) % __max; //
+    }
+    
+    //-- ComputeTribeChange
+    // Returns DAI cost to change tribe
+    // Cost = joinCost * number of changes
+    
+    function ComputeTribeChange(uint256 __change) public view returns (uint256) {
+        return joinCost.mul(__change);
+    }
+    
+    //-- ComputeUpgradeCost
+    // Returns RAD cost for __upgrade upgrades of level __level tier __tier Eggoa
+    // Cost = (square of __level) * UPGRADE_COST * (2 ^ tier) for one upgrade
+    // (n * (n + 1) * (2n + 1) / 6) * UPGRADE_COST
+    
+    function ComputeUpgradeCost(uint256 __level, uint256 __upgrade, uint256 __tier) public pure returns(uint256){
+        uint256 _max = __level.add(__upgrade);
+        uint256 _baseToMax = _max.mul(_max.add(1)).mul(_max.mul(2).add(1)).mul(UPGRADE_COST).div(6);
+        uint256 _baseToLevel = __level.mul(__level.add(1)).mul(__level.mul(2).add(1)).mul(UPGRADE_COST).div(6);
+        return (_baseToMax.sub(_baseToLevel)).mul(2 ** __tier);
+    }
+    
+    //-- ComputeEggoaPlantamidCost
+    // Returns Eggoa cost in __tier to raise the floor once 
+    // Cost = ((square of next floor) * base cost) / tier
+    
+    function ComputeEggoaPlantamidCost(uint256 __floor, uint256 __tier) public pure returns (uint256){
+        uint256 _nextFloor = __floor.add(1);
+        return PLANTAMID_GOA_COST.mul(_nextFloor ** 2).div(__tier);
+    }
+    
+    //-- ComputeDaiPlantamidCost
+    // Returns DAI cost for __upgrade
+    // Cost = (sum from 1 to (__upgrade + __floor) - sum from 1 to __floor) * base cost
+    
+    function ComputeDaiPlantamidCost(uint256 __floor, uint256 __upgrade) public view returns (uint256){
+        return ComputeSum(__floor, __floor.add(__upgrade)).mul(plantamidDaiCost);
+    }
+    
+    //-- ComputeAuction
+    // Returns cost for an anomaly auction
+    // Cost = base cost * 1 hour / (elapsed time + 1 hour)
+    // In simple terms, cost lowers at a decreasing rate
+    
+    function ComputeAuction(uint256 __start, uint256 __baseCost, uint256 __now) public pure returns(uint256) {
+
+        // time spent since auction start
+        uint256 _elapsed = __now.sub(__start);
+        
+        // multiply by base and divide by elapsed + base
+        return __baseCost.mul(AUCTION_BASE).div(_elapsed.add(AUCTION_BASE));
+    }
+    
+    //-- ComputeFullRad
+    // Returns accumulated rads from __player's eggoas
+    
+    function ComputeFullRad(address __player) public view returns(uint256){
+        
+        uint256 _rad; // final rads
+        uint256 _elapsed = now.sub(lastRad[__player]); // time since last collection
+        
+        // run a loop through all eggoas player unlocked
+        for(uint256 i = 1; i <= tier[__player]; i++){ 
+            _rad = _rad.add(ComputeRad(__player, _elapsed, i));
+        }
+        
+        return _rad;
+    }
+    
+    //-- ComputeRad
+    // Returns production in __elapsed for __player's eggoa __tier
+    
+    function ComputeRad(address __player, uint256 __elapsed, uint256 __tier) public view returns(uint256){
+        
+        // time elapsed * tier * amount.
+        uint256 _rad = __elapsed.mul(__tier).mul(eggoaNest[__player][__tier].amount);
+        
+        uint256 _mulSum; // add all multipliers to multiply later
+        uint256 _tierSum; // add all weights to divide later
+
+        // loop to go through all 4 stats
+        for(uint256 j = 0; j < BASE_STAT; j++){
+            _tierSum = _tierSum.add(tierProd[__tier].stat[j]);
+            _mulSum = _mulSum.add(eggoaNest[__player][__tier].stat[j].mul(tierProd[__tier].stat[j]));
+        }
+        
+        // multiply by _mulSum and by plantamids
+        _rad = _rad.mul(_mulSum).mul(daiPlantamid[msg.sender].add(eggoaPlantamid[msg.sender]).add(1));
+        
+        // divisions at the end for minimum losses. we return __rad
+        _rad = _rad.div(_tierSum).div(TIME_FOR_1_RAD);
+        
+        return _rad;
+    }
+    
+    //-- ComputeTribeRad 
+    // Returns rads player is entitled to from his tribe 
+    // rad = current tribe rads - previously collected rads 
+    
+    function ComputeTribeRad(address __sender) public view returns(uint256){
+        return tribeRad[tribe[__sender]].sub(collectedTribeRad[__sender]);
+    }
+    
+    //-- ComputeUnlockCost
+    // Returns cost in rads to unlock __tier
+    // Cost = base cost * (10 ^ tier)
+    
+    function ComputeUnlockCost(uint256 __tier) public pure returns(uint256){
+        return UNLOCK_COST.mul(10 ** __tier);
+    }
+    
+    //-- ComputeMultiplierCost
+    // Returns rad cost for a given shroom multiplier 
+    // Cost = base cost ** (__mult + __tier)
+    
+    function ComputeMultiplierCost(uint256 __tier, uint256 __mult) public pure returns (uint256){
+        return MULT_COST ** (__mult.add(__tier));
+    }
+    
+    //-- ComputeShroom
+    // Returns number of shrooms since last hatch * plantamids, + saved shrooms from territories
+    
+    function ComputeShroom(address __who) public view returns (uint256){
+        uint256 _elapsed = now.sub(lastShroom[__who]);
+        _elapsed = _elapsed.mul(daiPlantamid[__who].add(eggoaPlantamid[__who]).add(1));
+        return _elapsed.div(TIME_FOR_1_SHROOM).add(shroom[msg.sender]);
+    }
+    
+    //-- ComputeLandShroom
+    // Returns number of shrooms since last land collection
+    // shrooms = elapsed time * multiplier * land level / TIME_FOR_1_SHROOM / SHROOM_MULT
+    
+    function ComputeLandShroom(uint256 __land) public view returns(uint256){
+        uint256 _elapsed = now.sub(land[__land].lastLand);
+        
+        // multiplier starts at SHROOM_MULT and rises by 1 per hour
+        uint256 _mult = _elapsed.div(1 hours).add(SHROOM_MULT);
+        
+        return _elapsed.mul(_mult).mul(land[__land].level).div(SHROOM_MULT).div(TIME_FOR_1_SHROOM);
+    }
+    
+    // GETTERS
+    
+    //-- GetNestStat
+    // Returns stats for __player's __tier eggoas
+    
+    function GetNestStat(address __player, uint256 __tier) public view returns (uint256[4] memory){
+        return eggoaNest[__player][__tier].stat;
+    }
+    
+    //-- GetTierProd
+    // Returns stats for tierProd
+    
+    function GetTierProd(uint256 __tier) public view returns (uint256[4] memory){
+        return tierProd[__tier].stat;
+    }
+    
+    //-- GetLandStat
+    // Returns stats for __land
+    
+    function GetLandStat(uint256 __land) public view returns (uint256[4] memory){
+        return land[__land].stat;
+    }
+
+}

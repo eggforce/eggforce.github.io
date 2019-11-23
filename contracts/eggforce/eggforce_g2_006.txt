@@ -1,0 +1,369 @@
+pragma solidity >=0.5.0 <0.6.0;
+
+// ----------------------------------------------------------------------------
+// SafeMath library
+// ----------------------------------------------------------------------------
+
+library SafeMath {
+
+    function add(uint a, uint b) internal pure returns (uint c) {
+        c = a + b;
+        require(c >= a, "couldn't add with safemath");
+    }
+
+    function sub(uint a, uint b) internal pure returns (uint c) {
+        require(b <= a, "couldn't sub with safemath");
+        c = a - b;
+    }
+
+    function mul(uint a, uint b) internal pure returns (uint c) {
+        c = a * b;
+        require(a == 0 || c / a == b, "couldn't mul with safemath");
+    }
+
+    function div(uint a, uint b) internal pure returns (uint c) {
+        require(b > 0, "couldn't div with safemath");
+        c = a / b;
+    }
+    
+    function mod(uint a, uint b) internal pure returns (uint c) {
+        require(b != 0, "couldn't modulo by 0");
+        c = a % b;
+    }
+}
+
+// ----------------------------------------------------------------------------
+// Owned contract
+// ----------------------------------------------------------------------------
+
+contract Owned {
+
+    address payable public owner;
+    address payable public newOwner;
+
+    event OwnershipTransferred(address indexed _from, address indexed _to);
+
+    constructor() public {
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner {
+        require(msg.sender == owner, "must be owner");
+        _;
+    }
+
+    function transferOwnership(address payable _newOwner) public onlyOwner {
+        newOwner = _newOwner;
+    }
+
+    function acceptOwnership() public {
+        require(msg.sender == newOwner, "must be new owner");
+        
+        owner = newOwner;
+        newOwner = address(0);
+
+        emit OwnershipTransferred(owner, newOwner);
+    }
+}
+
+// ----------------------------------------------------------------------------
+// Game contract
+// ----------------------------------------------------------------------------
+
+contract EggforceG2v1 is Owned {
+    
+    using SafeMath for uint256;
+    
+    /* Constants */
+    
+    uint256 constant BASE_EGGOA = 200;              // number of Eggoas given on Push
+    uint256 constant TIME_FOR_1_SHROOM = 1 days;    // time for 1 eggoa to produce 1 shroom
+    uint256 constant PROD_BONUS = 1 hours;          // time to get +1 prod mult
+    uint256 constant SHROOM_MULT = 24;              // divider for shroom production
+    uint256 constant GLORY_DIVIDER = 1 minutes;     // base time for 1 glory
+    uint256 constant GAME_DURATION = 1 weeks;       // duration from start
+    
+    /* Variables */
+    
+    uint256 public chest;                           // DAI chest, split according to glory
+    uint256 public launch;                          // timestamp for round start
+    uint256 public end;                             // timestamp for round end
+    uint256 public totalGlory;                      // glory collected by all players
+    uint256 public throneHeight;                    // throne height, determines Push cost
+    address public throneKing;                      // current player on the throne
+    uint256 public throneReign;                     // timestamp when current king ascended
+    uint256 public throneArmy;                      // number of Eggoas current king sacrificed
+    bool public gameOver;                           // whether EndGame function was called
+    
+    /* Mappings */
+    
+    mapping(address => uint256) public balance;     // DAI balance for player
+    mapping(address => bool) public openedChest;    // whether player has claimed his DAI reward
+    mapping(address => uint256) public lastHatch;   // last shroom hatch for player
+    mapping(address => uint256) public eggoa;       // eggoas alive for player
+    mapping(address => uint256) public glory;       // glory earned for player
+
+    /* Events */
+    
+    event StartedGame(uint256 launch, uint256 end);
+    event WithdrewBalance(address player, uint256 dai);
+    event OpenedChest(address player, uint256 dai);
+    event Pushed(address player, uint256 dai);
+    event Pulled(address player, uint256 eggoa);
+    event Overthrown(address oldking, uint256 glory);
+    event Hatched(address player, uint256 eggoa);
+    
+    /* Functions */
+    
+    //-- constructor
+    constructor() public {
+
+    }
+    
+    //-- StartGame [owner only]
+    // Sets appropriate values, starts game
+    function StartGame() payable public onlyOwner {
+		require(msg.value > 0, "seed the game, dummy");
+		
+		// set round start and end
+		launch = now;
+		end = now.add(GAME_DURATION);
+		
+		// owner's seed becomes the chest
+		chest = msg.value;
+		
+		// set throneHeight to 1, set owner as throneKing
+		throneHeight = 1;
+		throneKing = owner;
+		throneReign = now;
+		throneArmy = BASE_EGGOA;
+		
+		emit StartedGame(launch, end);
+    }    
+    
+    // MODIFIERS
+    
+    modifier gameStarted {
+        require(end > 0, "game hasn't started yet");
+        _;
+    }
+    
+    modifier hasJoined {
+        require(lastHatch[msg.sender] != 0, "player hasn't joined the game yet");
+        _;
+    }
+    
+    modifier gameOngoing {
+        require(now < end, "game is over");
+        _;
+    }
+    
+    // MISC ACTIONS
+    
+       
+    //-- EndGame
+    // Called once when the game ends
+    // Gives King his Glory and allows everyone to open their Chest 
+    
+    function EndGame() gameStarted public {
+        require(now > end, "game hasn't ended yet");
+        require(gameOver != true, "game was already ended");
+        
+        uint256 _glory = ComputeGlory();
+        glory[throneKing] = glory[throneKing].add(_glory);
+        totalGlory = totalGlory.add(_glory);
+        
+        gameOver = true;
+        
+        emit Overthrown(throneKing, _glory);
+    }
+    
+    //-- OpenChest
+    // Gets share of DAI chest once game has ended 
+    // Personal share = glory / totalGlory
+    // Call withdraw()
+    
+    function OpenChest() gameStarted public {
+        require(gameOver == true, "End the Game first");
+        require(openedChest[msg.sender] == false, "already opened chest");
+        
+        uint256 _reward = chest.mul(glory[msg.sender]).div(totalGlory);
+        openedChest[msg.sender] = true;
+        balance[msg.sender] = balance[msg.sender].add(_reward);
+        
+        emit OpenedChest(msg.sender, _reward);
+        
+        WithdrawBalance();
+    }
+    
+    //-- WithdrawBalance
+    // Sends player balance to his wallet
+    
+    function WithdrawBalance() public {
+        require(balance[msg.sender] > 0, "balance is empty");
+        
+        uint _amount = balance[msg.sender];
+        balance[msg.sender] = 0;
+        msg.sender.transfer(_amount);
+        
+        emit WithdrewBalance(msg.sender, _amount);
+    }
+    
+    //-- PotSplit [private]
+    // Splits __value between chest and owner (50/50)
+    
+    function PotSplit(uint256 __value) private {
+        
+        // split value
+        chest = chest.add(__value.div(2));
+        balance[owner] = balance[owner].add(__value.div(2));
+    }
+    
+    // GAME ACTIONS
+    
+    //-- Push
+    // Spends DAI to take the throne
+    // Increases throneHeight by 1
+    // Player gets +BASE_EGGOA Eggoas. If new to the game, set lastHatch to now
+    // throneArmy = BASE_EGGOA
+    
+    function Push() gameStarted gameOngoing public payable {
+        
+        // check cost for Push, revert if DAI sent is too low
+        uint256 _cost = ComputePush();
+        require(msg.value >= _cost, "not enough DAI to Push");
+                
+        //reimburse sender for extra value sent
+        if(msg.value > _cost){
+            uint256 _refund = msg.value.sub(_cost);
+            balance[msg.sender] = balance[msg.sender].add(_refund);
+        }
+             
+        // split cost        
+        PotSplit(_cost);
+        
+        // raise throneHeight
+        throneHeight = throneHeight.add(1);
+        
+        emit Pushed(msg.sender, _cost);
+        
+        // push old king off
+        Overthrow();
+        
+        // set lastHatch to now if msg.sender has no Eggoas 
+        if(eggoa[msg.sender] == 0){
+            lastHatch[msg.sender] = now;
+        }
+        
+        // set throneArmy to BASE_EGGOA, and give to msg.sender
+        throneArmy = BASE_EGGOA;
+        eggoa[msg.sender] = eggoa[msg.sender].add(BASE_EGGOA);
+    }
+    
+    //-- Pull
+    // Sacrifices __eggoa Eggoas to take the throne
+    // throneArmy = __eggoa
+    
+    function Pull(uint256 __eggoa) gameStarted gameOngoing public {
+        require(__eggoa < eggoa[msg.sender], "you don't have that many Eggoas");
+        require(__eggoa > throneArmy, "not enough Eggoas to pull");
+
+        // remove Eggoas from msg.sender
+        eggoa[msg.sender] = eggoa[msg.sender].sub(__eggoa);
+        
+        emit Pulled(msg.sender, __eggoa);
+        
+        // push old king off
+        Overthrow();
+        
+        // set throneArmy to __eggoa
+        throneArmy = __eggoa;
+    }
+    
+    //-- Overthrow [private]
+    // Current throneKing sees his lastHatch reset and gets his glory
+    // msg.sender becomes throneKing and his reign starts
+    
+    function Overthrow() private {
+        
+        // give previous king his glory and set hatch to now
+        address _oldKing = throneKing;
+        uint256 _glory = ComputeGlory();
+        glory[_oldKing] = glory[_oldKing].add(_glory);
+        totalGlory = totalGlory.add(_glory);
+        lastHatch[_oldKing] = now;
+        
+        // make msg.sender new king
+        throneKing = msg.sender;
+        throneReign = now;
+        
+        emit Overthrown(_oldKing, _glory);
+    }
+    
+    //-- Hatch 
+    // Hatches Shrooms into Eggoas
+    
+    function Hatch() gameStarted gameOngoing hasJoined public {
+        require(msg.sender != throneKing, "cannot hatch while king");
+        
+        uint256 _hatch = ComputeShroom(msg.sender);
+        lastHatch[msg.sender] = now;
+        eggoa[msg.sender] = eggoa[msg.sender].add(_hatch);
+        
+        emit Hatched(msg.sender, _hatch);
+    }
+    
+    // COMPUTATIONS
+    
+    //-- ComputePush
+    // Chest / throneHeight
+    // (The more Pushes, the more height, the lower the cost)
+    
+    function ComputePush() public view returns(uint256){
+        return chest.div(throneHeight);
+    }
+    
+    //-- ComputeGlory
+    // glory = 1 point per interval
+    // interval rises following the arithmetic series 1, 2, 3... n
+    
+    function ComputeGlory() public view returns(uint256){
+        
+        // cap Glory gains at game end
+        uint256 _now;
+        if(now > end) {
+            _now = end;
+        }
+        else {
+            _now = now;
+        }
+        
+        uint256 _reignLength = _now.sub(throneReign);
+        _reignLength = _reignLength.div(GLORY_DIVIDER); // in minutes
+        
+        // add glory for as long as we can
+        uint256 _glory = 1; // start at 1 so there's always a reward for becoming king
+        uint256 _addedGlory = totalGlory;
+        while(_reignLength > _addedGlory) {
+            _glory++;
+            _addedGlory++;
+            _reignLength = _reignLength.sub(_addedGlory);
+        }
+
+        return _glory;
+    }
+    
+    //-- ComputeShroom
+    // Returns number of shrooms since last collection
+    // shrooms = elapsed time * eggoas * multiplier / TIME_FOR_1_SHROOM / SHROOM_MULT
+    
+    function ComputeShroom(address __who) public view returns(uint256){
+        uint256 _elapsed = now.sub(lastHatch[__who]);
+        
+        // multiplier starts at SHROOM_MULT and rises by 1 per PROD_BONUS
+        uint256 _mult = _elapsed.div(PROD_BONUS).add(SHROOM_MULT);
+        
+        return _elapsed.mul(eggoa[__who]).mul(_mult).div(SHROOM_MULT).div(TIME_FOR_1_SHROOM);
+    }
+    
+}

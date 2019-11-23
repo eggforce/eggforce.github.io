@@ -1,0 +1,339 @@
+pragma solidity >=0.5.0 <0.6.0;
+
+// ----------------------------------------------------------------------------
+// Compound v2 cDai Interface
+// ----------------------------------------------------------------------------
+
+contract cDaiInterface {
+    
+    function mint(uint mintAmount) public returns (uint);
+    function redeem(uint redeemTokens) public returns (uint);
+}
+
+// ----------------------------------------------------------------------------
+// ERC Token Standard #20 Interface
+// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
+// ----------------------------------------------------------------------------
+
+contract ERC20Interface {
+
+    function balanceOf(address _owner) public view returns (uint balance);
+    function transfer(address to, uint tokens) public returns (bool success);
+    function approve(address spender, uint tokens) public returns (bool success);
+    function transferFrom(address from, address to, uint tokens) public returns (bool success);
+    function allowance(address owner, address spender) external view returns (uint256);
+
+    event Transfer(address indexed from, address indexed to, uint tokens);
+    event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
+}
+
+// ----------------------------------------------------------------------------
+// SafeMath library
+// ----------------------------------------------------------------------------
+
+library SafeMath {
+
+    function add(uint a, uint b) internal pure returns (uint c) {
+        c = a + b;
+        require(c >= a, "couldn't add with safemath");
+    }
+
+    function sub(uint a, uint b) internal pure returns (uint c) {
+        require(b <= a, "couldn't sub with safemath");
+        c = a - b;
+    }
+
+    function mul(uint a, uint b) internal pure returns (uint c) {
+        c = a * b;
+        require(a == 0 || c / a == b, "couldn't mul with safemath");
+    }
+
+    function div(uint a, uint b) internal pure returns (uint c) {
+        require(b > 0, "couldn't div with safemath");
+        c = a / b;
+    }
+    
+    function mod(uint a, uint b) internal pure returns (uint c) {
+        require(b != 0, "couldn't modulo by 0");
+        c = a % b;
+    }
+}
+
+// ----------------------------------------------------------------------------
+// Owned contract
+// ----------------------------------------------------------------------------
+
+contract Owned {
+
+    address payable public owner;
+    address payable public newOwner;
+
+    event OwnershipTransferred(address indexed _from, address indexed _to);
+
+    constructor() public {
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner {
+        require(msg.sender == owner, "must be owner");
+        _;
+    }
+
+    function transferOwnership(address payable _newOwner) public onlyOwner {
+        newOwner = _newOwner;
+    }
+
+    function acceptOwnership() public {
+        require(msg.sender == newOwner, "must be new owner");
+        
+        owner = newOwner;
+        newOwner = address(0);
+
+        emit OwnershipTransferred(owner, newOwner);
+    }
+}
+
+// ----------------------------------------------------------------------------
+// Game contract
+// ----------------------------------------------------------------------------
+
+contract Treesury1 is Owned {
+    
+    using SafeMath for uint256;
+ 
+    //** CONSTANTS **//
+    
+    uint256 constant FUNDING_PERIOD = 1 days; // min time between redeems for eggforce
+    uint256 constant FUNDING_DRAW = 4000; // divider, = 0.025%. interest withdrawn per funding_period
+    uint256 constant DAI_MIN_INVEST = 10 ** 15; // 0.001 DAI. dust could result in chest = 0 
+ 
+    //** VARIABLES **//
+    
+    uint256 public lastFunding; //last timestamp since interest was withdrawn to fund game
+    uint256 public totalRadcorn; //number of shares
+    uint256 public cDaiChest; //amount of cDai tokens
+    address public daiAdr = 0xbF7A7169562078c96f0eC1A8aFD6aE50f12e5A99; //address for DAI contract
+    address public cDaiAdr = 0x0A1e4D0B5c71B955c0a5993023fc48bA6E380496; //address for cDAI contract
+    bool public emergencyWithdraw = false; //if true, bankroll has been secured, and players should withdraw
+    
+    //** MAPPINGS **//
+    
+    mapping(address => uint256) public radcorn; //radcorns for user
+    
+    //** EVENTS **//
+    
+    event GrewTreesury (uint256 dai, uint256 radcorn);
+    event HarvestedRadcorn (uint256 dai, uint256 radcorn);
+    event WithdrewBalance (uint256 dai, uint256 radcorn);
+    event FundedGame (uint256 dai, uint256 period);
+    event SentProfit (uint256 dai);
+    event SecuredBankroll (uint256 dai);
+    
+    //** FUNCTIONS **//
+    
+    constructor() public {
+        
+        // set last funding to now
+        lastFunding = now;
+        
+        // approve an enormous amount of Dai for the contract to send to Compound
+        ERC20Interface(daiAdr).approve(cDaiAdr, 1000000000000000000000000000000); // 1T * 10^18
+    }
+    
+    //** PLAYER FUNCTIONS**//
+    
+    //-- GrowTreesury
+    // (Use after frontend calls approve() from Dai contract)
+    // Invest Dai on Compound
+    // Give radcorns in exchange in accordance with radcorn cost
+    
+    function GrowTreesury(uint256 __dai) public {
+        require(tx.origin == msg.sender, "bots can't plant trees");
+        require(emergencyWithdraw == false, "bankroll secured. withdraw your balance!");
+        require(__dai > DAI_MIN_INVEST, "not enough dai to invest");
+        
+        // call "approve" Treesury from frontend, then transfer Dai to Treesury
+        ERC20Interface(daiAdr).transferFrom(msg.sender, address(this), __dai);
+ 
+        // send Dai to Compound
+        cDaiInterface(cDaiAdr).mint(__dai);
+        
+        // check how many cDai we have now
+        uint256 _cDaiChest = ERC20Interface(cDaiAdr).balanceOf(address(this));
+        
+        // calculate radcorns to give player
+        uint256 _playerShare;
+        
+        if(totalRadcorn == 0) {
+            _playerShare = 1000000; // initialize first buy to 1M radcorns
+        }
+        else {
+            _playerShare = (_cDaiChest.sub(cDaiChest)).div(ComputeRadcornCost());
+        }
+        
+        // change cDaiChest, then add to totalRadcorn, then add to player's radcorn
+        cDaiChest = _cDaiChest;
+        totalRadcorn = totalRadcorn.add(_playerShare);
+        radcorn[msg.sender] = radcorn[msg.sender].add(_playerShare);
+        
+        emit GrewTreesury(__dai, _playerShare);
+    }
+    
+    //-- HarvestRadcorn
+    // Sell Radcorn to the contract
+    // Redeem corresponding amount of Dai from Compound
+    // Send Dai to user
+    
+    function HarvestRadcorn(uint256 __radcorn) public {
+        require(radcorn[msg.sender] >= __radcorn, "you don't have this many radcorns");
+        require(emergencyWithdraw == false, "bankroll secured. withdraw your balance!");
+        
+        // compute cDai equivalence
+        uint256 _cDaiToRedeem = __radcorn.mul(ComputeRadcornCost());
+            
+        // remove radcorn from user
+        radcorn[msg.sender] = radcorn[msg.sender].sub(__radcorn);
+            
+        // decrease totalRadcorn
+        totalRadcorn = totalRadcorn.sub(__radcorn);
+            
+        // decrease cDaiChest
+        cDaiChest = cDaiChest.sub(_cDaiToRedeem);
+            
+        // redeem Dai from Compound
+        cDaiInterface(cDaiAdr).redeem(_cDaiToRedeem);
+            
+        // get Dai in Treesury
+        uint256 _playerDai = GetTreesuryDai();
+            
+        // send Dai reward to user
+        ERC20Interface(daiAdr).transfer(msg.sender, _playerDai);
+        
+        emit HarvestedRadcorn(_playerDai, __radcorn);
+    }
+        
+    //-- WithdrawBalance
+    // Only of use if SecureBankroll has been used
+    // Players can trade their Radcorns for their share of the Dai in contract
+    
+    function WithdrawBalance() public {
+        require(emergencyWithdraw == true, "for emergencies only. use HarvestRadcorn to sell your shares");
+        
+        // get Dai in Treesury
+        uint256 _playerDai = GetTreesuryDai();
+        
+        // multiply by player radcorns and divide by total to get his share
+        uint256 _playerRadcorn = radcorn[msg.sender];
+        _playerDai = _playerDai.mul(_playerRadcorn).div(totalRadcorn);
+        
+        // remove radcorn from user and from total
+        totalRadcorn = totalRadcorn.sub(_playerRadcorn);
+        radcorn[msg.sender] = 0;
+        
+        // send Dai reward to user
+        ERC20Interface(daiAdr).transfer(msg.sender, _playerDai);
+        
+        emit WithdrewBalance(_playerDai, _playerRadcorn);
+    }
+    
+    //**OWNER FUNCTIONS**//
+    
+    //-- FundGame (owner only)
+    // Redeem some amount of Dai from Compound to the owner's wallet
+    // (Ugly, not trustless, but beats adding a layer of complexity)
+    // Hardcoded time and size limits, to ensure the "drain" doesn't outpace interest
+    
+    function FundGame() public onlyOwner {
+        require(emergencyWithdraw == false, "bankroll secured. no more funding!");
+
+        // check time since last fund, and make sure it's at least above 1 period
+        uint256 _timeSinceFund = ComputeTimeSinceFund();
+        require(_timeSinceFund > 0, "not enough time since last funding");
+        
+        // set lastFunding to now
+        lastFunding = now;
+        
+        // redeem (cDaiChest * periods / draw) from Compound
+        uint256 _fundSize = cDaiChest.mul(_timeSinceFund).div(FUNDING_DRAW);
+        cDaiChest = cDaiChest.sub(_fundSize);
+        cDaiInterface(cDaiAdr).redeem(_fundSize);
+        
+        // get Dai in Treesury
+        uint256 _playerDai = GetTreesuryDai();
+        
+        // send Dai to owner
+        ERC20Interface(daiAdr).transfer(owner, _playerDai);
+        
+        emit FundedGame(_playerDai, _timeSinceFund);
+    }
+    
+    //-- SendProfit
+    // Invest Dai profits from game round on Compound
+    // Similar to GrowTreesury, but doesn't give radcorns
+    // Ergo, game profits raise radcorn value for everyone
+    
+    function SendProfit(uint256 __dai) public onlyOwner {
+        require(emergencyWithdraw == false, "bankroll secured. can't send profit now!");
+        require(__dai > DAI_MIN_INVEST, "send more dai at once");
+        
+        // call "approve" Treesury from frontend, then transfer Dai to Treesury
+        ERC20Interface(daiAdr).transferFrom(msg.sender, address(this), __dai);
+ 
+        // send Dai to Compound
+        cDaiInterface(cDaiAdr).mint(__dai);
+        
+        // check how many cDai we have now
+        uint256 _cDaiChest = ERC20Interface(cDaiAdr).balanceOf(address(this));
+        
+        // change cDaiChest
+        cDaiChest = _cDaiChest;
+        
+        emit SentProfit(__dai);
+    }
+    
+    //-- SecureBankroll (owner only)
+    // Redeem all the Dai from Compound, in case a bug or migration is necessary
+    // Each player can then redeem their Dai in accordance to their Radcorns 
+    
+    function SecureBankroll() public onlyOwner {
+        require(emergencyWithdraw == false, "bankroll was already secured");
+        
+        // redeem entire chest from Compound 
+        cDaiInterface(cDaiAdr).redeem(cDaiChest);
+        
+        // set chest to 0, emergencyWithdraw to True
+        cDaiChest = 0;
+        emergencyWithdraw = true;
+        
+        emit SecuredBankroll(GetTreesuryDai());
+    }
+
+    //-- transferAnyERC20Token
+    // Owner can transfer out any accidentally sent ERC20 tokens
+
+    function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
+        return ERC20Interface(tokenAddress).transfer(owner, tokens);
+    }
+    
+    //** VIEW ONLY **//
+
+    // cost in cDai for 1 Radcorn
+    function ComputeRadcornCost() public view returns(uint256) {
+        if(totalRadcorn != 0) {
+            return cDaiChest.div(totalRadcorn);
+        }
+        else {
+            return 0;
+        }
+    }
+    
+    // number of funding periods (= 1 day) since last funding 
+    function ComputeTimeSinceFund() public view returns(uint256) {
+        return (now.sub(lastFunding)).div(FUNDING_PERIOD);
+    }
+    
+    // current amount of Dai in Treesury
+    function GetTreesuryDai() public view returns(uint256) {
+        return ERC20Interface(daiAdr).balanceOf(address(this));
+    }
+}
