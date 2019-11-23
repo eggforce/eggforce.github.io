@@ -383,8 +383,13 @@ function localProdUpdate() {
 
 // Local Shroom calculation
 function localShroomUpdate() {
-	if(m_account !== a_king) {
-		m_localShroom = parseFloat(parseFloat(m_localShroom) + parseFloat(m_prod)).toFixed(4);
+	if (m_account !== a_king) {
+		if (m_localShroom === 0) {
+			m_localShroom = m_shroom;
+		}
+		else {
+			m_localShroom = parseFloat(parseFloat(m_localShroom) + parseFloat(m_prod)).toFixed(4);
+		}
 	}
 	else {
 		m_localShroom = 0;
@@ -573,7 +578,7 @@ function updateShroom() {
 		// check if m_shroom differs significantly from m_localShroom
 		// update the latter if so
 		let _diff = Math.abs(parseInt(m_shroom) - m_localShroom);
-		if(_diff > parseInt(m_shroom)) {
+		if(_diff > (parseInt(m_shroom) / 100)) {
 			m_localShroom = parseInt(m_shroom);
 		}
         //document.getElementById('shroom').innerHTML = m_shroom;
