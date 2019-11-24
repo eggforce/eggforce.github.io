@@ -55,6 +55,7 @@ const PAST_BLOCKS = 12 * 60 * 24 * 2 * 10; // ~12 blocks per minute, 60min per h
 // only used as an arbitrary point to query events from, so accuracy isn't important
 
 var a_end = 0;
+var a_gameOver = false;
 var a_gameState = 0;
 var a_pullCost = 0;
 var a_king = 0;
@@ -87,13 +88,6 @@ function initializeBlockchainData() {
     initializeFilter();
     refreshData();
     updateEndTimestamp();
-	/*updateJoinCost();
-	updateLaunchTimestamp();
-	
-	updateTerritory();
-	getSacrificeAmount(1);
-	getFloorDaiCost(1);
-	getShroomCost();*/
 }
 
 //Fast loop every 100ms 
@@ -102,14 +96,6 @@ function controlLoopFast() {
 	if(m_account !== "" && m_shroom !== 0) {
 		localShroomUpdate();
 	}
-	/*updateLaunchTimer();
-	
-	updateDaimidTimer();
-	updateGoamidTimer();
-	updateLastRadTimer();
-	updateLastShroomTimer();
-	//updateSelectedLandTimer(h_selectedLand);
-	updateNestTextTimer();*/
 	setTimeout(controlLoopFast, 100);
 }
 
@@ -133,7 +119,12 @@ function refreshData(){
     updateKing();
 	updateReign();
 	updateKingGlory();
-	if(a_gameState !== 0){ updatePushCost()};
+	if (a_gameState === 1) {
+		updatePushCost();
+	} else if (a_gameState === 2) {
+		updateGameWindow();
+		updateGameOver();
+	}
 	updatePullCost();
 	if(m_account !== "") {
 		updateEggoa();
@@ -327,6 +318,18 @@ function checkGameState() {
     else {
         a_gameState = 1;
     }
+}
+
+// Change game window if game has ended
+function updateGameWindow() {
+	d_gameState = document.getElementById('gameState');
+	if (a_gameOver !== true) {
+		d_gameState.innerHTML = '<button class="btn-lg btn-success" onclick="endTheGame()">END GAME</button><h6>Once the game has ended, you will get your reward</h6>' 
+	}
+	else {
+		d_gameState.innerHTML = '<button class="btn-lg btn-success" onclick="openRewardChest()">OPEN CHEST</button><h6>Your reward: <span id="reward">?</span> POA</h6>' 
+	}
+
 }
 
 // Restricts __number between __min and __max
@@ -575,11 +578,15 @@ function updateShroom() {
 	contract.ComputeShroom(m_account).then((result) =>
     {
 		m_shroom = result.toString();
+		/*
 		// check if m_shroom differs significantly from m_localShroom
 		// update the latter if so
 		let _diff = Math.abs(parseInt(m_shroom) - m_localShroom);
-		if(_diff > (parseInt(m_shroom) / 100) && _diff > 1) {
+		if(_diff > (parseInt(m_shroom) / 10) && _diff > 1) {
 			m_localShroom = parseInt(m_shroom);
+		}*/
+		if (parseInt(m_shroom) === 0 && m_localShroom >= 1 || parseInt(m_shroom) > m_localShroom) {
+			m_localShroom = parseInt(m_shroom); 
 		}
         //document.getElementById('shroom').innerHTML = m_shroom;
     });
@@ -613,6 +620,9 @@ function updateShare() {
 		m_sharePercent = m_sharePercent * 100;
 		document.getElementById('sharePercent').innerHTML = parseFloat(m_sharePercent).toFixed(2);
 		document.getElementById('share').innerHTML = parseFloat(m_share).toFixed(4);
+		if (a_gameOver === true) {
+			document.getElementById('reward').innerHTML = parseFloat(m_share).toFixed(4);
+		}
 	});
 }
 
@@ -625,24 +635,26 @@ function updateKingGlory() {
 	})
 }
 
+// Whether the endgame function has been called
+function updateGameOver() {
+	contract.gameOver().then((result) =>
+	{
+		a_gameOver = result;
+	})
+}
+
 //-- WRITE ETHERS
 
 // Push - spend DAI to become King
 
 const pushKing = async() => {
-	console.log("step 1");
 	try {
-		console.log("step 2");
-		//let _pushCost = parseFloat(a_pushCost) + 0.001;
-		//notificationSend('About to push the King for ' + a_pushCost + ' POA');
-		console.log("step 4");
+		notificationSend('About to push the King for ' + a_pushCost + ' POA');
 		const pushTheKing = await contract.Push({
             value: ethers.utils.parseEther(a_pushCost.toString())
 		})
-		console.log("step 5");
 		notificationSuccess('Pushing the King!');
 	  } catch (error) {
-
 		notificationError();
 	  }
 }
@@ -652,12 +664,10 @@ const pushKing = async() => {
 const pullKing = async() => {
 	try {
 		notificationSend('About to sacrifice ' + m_sacrifice + ' Eggoas to pull the King');
-		const pullTheKing = await contract.Pull(m_sacrifice);
-		//console.log("found anomaly successfully");
-		notificationSuccess('Pulling the King!');
 		current_modal.style.display = "none"; // close modal window
+		const pullTheKing = await contract.Pull(m_sacrifice);
+		notificationSuccess('Pulling the King!');
 	} catch (error) {
-		//console.log("Error: ", error);
 		notificationError();
 	}
 }
@@ -666,12 +676,22 @@ const pullKing = async() => {
 
 const hatchShroom = async() => {
 	try {
-		notificationSend('About to hatch ' + m_shroom + ' into Eggoas');
+		notificationSend('About to hatch ' + m_shroom + ' Shrooms into Eggoas');
 		const pullTheKing = await contract.Hatch();
-		//console.log("found anomaly successfully");
 		notificationSuccess('Hatching Eggoas!');
 	} catch (error) {
-		//console.log("Error: ", error);
+		notificationError();
+	}
+}
+
+// EndGame - ends the game so players can open their chest
+
+const endTheGame = async () => {
+	try {
+		notificationSend('Ending the game...');
+		const endThisGame = await contract.EndGame();
+		notificationSuccess('The game is ending!');
+	} catch (error) {
 		notificationError();
 	}
 }
@@ -680,13 +700,10 @@ const hatchShroom = async() => {
 
 const openRewardChest = async () => {
 	try {
-		//console.log("opening dai chest...");
 		notificationSend('Opening POA chest...');
 		const openMyChest = await contract.OpenChest();
-		//console.log("success!");
 		notificationSuccess('Your wallet grows fatter!');
 	} catch (error) {
-		//console.log("Error: couldn't open ", error);
 		notificationError();
 	}
 }
@@ -718,7 +735,6 @@ function notificationError() {
 
 // Event logging
 
-// Conversion of Date to hh:mm:ss
 var d_eventLog = document.getElementById('eventLog');
 //var d_scrollLog = document.getElementById('scrollLog');
 
