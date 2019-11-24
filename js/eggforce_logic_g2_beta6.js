@@ -578,7 +578,7 @@ function updateShroom() {
 		// check if m_shroom differs significantly from m_localShroom
 		// update the latter if so
 		let _diff = Math.abs(parseInt(m_shroom) - m_localShroom);
-		if(_diff > (parseInt(m_shroom) / 100)) {
+		if(_diff > (parseInt(m_shroom) / 100) && _diff > 1) {
 			m_localShroom = parseInt(m_shroom);
 		}
         //document.getElementById('shroom').innerHTML = m_shroom;
@@ -655,6 +655,7 @@ const pullKing = async() => {
 		const pullTheKing = await contract.Pull(m_sacrifice);
 		//console.log("found anomaly successfully");
 		notificationSuccess('Pulling the King!');
+		current_modal.style.display = "none"; // close modal window
 	} catch (error) {
 		//console.log("Error: ", error);
 		notificationError();
