@@ -7,316 +7,302 @@
 		<link rel="stylesheet" type="text/css" href="css/eggforce_beta2.css">
 	</head>
 	<body>
-		<br>
         <div class="container-fluid" style="text-align:center;">
-            <div class="border-orange terminal">
-                <h1 class="display-1">EGGFORCE Beta 5</h1>
-                <div class="row">
-                    <div class="col">
-                        <a href="https://blockscout.com/poa/core/address/0x8e51bd6a69b59f486e7e7ab4102fd4970e07e1bc/transactions" target="_blank"><img class="icon-link icon-big" src="img/icon_contract.png"></a>
-                    </div>
-                    <div class="col">
-                        <a href="https://discord.gg/JU8P4Ru" target="_blank"><img class="icon-link icon-big" src="img/icon_discord.png"></a>
-                    </div>
-                    <div class="col">
-                        <a href="https://twitter.com/eskaroy" target="_blank"><img class="icon-link icon-big" src="img/icon_twitto.png"></a>
-                    </div>
-                    <div class="col">
-                        <a href="https://medium.com/@thesnailking" target="_blank"><img class="icon-link icon-big" src="img/icon_medium.png"></a>
-                    </div>
-                </div>               
-                <br>
-                <br>
-                <span id="gameState">?</span>
-            </div>
-            <!-- LINK TO BACKUP -->
-            <br>
-            <div class="border-orange terminal">
-                <h6>Beta is consistently updated, and things might break. Is this page not working? Visit the backup: <a href="beta5_bkup.html">click me</a>
-            </div>
-            <!-- -->
-            <br>
-            <!-- CHEST AND TRIBE SELECTION -->
-            <div class="border-orange terminal">
-                <h3 class="title-container">REWARD CHEST: <span id="chest">?</span> [POA]</h3>
-                <h6>(Shared on round end)</h6>
-                <br>
-                <h6>Select your Tribe before <span id="joinOrChange">?</span></h6>
-                <br>                
-                <div class="row">
-                    <div class="col-sm border-orange border-margin show-pointer" id="Crimson" onclick="selectTribe(1)">
-                        <img src="img/goa_crimson.svg" class="tribe-img">
-                        <h6>Crimson</h6>
-                    </div>
-                    <div class="col-sm border-orange border-margin show-pointer" id="Blu" onclick="selectTribe(2)">
-                        <img src="img/goa_blu.svg" class="tribe-img">
-                        <h6>Blu</h6>
-                    </div>
-                    <div class="col-sm border-orange border-margin show-pointer" id="Greg" onclick="selectTribe(3)">
-                        <img src="img/goa_greg.svg" class="tribe-img">
-                        <h6>Greg</h6>
-                    </div>
-                    <div class="col-sm border-orange border-margin show-pointer" id="Lumi" onclick="selectTribe(4)">
-                        <img src="img/goa_lumi.svg" class="tribe-img">
-                        <h6>Lumi</h6>
-                    </div>
-                </div>
-                <h6>Selected Tribe: <span id="selectedTribe">?</span></h6>
-                <span id="joinOrChangeButton"><button class="btn btn-danger" onclick="checkTribeIsSelected(joinGame)">Join Game</button></span>
-                <h6>(Cost: <span id="joinCost">?</span> POA)</h6>
-            </div>
-            <br>
             <!-- EVENT LOGGING -->
             <div class="border-orange terminal">
-                <h3 class="title-container">EVENTS</h4>
-                <br>
                 <div class="scroll-box" id="scrollLog" style="text-align:left;">
                     <span id="eventLog">[Waiting for events...]</span>
                 </div>
             </div>
-            <br>
+            <!-- TAB SELECTION -->
+            <div class="row">
+                <div class="border-orange terminal tab col-sm-2">
+                    <button class="btn-lg tablinks border-orange" onclick="selectTab(event, 'tabTribe')">Tribe Select</button>
+                    <button class="btn-lg tablinks border-orange" onclick="selectTab(event, 'tabPlayer')">Player Stuff</button>
+                    <button class="btn-lg tablinks border-orange" onclick="selectTab(event, 'tabLand')">Land Attack</button>
+                    <button class="btn-lg tablinks border-orange" onclick="selectTab(event, 'tabAnomaly')">Anomalies</button>
+                    <button class="btn-lg tablinks border-orange" onclick="selectTab(event, 'tabNest')">Nest</button>
+                    <button class="btn-lg tablinks border-orange" onclick="selectTab(event, 'tabUpgrade')">Upgrades</button>
+                    <button class="btn-lg tablinks border-orange" onclick="selectTab(event, 'tabPlantamid')">Plantamids</button>
+                </div>
+            <!-- CHEST AND TRIBE SELECTION -->
+                <div id="tabTribe" class="border-orange terminal tabcontent col-sm">
+                    <h3 class="title-container">REWARD CHEST: <span id="chest">?</span> [POA]</h3>
+                    <h6>(Shared on round end)</h6>
+                    <br>
+                    <h6>Select your Tribe before <span id="joinOrChange">?</span></h6>
+                    <br>                
+                    <div class="row">
+                        <div class="col-sm border-orange border-margin show-pointer" id="Crimson" onclick="selectTribe(1)">
+                            <img src="img/goa_crimson.svg" class="tribe-img">
+                            <h6>Crimson</h6>
+                        </div>
+                        <div class="col-sm border-orange border-margin show-pointer" id="Blu" onclick="selectTribe(2)">
+                            <img src="img/goa_blu.svg" class="tribe-img">
+                            <h6>Blu</h6>
+                        </div>
+                        <div class="col-sm border-orange border-margin show-pointer" id="Greg" onclick="selectTribe(3)">
+                            <img src="img/goa_greg.svg" class="tribe-img">
+                            <h6>Greg</h6>
+                        </div>
+                        <div class="col-sm border-orange border-margin show-pointer" id="Lumi" onclick="selectTribe(4)">
+                            <img src="img/goa_lumi.svg" class="tribe-img">
+                            <h6>Lumi</h6>
+                        </div>
+                    </div>
+                    <h6>Selected Tribe: <span id="selectedTribe">?</span></h6>
+                    <span id="joinOrChangeButton"><button class="btn btn-danger" onclick="checkTribeIsSelected(joinGame)">Join Game</button></span>
+                    <h6>(Cost: <span id="joinCost">?</span> POA)</h6>
+                </div>
+                <br>
             <!-- PLAYER SHROOMS, TRIBE, RADS -->
-            <div class="border-orange terminal">
-                <h3 class="title-container">MY STUFF</h3>
-                <h5>Account = <span id="account">?</span></h3>
+                <div id="tabPlayer" class="border-orange terminal tabcontent col-sm">
+                    <h3 class="title-container">MY STUFF</h3>
+                    <h5>Account = <span id="account">?</span></h3>
+                    <br>
+                    <div class="row" style="text-align:left;">
+                        <div class="col-sm border-orange border-margin">
+                            <h5>SHROOMS</h5>
+                            <br>
+                            <h6>You have <span id="shroom">?</span> Shrooms</h6>                        
+                            <h6>Tier of Eggoa to hatch: <input type="text" id="shroomTier" oninput="changeShroomTier(this.value)" value="1" size="2"></h6>
+                            <h6>Multiplier: <input type="text" id="shroomMult" oninput="changeShroomMult(this.value)" value="1" size="2">
+                            <h6>Cost = <span id="shroomCost">?</span> RAD</h6>
+                            <h6>You will get <span id="shroomEggoa">?</span> Eggoas</h6>
+                            <h6><button class="btn btn-success" onclick="checkShroomCostThenHatch()">Hatch Shrooms</button></h6>
+                            <br>
+                            <h6>Last Shroom hatch: <span id="lastShroom">?</span></h6>
+                        </div>
+                        <div class="col-sm border-orange border-margin">
+                                <h5>TRIBE</h5>
+                                <br>
+                                <h6>Tribe: <span id="tribe">?</span></h6>
+                                <h6>Number of Tribe Changes: <span id="tribeChange">?</span></h6>
+                                <h6>Balance: <span id="balance">?</span> POA</h6> <button class="btn btn-success" onclick="withdrawDai()">Withdraw Balance</button>
+                        </div>
+                        <div class="col-sm border-orange border-margin">
+                            <h5>RADs</h5>
+                            <br>
+                            <h6>You have <span id="rad">?</span> RADS</h6>
+                                <h6>RADs ready for Harvest: <span id="radToHarvest">?</span></h6>
+                                <button class="btn btn-success" onclick="harvestRads()">Harvest RADs</button>
+                                <br>
+                                <h6>Last RAD collection: <span id="lastRad">?</span></h6>
+                                <br>
+                                <h6>RADs available to claim: <span id="tribeRadToClaim">?</span></h6>
+                                <button class="btn btn-success" onclick="claimTribeRads()">Claim Tribe RADs</button>
+                                <br>
+                                <h6>You have previously claimed: <span id="collectedTribeRad">?</span> RADS</h6>
+                                <br>
+                                <h6>Earned RADs: <span id="earnedRad">?</span></h6>                    
+                        </div>
+                    </div> 
+                </div>         
                 <br>
-                <div class="row" style="text-align:left;">
-                    <div class="col-sm border-orange border-margin">
-                        <h5>SHROOMS</h5>
-                        <br>
-                        <h6>You have <span id="shroom">?</span> Shrooms</h6>                        
-                        <h6>Tier of Eggoa to hatch: <input type="text" id="shroomTier" oninput="changeShroomTier(this.value)" value="1" size="2"></h6>
-                        <h6>Multiplier: <input type="text" id="shroomMult" oninput="changeShroomMult(this.value)" value="1" size="2">
-                        <h6>Cost = <span id="shroomCost">?</span> RAD</h6>
-                        <h6>You will get <span id="shroomEggoa">?</span> Eggoas</h6>
-                        <h6><button class="btn btn-success" onclick="checkShroomCostThenHatch()">Hatch Shrooms</button></h6>
-                        <br>
-                        <h6>Last Shroom hatch: <span id="lastShroom">?</span></h6>
-                    </div>
-                    <div class="col-sm border-orange border-margin">
-                            <h5>TRIBE</h5>
-                            <br>
-                            <h6>Tribe: <span id="tribe">?</span></h6>
-                            <h6>Number of Tribe Changes: <span id="tribeChange">?</span></h6>
-                            <h6>Balance: <span id="balance">?</span> POA</h6> <button class="btn btn-success" onclick="withdrawDai()">Withdraw Balance</button>
-                    </div>
-                    <div class="col-sm border-orange border-margin">
-                        <h5>RADs</h5>
-                        <br>
-                        <h6>You have <span id="rad">?</span> RADS</h6>
-                            <h6>RADs ready for Harvest: <span id="radToHarvest">?</span></h6>
-                            <button class="btn btn-success" onclick="harvestRads()">Harvest RADs</button>
-                            <br>
-                            <h6>Last RAD collection: <span id="lastRad">?</span></h6>
-                            <br>
-                            <h6>RADs available to claim: <span id="tribeRadToClaim">?</span></h6>
-                            <button class="btn btn-success" onclick="claimTribeRads()">Claim Tribe RADs</button>
-                            <br>
-                            <h6>You have previously claimed: <span id="collectedTribeRad">?</span> RADS</h6>
-                            <br>
-                            <h6>Earned RADs: <span id="earnedRad">?</span></h6>                    
-                    </div>
-                </div> 
-            </div>         
-            <br>
             <!-- LAND WINDOW -->
-            <div class="border-orange terminal">
-                <h3 class="title-container">LAND</h3>
-                    <h5>Select Land (1 to <span id="maxLand">?</span>) <input type="text" id="landSelector" value="1" size="2"><button onclick="updateTerritory()">OK</button></h5>
-                <br>
-                <div class="row">
-                    <div class="col-sm">
-                        <h5>Land Level:</h5>
-                        <span id="landLevel">?</span>
+                <div id="tabLand" class="border-orange terminal tabcontent col-sm">
+                    <h3 class="title-container">LAND</h3>
+                        <h5>Select Land (1 to <span id="maxLand">?</span>) <input type="text" id="landSelector" value="1" size="2"><button onclick="updateTerritory()">OK</button></h5>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm">
+                            <h6>Land Level:</h5>
+                            <span id="landLevel">?</span>
+                        </div>
+                        <div class="col-sm">
+                            <h6>Land Stats:</h5>
+                            <span id="landStat">?</span>
+                        </div>
+                        <div class="col-sm">
+                            <h6>Current Lord:</h5>
+                            <span id="landLord">?</span>
+                        </div>
+                        <div class="col-sm">
+                            <h6>Lord Power:</h5>
+                            <span id="landPower">?</span>
+                        </div>
+                        <div class="col-sm">
+                            <h6>Lord Tribe:</h5>
+                            <span id="landTribe">?</span>
+                        </div>
+                        <div class="col-sm">
+                            <h6>Lord Stats:</h5>
+                            <span id="landLordStat">?</span>
+                        </div>
+                        <div class="col-sm">
+                            <h6>Last Shroom Harvest:</h5>
+                            <span id="landLast">?</span>
+                        </div>
+                        <div class="col-sm">
+                            <h6>Shrooms to Harvest:</h5>
+                            <span id="landShroom">?</span>
+                        </div>
                     </div>
-                    <div class="col-sm">
-                        <h5>Land Stats:</h5>
-                        <span id="landStat">?</span>
+                    <br>
+                    <h6>Attack Land with Eggoas of tier <input type="text" id="attackLandTierSelector" value="1" size="2"><button onclick="changeAttackLandTier()">OK</button></h6>
+                    <div class="row">
+                        <div class="col-sm">
+                            <h5>Power: <span id="attackPower">?</span></h6>
+                        </div>
+                        <div class="col-sm">
+                            <h5>Chance to win: <span id="winRate">?</span>%</h6>
+                        </div>
                     </div>
-                    <div class="col-sm">
-                        <h5>Current Lord:</h5>
-                        <span id="landLord">?</span>
-                    </div>
-                    <div class="col-sm">
-                        <h5>Lord Power:</h5>
-                        <span id="landPower">?</span>
-                    </div>
-                    <div class="col-sm">
-                        <h5>Lord Tribe:</h5>
-                        <span id="landTribe">?</span>
-                    </div>
-                    <div class="col-sm">
-                        <h5>Lord Stats:</h5>
-                        <span id="landLordStat">?</span>
-                    </div>
-                    <div class="col-sm">
-                        <h5>Last Shroom Harvest:</h5>
-                        <span id="landLast">?</span>
-                    </div>
-                    <div class="col-sm">
-                        <h5>Shrooms to Harvest:</h5>
-                        <span id="landShroom">?</span>
-                    </div>
+                    <span id="landButton">?</span>
                 </div>
                 <br>
-                <h6>Attack Land with Eggoas of tier <input type="text" id="attackLandTierSelector" value="1" size="2"><button onclick="changeAttackLandTier()">OK</button></h6>
-                <div class="row">
-                    <div class="col-sm">
-                        <h6>Power: <span id="attackPower">?</span></h6>
-                    </div>
-                    <div class="col-sm">
-                        <h6>Chance to win: <span id="winRate">?</span>%</h6>
-                    </div>
-                </div>
-                <span id="landButton">?</span>
-            </div>
-            <br>
             <!-- ANOMALIES -->
-            <div class="border-orange terminal">
-                <h3 class="title-container">FIND ANOMALY</h3>
-                <br>
-                <h6>Choose what to change: <button id="anomalyLand" class="btn btn-info btn-sm" onclick="updateTargetType('land')">Land</button> or <button id="anomalyProd" class="btn btn-info btn-sm" onclick="updateTargetType('prod')">Prod</button></h6>
-                <h6><span id="anomalyTargetType">?</span> to target: <input type="text" id="anomalyTargetId" onInput="updateTargetId(this.value)" value="0" size="2"></h6>
-                <h6>(between 1 and 8 for tier, 1 and <span id="maxLand2">?</span> for land)</h6>
-                <h6>Weights: <input type="text" id="anomalyWeight0" onInput="updateWeight(0, this.value, 'anomalyWeight0')" value="0" size="2"> <input type="text" id="anomalyWeight1" onInput="updateWeight(1, this.value, 'anomalyWeight1')" value="0" size="2"> <input type="text" id="anomalyWeight2" onInput="updateWeight(2, this.value, 'anomalyWeight2')" value="0" size="2"> <input type="text" id="anomalyWeight3" onInput="updateWeight(3, this.value, 'anomalyWeight3')" value="0" size="2"></h6>
-                <h6>(between 0 and 4 for each weight)</h6> 
-                <div class="row">
-                    <div class="col-sm border-orange border-margin">
-                        <h5>POA Anomaly</h5>
-                        <h6>Auction started <span id="daiAuctionTimer">?</span></h6>
-                        <button class="btn btn-danger" onclick="checkAnomalyParams(findDaiAnomaly)">BUY POA ANOMALY</button>
-                        <h6>Auction cost: <span id="daiAuctionCost">?</span> POA</h6>
-                    </div>
-                    <div class="col-sm border-orange border-margin">
-                        <h5>RAD Anomaly</h5>
-                        <h6>Auction started <span id="radAuctionTimer">?</span></h6>
-                        <button class="btn btn-success" onclick="checkAnomalyParams(checkRadForAnomaly)">BUY RAD ANOMALY</button>
-                        <h6>Auction cost: <span id="radAuctionCost">?</span> RADS</h6>
+                <div id="tabAnomaly" class="border-orange terminal tabcontent col-sm">
+                    <h3 class="title-container">FIND ANOMALY</h3>
+                    <br>
+                    <h6>Choose what to change: <button id="anomalyLand" class="btn btn-info btn-sm" onclick="updateTargetType('land')">Land</button> or <button id="anomalyProd" class="btn btn-info btn-sm" onclick="updateTargetType('prod')">Prod</button></h6>
+                    <h6><span id="anomalyTargetType">?</span> to target: <input type="text" id="anomalyTargetId" onInput="updateTargetId(this.value)" value="0" size="2"></h6>
+                    <h6>(between 1 and 8 for tier, 1 and <span id="maxLand2">?</span> for land)</h6>
+                    <h6>Weights: <input type="text" id="anomalyWeight0" onInput="updateWeight(0, this.value, 'anomalyWeight0')" value="0" size="2"> <input type="text" id="anomalyWeight1" onInput="updateWeight(1, this.value, 'anomalyWeight1')" value="0" size="2"> <input type="text" id="anomalyWeight2" onInput="updateWeight(2, this.value, 'anomalyWeight2')" value="0" size="2"> <input type="text" id="anomalyWeight3" onInput="updateWeight(3, this.value, 'anomalyWeight3')" value="0" size="2"></h6>
+                    <h6>(between 0 and 4 for each weight)</h6> 
+                    <div class="row">
+                        <div class="col-sm border-orange border-margin">
+                            <h5>POA Anomaly</h5>
+                            <h6>Auction started <span id="daiAuctionTimer">?</span></h6>
+                            <button class="btn btn-danger" onclick="checkAnomalyParams(findDaiAnomaly)">BUY POA ANOMALY</button>
+                            <h6>Auction cost: <span id="daiAuctionCost">?</span> POA</h6>
+                        </div>
+                        <div class="col-sm border-orange border-margin">
+                            <h5>RAD Anomaly</h5>
+                            <h6>Auction started <span id="radAuctionTimer">?</span></h6>
+                            <button class="btn btn-success" onclick="checkAnomalyParams(checkRadForAnomaly)">BUY RAD ANOMALY</button>
+                            <h6>Auction cost: <span id="radAuctionCost">?</span> RADS</h6>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <br>
+                <br>               
             <!-- PLAYER NEST, ALL 8 TIERS, PROD, UNLOCK -->
-            <div class="border-orange terminal">
-                <h3 class="title-container">MY NEST</h3>
-                <h4>Producing <span id="totalProd">?</span> RAD per hour</h4>
-                <br>
-                <h6>Best Tier unlocked: <span id="tier">?</span></h5>
-                <h6><button class="btn btn-success" onclick="checkUnlockTier()">Unlock Next Tier</button></h6>
-                <h6>(Cost: <span id="unlockTierRadCost">?</span> Rads)</h6>
-                <div class="row">
-                    <div class="col-sm border-orange border-margin">
-                        <h6>TIER 1</h6>
-                        <span id="tier1">?</span>
-                        <br>
-                        <h6>Tier weight: <span id="tier1weight">?</span></h6>
-                        <h5>PROD = <span id="tier1prod">?</span> RAD/hour</h5>
-                        <hr>
-                    </div>
-                    <div class="col-sm border-orange border-margin">
-                        <h6>TIER 2</h6>
-                        <span id="tier2">?</span>
-                        <br>
-                        <h6>Tier weight: <span id="tier2weight">?</span></h6>
-                        <h5>PROD = <span id="tier2prod">?</span> RAD/hour</h5>
-                        <hr>
-                    </div>
-                    <div class="col-sm border-orange border-margin">
-                        <h6>TIER 3</h6>
-                        <span id="tier3">?</span>
-                        <br>
-                        <h6>Tier weight: <span id="tier3weight">?</span></h6>
-                        <h5>PROD = <span id="tier3prod">?</span> RAD/hour</h5>
-                        <hr>
-                    </div>
-                    <div class="col-sm border-orange border-margin">
-                        <h6>TIER 4</h6>
-                        <span id="tier4">?</span>
-                        <br>
-                        <h6>Tier weight: <span id="tier4weight">?</span></h6>
-                        <h5>PROD = <span id="tier4prod">?</span> RAD/hour</h5>
-                        <hr>
+                <div id="tabNest" class="border-orange terminal tabcontent col-sm">
+                    <h3 class="title-container">MY NEST</h3>
+                    <h4>Producing <span id="totalProd">?</span> RAD per hour</h4>
+                    <br>
+                    <h6>Best Tier unlocked: <span id="tier">?</span></h5>
+                    <span id="fullUnlock"><h6><button class="btn btn-success" onclick="checkUnlockTier()">Unlock Next Tier</button></h6>
+                    <h6>(Cost: <span id="unlockTierRadCost">?</span> Rads)</h6></span>
+                    <div class="row">
+                        <div class="col-sm-5 col-md border-orange border-margin">
+                            <h6>TIER 1</h6>
+                            <span id="tier1">?</span>
+                            <br>
+                            <h6>Tier weight: <span id="tier1weight">?</span></h6>
+                            <h5>PROD = <span id="tier1prod">?</span> RAD/hour</h5>
+                            <hr>
+                        </div>
+                        <div class="col-sm-5 col-md border-orange border-margin">
+                            <h6>TIER 2</h6>
+                            <span id="tier2">?</span>
+                            <br>
+                            <h6>Tier weight: <span id="tier2weight">?</span></h6>
+                            <h5>PROD = <span id="tier2prod">?</span> RAD/hour</h5>
+                            <hr>
+                        </div>
+                        <div class="col-sm-5 col-md border-orange border-margin">
+                            <h6>TIER 3</h6>
+                            <span id="tier3">?</span>
+                            <br>
+                            <h6>Tier weight: <span id="tier3weight">?</span></h6>
+                            <h5>PROD = <span id="tier3prod">?</span> RAD/hour</h5>
+                            <hr>
+                        </div>
+                        <div class="col-sm-5 col-md border-orange border-margin">
+                            <h6>TIER 4</h6>
+                            <span id="tier4">?</span>
+                            <br>
+                            <h6>Tier weight: <span id="tier4weight">?</span></h6>
+                            <h5>PROD = <span id="tier4prod">?</span> RAD/hour</h5>
+                            <hr>
+                        </div>
+                        <div class="w-100"></div>
+                        <div class="col-sm-5 col-md border-orange border-margin">
+                            <h6>TIER 5</h6>
+                            <span id="tier5">?</span>
+                            <br>
+                            <h6>Tier weight: <span id="tier5weight">?</span></h6>
+                            <h5>PROD = <span id="tier5prod">?</span> RAD/hour</h5>
+                            <hr>
+                        </div>
+                        <div class="col-sm-5 col-md border-orange border-margin">
+                            <h6>TIER 6</h6>
+                            <span id="tier6">?</span>
+                            <br>
+                            <h6>Tier weight: <span id="tier6weight">?</span></h6>
+                            <h5>PROD = <span id="tier6prod">?</span> RAD/hour</h5>
+                            <hr>
+                        </div>
+                        <div class="col-sm-5 col-md border-orange border-margin">
+                            <h6>TIER 7</h6>
+                            <span id="tier7">?</span>
+                            <br>
+                            <h6>Tier weight: <span id="tier7weight">?</span></h6>
+                            <h5>PROD = <span id="tier7prod">?</span> RAD/hour</h5>
+                            <hr>
+                        </div>
+                        <div class="col-sm-5 col-md border-orange border-margin">
+                            <h6>TIER 8</h6>
+                            <span id="tier8">?</span>
+                            <br>
+                            <h6>Tier weight: <span id="tier8weight">?</span></h6>
+                            <h5>PROD = <span id="tier8prod">?</span> RAD/hour</h5>
+                            <hr>
+                        </div>
                     </div>
                 </div>
                 <br>
-                <div class="row">
-                    <div class="col-sm border-orange border-margin">
-                        <h6>TIER 5</h6>
-                        <span id="tier5">?</span>
-                        <br>
-                        <h6>Tier weight: <span id="tier5weight">?</span></h6>
-                        <h5>PROD = <span id="tier5prod">?</span> RAD/hour</h5>
-                        <hr>
-                    </div>
-                    <div class="col-sm border-orange border-margin">
-                        <h6>TIER 6</h6>
-                        <span id="tier6">?</span>
-                        <br>
-                        <h6>Tier weight: <span id="tier6weight">?</span></h6>
-                        <h5>PROD = <span id="tier6prod">?</span> RAD/hour</h5>
-                        <hr>
-                    </div>
-                    <div class="col-sm border-orange border-margin">
-                        <h6>TIER 7</h6>
-                        <span id="tier7">?</span>
-                        <br>
-                        <h6>Tier weight: <span id="tier7weight">?</span></h6>
-                        <h5>PROD = <span id="tier7prod">?</span> RAD/hour</h5>
-                        <hr>
-                    </div>
-                    <div class="col-sm border-orange border-margin">
-                        <h6>TIER 8</h6>
-                        <span id="tier8">?</span>
-                        <br>
-                        <h6>Tier weight: <span id="tier8weight">?</span></h6>
-                        <h5>PROD = <span id="tier8prod">?</span> RAD/hour</h5>
-                        <hr>
-                    </div>
-                </div>
-            </div>
-            <br>
             <!-- UPGRADES -->
-            <div class="border-orange terminal">
-                <h3 class="title-container">UPGRADE EGGOA</h5>
+                <div id="tabUpgrade" class="border-orange terminal tabcontent col-sm">
+                    <h3 class="title-container">UPGRADE EGGOA</h5>
+                    <br>
+                    <h6>Tier: <input type="text" id="tierToUpgrade" onInput="updateUpgradeTier(this.value)" value="0" size="2"></h6>
+                    <h6>(between 1 and 8 for tier)</h6>
+                    <h6>Weights: <input type="text" id="upgradeWeight0" onInput="updateUpgradeWeight(0, this.value, 'upgradeWeight0')" value="0" size="2"> <input type="text" id="upgradeWeight1" onInput="updateUpgradeWeight(1, this.value, 'upgradeWeight1')" value="0" size="2"> <input type="text" id="upgradeWeight2" onInput="updateUpgradeWeight(2, this.value, 'upgradeWeight2')" value="0" size="2"> <input type="text" id="upgradeWeight3" onInput="updateUpgradeWeight(3, this.value, 'upgradeWeight3')" value="0" size="2"></h6>
+                    <h6>(each weight will give +1 to the selected stat)</h6>
+                    <h6>Upgrade cost: <span id="upgradeCost">?</span> RADs</h6>
+                    <button class="btn btn-success" onclick="checkUpgradeCostThenUpgrade()">Upgrade Eggoa</button>
+                </div>
                 <br>
-                <h6>Tier: <input type="text" id="tierToUpgrade" onInput="updateUpgradeTier(this.value)" value="0" size="2"></h6>
-                <h6>(between 1 and 8 for tier)</h6>
-                <h6>Weights: <input type="text" id="upgradeWeight0" onInput="updateUpgradeWeight(0, this.value, 'upgradeWeight0')" value="0" size="2"> <input type="text" id="upgradeWeight1" onInput="updateUpgradeWeight(1, this.value, 'upgradeWeight1')" value="0" size="2"> <input type="text" id="upgradeWeight2" onInput="updateUpgradeWeight(2, this.value, 'upgradeWeight2')" value="0" size="2"> <input type="text" id="upgradeWeight3" onInput="updateUpgradeWeight(3, this.value, 'upgradeWeight3')" value="0" size="2"></h6>
-                <h6>(each weight will give +1 to the selected stat)</h6>
-                <h6>Upgrade cost: <span id="upgradeCost">?</span> RADs</h6>
-                <button class="btn btn-success" onclick="checkUpgradeCostThenUpgrade()">Upgrade Eggoa</button>
-            </div>
-            <br>
             <!-- PLANTAMIDS -->
-            <div class="border-orange terminal">
-                <h3 class="title-container">MY PLANTAMIDS</h5>
-                <br>
-                <div class="row">
-                    <div class="col-sm border-orange border-margin">
-                        <h6>Eggoa Plantamid Floor: <span id="eggoaPlantamid">?</span></h6>
-                        <br>
-                        <h5>Sacrifice Eggoas for Floors</h5>
-                        <h6>Tier to sacrifice: <input type="text" id="tierSacrifice" oninput="getSacrificeAmount(this.value)" value="1" size="2"></h6>
-                        <h6>(You will sacrifice <span id="sacrificeAmount">?</span> Eggoas)</h6>
-                        <button class="btn btn-success" onclick="raiseGoamid()">Raise Goamid</button>
-                    </div>
-                    <div class="col-sm plantamid-img">
-                        <h3>BOOST</h3>
-                        <h5>Multiplies all prod and power</h6>
-                        <br>
-                        <h2>x<span id="boost">?</span></h3>                      
-                    </div>
-                    <div class="col-sm border-orange border-margin">
-                        <h6>Poa Plantamid Floor: <span id="daiPlantamid">?</span></h6>
-                        <br>
-                        <h5>Spend Poa to raise Floor</h5>
-                        <h6>Number of Floors: <input type="text" id="floorsAdded" oninput="getFloorDaiCost(this.value)" value="1" size="2"></h6>
-                        <h6>(You will spend <span id="floorDaiCost">?</span> POA)</h6>
-                        <button class="btn btn-danger" onclick="raiseDaimid()">Raise Poamid</button>
-                    </div>
-                </div>   
-            </div>                 
+                <div id="tabPlantamid" class="border-orange terminal tabcontent col-sm-9">
+                    <h3 class="title-container">MY PLANTAMIDS</h5>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm border-orange border-margin">
+                            <h6>Eggoa Plantamid Floor: <span id="eggoaPlantamid">?</span></h6>
+                            <br>
+                            <h5>Sacrifice Eggoas for Floors</h5>
+                            <h6>Tier to sacrifice: <input type="text" id="tierSacrifice" oninput="getSacrificeAmount()" value="1" size="2"></h6>
+                            <h6>(You will sacrifice <span id="sacrificeAmount">?</span> Eggoas)</h6>
+                            <button class="btn btn-success" onclick="raiseGoamid()">Raise Goamid</button>
+                        </div>
+                        <div class="col-sm plantamid-img">
+                            <h3>BOOST</h3>
+                            <h5>Multiplies all prod and power</h6>
+                            <br>
+                            <h2>x<span id="boost">?</span></h3>                      
+                        </div>
+                        <div class="col-sm border-orange border-margin">
+                            <h6>Poa Plantamid Floor: <span id="daiPlantamid">?</span></h6>
+                            <br>
+                            <h5>Spend Poa to raise Floor</h5>
+                            <h6>Number of Floors: <input type="text" id="floorsAdded" oninput="getFloorDaiCost()" value="1" size="2"></h6>
+                            <h6>(You will spend <span id="floorDaiCost">?</span> POA)</h6>
+                            <button class="btn btn-danger" onclick="raiseDaimid()">Raise Poamid</button>
+                        </div>
+                    </div>   
+                </div>                 
+                <br>                 
+            </div></div><!-- closing row -->
             <br>
+            <!-- LINK TO BACKUP -->
+            <div class="border-orange terminal">
+                <h6>Beta is consistently updated, and things might break. Is this page not working? Visit the backup: <a href="beta5_bkup.html">click me</a>
+            </div>
+            <!-- -->
+            <br>           
             <!-- GAME LAUNCH, END, RADS EARNED -->
             <div class="border-orange terminal">
                 <h3 class="title-container">GAME STATS</h5>
@@ -342,7 +328,28 @@
                     <span id="leaderboard" >?</span>
                 </div>
             </div>
-            <br>     
+            <br>
+            <!-- TITLE -->
+            <div class="border-orange terminal">
+                    <h1 class="display-1">EGGFORCE Beta 5</h1>
+                    <div class="row">
+                        <div class="col">
+                            <a href="https://blockscout.com/poa/core/address/0x8e51bd6a69b59f486e7e7ab4102fd4970e07e1bc/transactions" target="_blank"><img class="icon-link icon-big" src="img/icon_contract.png"></a>
+                        </div>
+                        <div class="col">
+                            <a href="https://discord.gg/JU8P4Ru" target="_blank"><img class="icon-link icon-big" src="img/icon_discord.png"></a>
+                        </div>
+                        <div class="col">
+                            <a href="https://twitter.com/eskaroy" target="_blank"><img class="icon-link icon-big" src="img/icon_twitto.png"></a>
+                        </div>
+                        <div class="col">
+                            <a href="https://medium.com/@thesnailking" target="_blank"><img class="icon-link icon-big" src="img/icon_medium.png"></a>
+                        </div>
+                    </div>               
+                    <br>
+                    <br>
+                    <span id="gameState">?</span>
+                </div>     
         </div>
         <!-- TUTORIAL -->
         <div class="container">

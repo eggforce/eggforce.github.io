@@ -162,6 +162,7 @@ var t_land = []; // holds all land info. lastLand, lord, eggoa, level, tribe
 //Initiates loops
 function startLoop(){
 	console.log('Main loop started.');
+	closeTab();
 	initializeBlockchainData();
 	controlLoop1();
 	controlLoop4();
@@ -205,6 +206,7 @@ function controlLoop4() {
     updatePlayerChest();
     checkGameState();
 	updateGameState();
+	checkFullUnlock();
 	logThePast();
 	refreshData();
     setTimeout(controlLoop4, 4000);
@@ -394,16 +396,34 @@ function setRedLimit(_id, _bool) {
 
 //** LOCAL FUNCTIONS **//
 
+// Check whether all tiers are unlocked
+function checkFullUnlock() {
+	d_fullUnlock = document.getElementById('fullUnlock');
+	if (parseInt(m_tier[0]) >= 8) {
+		d_fullUnlock.innerHTML = '<h5>All Tiers Unlocked</h5>';
+	}
+	else {
+		d_fullUnlock.innerHTML = '<h6><button class="btn btn-success" onclick="checkUnlockTier()">Unlock Next Tier</button></h6><h6>(Cost: <span id="unlockTierRadCost">?</span> Rads)</h6>';
+	}
+}
+
 // Tabs (from w3schools)
+
+// Close all tabs on ini
+function closeTab() {
+
+	// Get all elements with class="tabcontent" and hide them
+	let tabcontent = document.getElementsByClassName("tabcontent");
+	for (i = 0; i < tabcontent.length; i++) {
+		tabcontent[i].style.display = "none";
+	}
+}
+
 function selectTab(event, tabName) {
 	// Declare all variables
-	let i, tabcontent, tablinks;
+	let i, tablinks;
   
-	// Get all elements with class="tabcontent" and hide them
-	tabcontent = document.getElementsByClassName("tabcontent");
-	for (i = 0; i < tabcontent.length; i++) {
-	  tabcontent[i].style.display = "none";
-	}
+	closeTab();
   
 	// Get all elements with class="tablinks" and remove the class "active"
 	tablinks = document.getElementsByClassName("tablinks");
@@ -1395,7 +1415,9 @@ function getFloorDaiCost(){
 function updateUnlockCost() {
 	contract.ComputeUnlockCost(m_tier).then((result) =>
 	{
-		handleResult(result, m_unlockTierRadCost, 'unlockTierRadCost', "red");
+		if (parseInt(m_tier[0]) >= 8) {
+			handleResult(result, m_unlockTierRadCost, 'unlockTierRadCost', "red");
+		}
 	});
 }
 
