@@ -324,10 +324,10 @@ function checkGameState() {
 function updateGameWindow() {
 	d_gameState = document.getElementById('gameState');
 	if (a_gameOver !== true) {
-		d_gameState.innerHTML = '<button class="btn-lg btn-success" onclick="endTheGame()">END GAME</button><br><h6>Once the game has ended, you will get your reward</h6>' 
+		d_gameState.innerHTML = '<div class="col"><button class="btn-lg btn-success" onclick="endTheGame()">END GAME</button><h6>Once the game has ended, you will get your reward</h6></div>'; 
 	}
 	else {
-		d_gameState.innerHTML = '<button class="btn-lg btn-success" onclick="openRewardChest()">OPEN CHEST</button><br><h6>Your reward: <span id="reward">?</span> POA</h6>' 
+		d_gameState.innerHTML = '<div class="col"><button class="btn-lg btn-success" onclick="openRewardChest()">OPEN CHEST</button><h6>Your reward: <span id="reward">?</span> POA</h6></div>'; 
 	}
 
 }

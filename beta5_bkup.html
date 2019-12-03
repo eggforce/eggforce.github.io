@@ -11,21 +11,10 @@
         <div class="container-fluid" style="text-align:center;">
             <div class="border-orange terminal">
                 <h1 class="display-1">EGGFORCE Beta 5</h1>
-                <div class="row">
-                    <div class="col">
-                        <a href="https://blockscout.com/poa/core/address/0x8e51bd6a69b59f486e7e7ab4102fd4970e07e1bc/transactions" target="_blank"><img class="icon-link icon-big" src="img/icon_contract.png"></a>
-                    </div>
-                    <div class="col">
-                        <a href="https://discord.gg/JU8P4Ru" target="_blank"><img class="icon-link icon-big" src="img/icon_discord.png"></a>
-                    </div>
-                    <div class="col">
-                        <a href="https://twitter.com/eskaroy" target="_blank"><img class="icon-link icon-big" src="img/icon_twitto.png"></a>
-                    </div>
-                    <div class="col">
-                        <a href="https://medium.com/@thesnailking" target="_blank"><img class="icon-link icon-big" src="img/icon_medium.png"></a>
-                    </div>
-                </div>               
-                <br>
+                        <a href="https://blockscout.com/poa/core/address/0x8e51bd6a69b59f486e7e7ab4102fd4970e07e1bc/transactions" target="_blank"><img class="icon-link icon-small" src="img/icon_contract.png"></a>
+                        <a href="https://discord.gg/JU8P4Ru" target="_blank"><img class="icon-link icon-small" src="img/icon_discord.png"></a>
+                        <a href="https://twitter.com/eskaroy" target="_blank"><img class="icon-link icon-small" src="img/icon_twitto.png"></a>
+                        <a href="https://medium.com/@thesnailking" target="_blank"><img class="icon-link icon-small" src="img/icon_medium.png"></a>
                 <br>
                 <span id="gameState">?</span>
             </div>
@@ -35,7 +24,6 @@
                 <h6>Beta is consistently updated, and things might break. Is this page not working? Visit the backup: <a href="beta5_bkup.html">click me</a>
             </div>
             <!-- -->
-            <br>
             <!-- CHEST AND TRIBE SELECTION -->
             <div class="border-orange terminal">
                 <h3 class="title-container">REWARD CHEST: <span id="chest">?</span> [POA]</h3>
@@ -71,7 +59,7 @@
                 <h3 class="title-container">EVENTS</h4>
                 <br>
                 <div class="scroll-box" id="scrollLog" style="text-align:left;">
-                    <span id="eventLog">[Waiting for events...]</span>
+                    <h6><span id="eventLog">[Waiting for events...]</span></h6>
                 </div>
             </div>
             <br>
@@ -123,42 +111,42 @@
             <div class="border-orange terminal">
                 <h3 class="title-container">LAND</h3>
                     <h5>Select Land (1 to <span id="maxLand">?</span>) <input type="text" id="landSelector" value="1" size="2"><button onclick="updateTerritory()">OK</button></h5>
-                <br>
+                <hr>
                 <div class="row">
                     <div class="col-sm">
-                        <h6>Land Level:</h5>
+                        <h6 class="title-container">Land Level:</h5>
                         <span id="landLevel">?</span>
                     </div>
                     <div class="col-sm">
-                        <h6>Land Stats:</h5>
+                        <h6 class="title-container">Land Stats:</h5>
                         <span id="landStat">?</span>
                     </div>
                     <div class="col-sm">
-                        <h6>Current Lord:</h5>
+                        <h6 class="title-container">Current Lord:</h5>
                         <span id="landLord">?</span>
                     </div>
                     <div class="col-sm">
-                        <h6>Lord Power:</h5>
+                        <h6 class="title-container">Lord Power:</h5>
                         <span id="landPower">?</span>
                     </div>
                     <div class="col-sm">
-                        <h6>Lord Tribe:</h5>
+                        <h6 class="title-container">Lord Tribe:</h5>
                         <span id="landTribe">?</span>
                     </div>
                     <div class="col-sm">
-                        <h6>Lord Stats:</h5>
+                        <h6 class="title-container">Lord Stats:</h5>
                         <span id="landLordStat">?</span>
                     </div>
                     <div class="col-sm">
-                        <h6>Last Shroom Harvest:</h5>
+                        <h6 class="title-container">Last Shroom Harvest:</h5>
                         <span id="landLast">?</span>
                     </div>
                     <div class="col-sm">
-                        <h6>Shrooms to Harvest:</h5>
+                        <h6 class="title-container">Shrooms to Harvest:</h5>
                         <span id="landShroom">?</span>
                     </div>
                 </div>
-                <br>
+                <hr>
                 <h6>Attack Land with Eggoas of tier <input type="text" id="attackLandTierSelector" value="1" size="2"><button onclick="changeAttackLandTier()">OK</button></h6>
                 <div class="row">
                     <div class="col-sm">
@@ -175,20 +163,22 @@
             <div class="border-orange terminal">
                 <h3 class="title-container">FIND ANOMALY</h3>
                 <br>
-                <h6>Choose what to change: <button id="anomalyLand" class="btn btn-info btn-sm" onclick="updateTargetType('land')">Land</button> or <button id="anomalyProd" class="btn btn-info btn-sm" onclick="updateTargetType('prod')">Prod</button></h6>
-                <h6><span id="anomalyTargetType">?</span> to target: <input type="text" id="anomalyTargetId" onInput="updateTargetId(this.value)" value="0" size="2"></h6>
+                <h6>Change <button id="anomalyLand" class="btn btn-info btn-sm" onclick="updateTargetType('land')">Land</button> or <button id="anomalyProd" class="btn btn-info btn-sm" onclick="updateTargetType('prod')">Prod</button></h6>
+                <h6 class="title-container"><span id="anomalyTargetType">?</span> Target ID: <input type="text" id="anomalyTargetId" onInput="updateTargetId(this.value)" value="0" size="2"></h6>
                 <h6>(between 1 and 8 for tier, 1 and <span id="maxLand2">?</span> for land)</h6>
-                <h6>Weights: <input type="text" id="anomalyWeight0" onInput="updateWeight(0, this.value, 'anomalyWeight0')" value="0" size="2"> <input type="text" id="anomalyWeight1" onInput="updateWeight(1, this.value, 'anomalyWeight1')" value="0" size="2"> <input type="text" id="anomalyWeight2" onInput="updateWeight(2, this.value, 'anomalyWeight2')" value="0" size="2"> <input type="text" id="anomalyWeight3" onInput="updateWeight(3, this.value, 'anomalyWeight3')" value="0" size="2"></h6>
+                <h6 class="title-container">Weights: <input type="text" id="anomalyWeight0" onInput="updateWeight(0, this.value, 'anomalyWeight0')" value="0" size="2"> <input type="text" id="anomalyWeight1" onInput="updateWeight(1, this.value, 'anomalyWeight1')" value="0" size="2"> <input type="text" id="anomalyWeight2" onInput="updateWeight(2, this.value, 'anomalyWeight2')" value="0" size="2"> <input type="text" id="anomalyWeight3" onInput="updateWeight(3, this.value, 'anomalyWeight3')" value="0" size="2"></h6>
                 <h6>(between 0 and 4 for each weight)</h6> 
                 <div class="row">
                     <div class="col-sm border-orange border-margin">
                         <h5>POA Anomaly</h5>
+                        <hr>
                         <h6>Auction started <span id="daiAuctionTimer">?</span></h6>
                         <button class="btn btn-danger" onclick="checkAnomalyParams(findDaiAnomaly)">BUY POA ANOMALY</button>
                         <h6>Auction cost: <span id="daiAuctionCost">?</span> POA</h6>
                     </div>
                     <div class="col-sm border-orange border-margin">
                         <h5>RAD Anomaly</h5>
+                        <hr>
                         <h6>Auction started <span id="radAuctionTimer">?</span></h6>
                         <button class="btn btn-success" onclick="checkAnomalyParams(checkRadForAnomaly)">BUY RAD ANOMALY</button>
                         <h6>Auction cost: <span id="radAuctionCost">?</span> RADS</h6>
@@ -277,10 +267,12 @@
             <div class="border-orange terminal">
                 <h3 class="title-container">UPGRADE EGGOA</h5>
                 <br>
-                <h6>Tier: <input type="text" id="tierToUpgrade" onInput="updateUpgradeTier(this.value)" value="0" size="2"></h6>
+                <h6 class="title-container">Tier: <input type="text" id="tierToUpgrade" onInput="updateUpgradeTier(this.value)" value="0" size="2"></h6>
                 <h6>(between 1 and 8 for tier)</h6>
-                <h6>Weights: <input type="text" id="upgradeWeight0" onInput="updateUpgradeWeight(0, this.value, 'upgradeWeight0')" value="0" size="2"> <input type="text" id="upgradeWeight1" onInput="updateUpgradeWeight(1, this.value, 'upgradeWeight1')" value="0" size="2"> <input type="text" id="upgradeWeight2" onInput="updateUpgradeWeight(2, this.value, 'upgradeWeight2')" value="0" size="2"> <input type="text" id="upgradeWeight3" onInput="updateUpgradeWeight(3, this.value, 'upgradeWeight3')" value="0" size="2"></h6>
+                <hr>
+                <h6 class="title-container">Weights: <input type="text" id="upgradeWeight0" onInput="updateUpgradeWeight(0, this.value, 'upgradeWeight0')" value="0" size="2"> <input type="text" id="upgradeWeight1" onInput="updateUpgradeWeight(1, this.value, 'upgradeWeight1')" value="0" size="2"> <input type="text" id="upgradeWeight2" onInput="updateUpgradeWeight(2, this.value, 'upgradeWeight2')" value="0" size="2"> <input type="text" id="upgradeWeight3" onInput="updateUpgradeWeight(3, this.value, 'upgradeWeight3')" value="0" size="2"></h6>
                 <h6>(each weight will give +1 to the selected stat)</h6>
+                <hr>
                 <h6>Upgrade cost: <span id="upgradeCost">?</span> RADs</h6>
                 <button class="btn btn-success" onclick="checkUpgradeCostThenUpgrade()">Upgrade Eggoa</button>
             </div>
@@ -293,7 +285,7 @@
                     <div class="col-sm border-orange border-margin">
                         <h6>Eggoa Plantamid Floor: <span id="eggoaPlantamid">?</span></h6>
                         <br>
-                        <h5>Sacrifice Eggoas for Floors</h5>
+                        <h6 class="title-container">Sacrifice Eggoas for Floors</h5>
                         <h6>Tier to sacrifice: <input type="text" id="tierSacrifice" oninput="getSacrificeAmount()" value="1" size="2"></h6>
                         <h6>(You will sacrifice <span id="sacrificeAmount">?</span> Eggoas)</h6>
                         <button class="btn btn-success" onclick="raiseGoamid()">Raise Goamid</button>
@@ -307,7 +299,7 @@
                     <div class="col-sm border-orange border-margin">
                         <h6>Poa Plantamid Floor: <span id="daiPlantamid">?</span></h6>
                         <br>
-                        <h5>Spend Poa to raise Floor</h5>
+                        <h6 class="title-container">Spend Poa to raise Floor</h5>
                         <h6>Number of Floors: <input type="text" id="floorsAdded" oninput="getFloorDaiCost()" value="1" size="2"></h6>
                         <h6>(You will spend <span id="floorDaiCost">?</span> POA)</h6>
                         <button class="btn btn-danger" onclick="raiseDaimid()">Raise Poamid</button>
@@ -329,7 +321,7 @@
             <div class="border-orange terminal">
                 <h3 class="title-container">POA CHEST</h5>
                 <br>
-                <h6><span id="playerChest">(do that later)</span></h6>
+                <h6><span id="playerChest">?</span></h6>
             </div>          
             <br>
             <!-- LEADERBOARD -->
